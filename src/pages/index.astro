@@ -75,7 +75,7 @@ const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
       <h2>{start.mitmachenTitel}</h2>
       <div>
         <p class="gross">{start.mitmachenText}</p>
-        <a class="knopf" href={`mailto:${texte.kontaktEmail}`}>{start.mitmachenKnopf}</a>
+        <a class="knopf" href={`mailto:${start.mitmachenEmail || texte.kontaktEmail}`}>{start.mitmachenKnopf}</a>
       </div>
     </div>
   </section>

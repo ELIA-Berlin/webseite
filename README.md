@@ -91,7 +91,7 @@ Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist,
 | `werWirSindTitel`, `werWirSindText` | weißer Bereich unter dem Kopf (erster Absatz groß) |
 | `themenAufruf` | gestrichelter Kasten „Dein Bauteil fehlt noch“ unter den Themen |
 | `missionslogTitel`, `missionslogLink` | dunkles Band mit der Zeitleiste; die Einträge stehen in `seiten/ueber-uns.yaml` unter `rueckblick` |
-| `mitmachenTitel`, `mitmachenText`, `mitmachenKnopf` | grauer Bereich unten |
+| `mitmachenTitel`, `mitmachenText`, `mitmachenKnopf`, `mitmachenEmail` | grauer Bereich unten; der Button schreibt an `mitmachenEmail` (leer = allgemeine Kontakt-E-Mail) |
 
 Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Skizze“, „Kleine Zeile über dem Namen“ und „Kurztext für die Startseite“, Reihenfolge über das Feld „Reihenfolge“).
 

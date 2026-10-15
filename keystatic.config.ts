@@ -285,6 +285,10 @@ export default config({
         mitmachenTitel: fields.text({ label: 'Abschnitt „Mach mit“: Überschrift' }),
         mitmachenText: fields.text({ label: 'Abschnitt „Mach mit“: Text', multiline: true }),
         mitmachenKnopf: fields.text({ label: 'Abschnitt „Mach mit“: Button' }),
+        mitmachenEmail: fields.text({
+          label: 'Abschnitt „Mach mit“: E-Mail für den Button',
+          description: 'Leer lassen, dann wird die allgemeine Kontakt-E-Mail aus „Menü & Beschriftungen“ verwendet.',
+        }),
       },
     }),
 
