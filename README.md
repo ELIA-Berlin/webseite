@@ -87,14 +87,15 @@ Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist,
 |---|---|
 | `unterzeile`, `titel`, `einleitung` | dunkler Kopfbereich mit Raster |
 | `knopfMitmachen`, `knopfThemen` | die beiden Buttons im Kopfbereich |
-| `schriftfeld` | Kästchen unter den Buttons (Benennung, Wettbewerb, …) |
-| `zeichnung` | Beschriftungen der Raketenzeichnung rechts im Kopf |
+| `flugprofil` | Beschriftungen der animierten Flugbahn rechts im Kopf (Start, Brennschluss, Apogäum, Fallschirm, Landung) |
 | `werWirSindTitel`, `werWirSindText` | weißer Bereich unter dem Kopf (erster Absatz groß) |
 | `themenAufruf` | gestrichelter Kasten „Dein Bauteil fehlt noch“ unter den Themen |
 | `missionslogTitel`, `missionslogLink` | dunkles Band mit der Zeitleiste; die Einträge stehen in `seiten/ueber-uns.yaml` unter `rueckblick` |
 | `mitmachenTitel`, `mitmachenText`, `mitmachenKnopf` | grauer Bereich unten |
 
 Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Skizze“, „Kleine Zeile über dem Namen“ und „Kurztext für die Startseite“, Reihenfolge über das Feld „Reihenfolge“).
+
+**Raketenzeichnung (Stella):** steht auf der Themenseite Rakete im Abschnitt „Technik“. Beschriftungen und Schriftfeld in [`src/content/themen/rakete.yaml`](src/content/themen/rakete.yaml) unter `technik` → `raketenzeichnung`; `anzeigen: false` blendet sie aus.
 
 **Missionslog:** Die Zeitleiste steht auf der Startseite und auf „Über uns“. Einträge ändern in [`src/content/seiten/ueber-uns.yaml`](src/content/seiten/ueber-uns.yaml) unter `rueckblick`. Jeder Eintrag hat `zeitpunkt`, `titel`, `text` und `geplant` (`true` = noch nicht erreicht, wird gestrichelt gezeigt).
 
@@ -126,7 +127,7 @@ So sieht eine gute Skizze aus:
 
 ## Gestaltung
 
-- **Leitidee: technische Zeichnung.** Dunkle Flächen tragen ein feines Millimeterraster, die Startseite zeigt Stella als beschriftete Schnittzeichnung mit Schriftfeld, jedes Thema hat eine eigene Skizze.
+- **Leitidee: technische Zeichnung.** Dunkle Flächen sind fast schwarz (`--nacht`) mit feinem Millimeterraster und weichem Leuchten oben rechts. Die Startseite zeigt ein animiertes Flugprofil (`src/components/Flugprofil.astro`; bei „Bewegung reduzieren“ steht es still), die Raketenseite Stella als beschriftete Schnittzeichnung, jedes Thema hat eine eigene Skizze.
 - **Farben** aus dem Logo: Navy `#182c3c`, Ring-Grau `#eeeeee`, Weiß. Keine weiteren Akzentfarben.
 - **Schriften:** Barlow Semi Condensed für Überschriften (an DIN angelehnt, passt zur Logo-Umschrift), Source Sans 3 für Fließtext. Beide liegen auf dem eigenen Server, es gehen keine Daten an Google.
 - Festgelegt in [`src/styles/global.css`](src/styles/global.css).

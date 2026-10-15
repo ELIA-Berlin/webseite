@@ -12,6 +12,11 @@
   /* Farben aus dem Logo */
   --navy: #182c3c;
   --navy-tief: #0f1e2a;
+  /* fast schwarze Flächen: Kopf, Seitenköpfe, Missionslog, Fußzeile */
+  --nacht: #08131c;
+  --nacht-tief: #04090e;
+  /* Leuchten: weiches Licht auf dunklen Flächen */
+  --schein: rgb(150 190 225 / 0.13);
   --ring: #eeeeee;
   --weiss: #ffffff;
   /* abgeleitete Grautöne */
@@ -24,8 +29,8 @@
   --breite: 78rem;
 
   /* Millimeterraster wie auf einer technischen Zeichnung (dunkle Flächen) */
-  --raster-fein: rgb(255 255 255 / 0.025);
-  --raster-grob: rgb(255 255 255 / 0.055);
+  --raster-fein: rgb(255 255 255 / 0.03);
+  --raster-grob: rgb(255 255 255 / 0.06);
   --rand: clamp(1.25rem, 4vw, 3rem);
 }
 
@@ -92,7 +97,7 @@ img { max-width: 100%; height: auto; display: block; }
  * damit die Linien über beide Flächen durchlaufen.
  */
 .raster {
-  background-color: var(--navy);
+  background-color: var(--nacht);
   background-image:
     linear-gradient(var(--raster-grob) 1px, transparent 1px),
     linear-gradient(90deg, var(--raster-grob) 1px, transparent 1px),
@@ -118,3 +123,10 @@ img { max-width: 100%; height: auto; display: block; }
 .knopf--rahmen:hover { background: rgb(24 44 60 / 0.06); }
 .dunkel .knopf:hover { background: var(--ring); }
 .dunkel .knopf--rahmen:hover { background: rgb(255 255 255 / 0.08); }
+
+/* Weiches Leuchten oben rechts auf dunklen Köpfen (liegt über dem Raster, unter dem Inhalt) */
+.leuchten { position: relative; isolation: isolate; }
+.leuchten::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 70% at 78% 18%, var(--schein), transparent 70%);
+}
