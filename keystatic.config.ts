@@ -24,9 +24,13 @@ const bild = (label: string, ordner: string, description?: string) =>
   });
 
 export default config({
-  // Lokal schreibt der Editor direkt in die Dateien.
-  // Online kommt später die Anmeldung über GitHub dazu.
-  storage: { kind: 'local' },
+  // Lokal (npm run dev) schreibt der Editor direkt in die Dateien.
+  // Online (eliaspace.de/keystatic) meldet man sich mit GitHub an, und jede gespeicherte
+  // Änderung wird als Commit im Repo abgelegt. Danach baut Netlify die Seite neu.
+  // Dafür braucht Netlify die vier KEYSTATIC_-Umgebungsvariablen (siehe README).
+  storage: import.meta.env.DEV
+    ? { kind: 'local' }
+    : { kind: 'github', repo: 'ELIA-Berlin/webseite' },
 
   ui: {
     brand: { name: 'ELIA Webseite' },

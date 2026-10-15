@@ -2,7 +2,7 @@
 
 Webseite von ELIA, der studentischen Raumfahrtinitiative an der HTW Berlin (Nachwuchsgruppe der DGLR).
 
-**Aktueller Stand:** Startseite, Impressum und Datenschutz sind fertig. Alle Unterseiten sind als Gerüst angelegt, ihre Inhalte werden nach und nach eingetragen. Der Online-Editor folgt.
+**Aktueller Stand:** Startseite, Impressum und Datenschutz sind fertig. Alle Unterseiten sind angelegt, ihre Inhalte werden nach und nach eingetragen.
 
 ## Aufbau der Seite
 
@@ -77,9 +77,15 @@ Dann im Browser öffnen:
 
 Die Änderung landet in der passenden Datei unter `src/content/` und wird wie gewohnt mit Git committet und gepusht.
 
-### Weg 3: Online-Editor (folgt)
+### Weg 3: Online-Editor (am einfachsten)
 
-Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist, funktioniert derselbe Editor direkt unter `https://<unsere-domain>/keystatic`. Dann reicht ein GitHub-Account mit Schreibrechten, und jede gespeicherte Änderung ist nach ein bis zwei Minuten online.
+1. https://eliaspace.de/keystatic öffnen und mit GitHub anmelden.
+2. Links Seite oder Sammlung wählen, Texte ändern, oben rechts **Save**.
+3. Nach ein bis zwei Minuten ist die Änderung online.
+
+Voraussetzung: ein GitHub-Account mit Schreibrechten auf dieses Repo (Mitglied der Organisation `ELIA-Berlin`). Jede gespeicherte Änderung landet als Commit auf `main`.
+
+**Technik dahinter:** In der Organisation gibt es eine GitHub App für den Editor (Callback-URL `https://eliaspace.de/api/keystatic/github/oauth/callback`, Rechte: Contents lesen/schreiben, Metadata lesen, Pull requests lesen; nur für das Repo `webseite` installiert). Netlify braucht vier Umgebungsvariablen: `KEYSTATIC_GITHUB_CLIENT_ID`, `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET` (zufällige lange Zeichenkette) und `PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` (Kurzname der App). Lokal mit `npm run dev` arbeitet der Editor weiterhin direkt mit den Dateien.
 
 ### Welches Feld steht wo? (Startseite)
 
