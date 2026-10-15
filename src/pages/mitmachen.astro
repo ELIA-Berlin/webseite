@@ -1,0 +1,58 @@
+---
+/** Mitmachen. Texte: src/content/seiten/mitmachen.yaml */
+import Basis from '../layouts/Basis.astro';
+import Seitenkopf from '../components/Seitenkopf.astro';
+import Abschnitt from '../components/Abschnitt.astro';
+import Absaetze from '../components/Absaetze.astro';
+import { absaetze, allgemein, reader } from '../lib/inhalte';
+
+const seite = await reader.singletons.mitmachen.readOrThrow();
+const texte = await allgemein();
+const leer = (text?: string | null) => absaetze(text).length === 0;
+---
+<Basis titel={seite.titel}>
+  <Seitenkopf titel={seite.titel} einleitung={seite.einleitung} />
+
+  <Abschnitt titel={seite.fuerWenTitel} leer={leer(seite.fuerWenText)} platzhalter="alle Studiengänge, kein Vorwissen nötig">
+    <Absaetze text={seite.fuerWenText} />
+  </Abschnitt>
+
+  <Abschnitt titel={seite.wasDuMachstTitel} leer={leer(seite.wasDuMachstText)} platzhalter="was man bei uns macht und lernt">
+    <Absaetze text={seite.wasDuMachstText} />
+  </Abschnitt>
+
+  <Abschnitt titel={seite.einstiegTitel} leer={seite.einstiegSchritte.length === 0} platzhalter="Schritte, z. B. Treffen besuchen → Thema wählen → loslegen">
+    <ol class="schritte">
+      {seite.einstiegSchritte.map((s) => <li><h3>{s.titel}</h3>{s.text && <p>{s.text}</p>}</li>)}
+    </ol>
+  </Abschnitt>
+
+  <Abschnitt titel={seite.treffenTitel} leer={!seite.treffenWann && !seite.treffenWo} platzhalter="Tag, Uhrzeit, Raum" grau>
+    <dl class="treffen">
+      {seite.treffenWann && <><dt>Wann</dt><dd>{seite.treffenWann}</dd></>}
+      {seite.treffenWo && <><dt>Wo</dt><dd>{seite.treffenWo}</dd></>}
+    </dl>
+    {seite.treffenHinweis && <p>{seite.treffenHinweis}</p>}
+  </Abschnitt>
+
+  <Abschnitt titel={seite.kontaktTitel} id="kontakt">
+    {seite.kontaktText && <p>{seite.kontaktText}</p>}
+    <a class="knopf" href={`mailto:${texte.kontaktEmail}`}>{texte.kontaktKnopf}</a>
+  </Abschnitt>
+</Basis>
+
+<style>
+  .schritte { list-style: none; margin: 0; padding: 0; counter-reset: schritt; }
+  .schritte li { counter-increment: schritt; position: relative; padding-left: 3rem; }
+  .schritte li + li { margin-top: 1.4rem; }
+  .schritte li::before {
+    content: counter(schritt); position: absolute; left: 0; top: 0;
+    width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%;
+    box-shadow: inset 0 0 0 2px var(--navy); font-family: var(--schrift-titel); font-weight: 700;
+  }
+  .schritte h3 { margin: 0.15rem 0 0.3rem; font-size: 1.3rem; }
+  .schritte p { margin: 0; color: var(--grau); }
+  .treffen { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1.5rem; margin: 0 0 1rem; }
+  .treffen dt { font-family: var(--schrift-titel); font-weight: 600; }
+  .treffen dd { margin: 0; white-space: pre-line; }
+</style>

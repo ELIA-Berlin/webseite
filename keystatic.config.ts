@@ -2,10 +2,26 @@
  * Keystatic: der Editor für die Texte der Webseite (erreichbar unter /keystatic).
  *
  * Hier wird festgelegt, welche Texte im Editor bearbeitet werden können.
- * Gespeichert wird alles als Datei im Repo, z. B. src/content/startseite.yaml.
+ * Gespeichert wird alles als Datei im Repo unter src/content/.
+ *
+ * - Sammlungen (collections) haben beliebig viele Einträge: Themen, News, Personen, Partner.
+ * - Einzelseiten (singletons) gibt es genau einmal: Startseite, Mitmachen, Über uns usw.
+ *
  * Wie man Texte ändert, steht in der README.
  */
-import { config, fields, singleton } from '@keystatic/core';
+import { collection, config, fields, singleton } from '@keystatic/core';
+
+// Wiederkehrende Felder
+const absatzText = (label: string, description = 'Eine Leerzeile beginnt einen neuen Absatz.') =>
+  fields.text({ label, description, multiline: true });
+
+const bild = (label: string, ordner: string, description?: string) =>
+  fields.image({
+    label,
+    description,
+    directory: `public/bilder/${ordner}`,
+    publicPath: `/bilder/${ordner}/`,
+  });
 
 export default config({
   // Lokal schreibt der Editor direkt in die Dateien.
@@ -14,9 +30,179 @@ export default config({
 
   ui: {
     brand: { name: 'ELIA Webseite' },
+    navigation: {
+      Seiten: ['startseite', 'themenSeite', 'newsSeite', 'mitmachen', 'partnerSeite', 'ueberUns'],
+      Inhalte: ['themen', 'news', 'personen', 'partner'],
+      Allgemein: ['allgemein'],
+    },
+  },
+
+  collections: {
+    /* ---------- Themen: Rover, Rakete, Space Law, Entrepreneurship ---------- */
+    themen: collection({
+      label: 'Themen',
+      path: 'src/content/themen/*',
+      slugField: 'titel',
+      format: 'yaml',
+      columns: ['titel', 'reihenfolge'],
+      schema: {
+        titel: fields.slug({
+          name: { label: 'Name des Themas' },
+          slug: { label: 'Adresse', description: 'Teil der Adresse, z. B. „rover“ → eliaspace.de/themen/rover' },
+        }),
+        reihenfolge: fields.integer({
+          label: 'Reihenfolge',
+          description: 'Kleinere Zahl steht weiter vorne (Startseite, Themenübersicht, News-Filter).',
+          defaultValue: 1,
+        }),
+        einordnung: fields.text({ label: 'Kleine Zeile über dem Namen', description: 'z. B. Wettbewerb oder Bereich' }),
+        kurztext: fields.text({ label: 'Kurztext für die Startseite', description: 'Ein kurzer Satz.' }),
+        teaser: fields.text({
+          label: 'Text für die Themenübersicht',
+          description: 'Zwei bis drei Sätze, etwas ausführlicher als auf der Startseite.',
+          multiline: true,
+        }),
+
+        // Kopf der Themenseite
+        einzeiler: fields.text({ label: 'Einzeiler im Seitenkopf', multiline: true }),
+        bild: bild('Bild im Seitenkopf', 'themen'),
+        bildBeschreibung: fields.text({ label: 'Bildbeschreibung', description: 'Für Screenreader: Was ist auf dem Bild zu sehen?' }),
+
+        worumEsGeht: absatzText('Worum es geht'),
+
+        wettbewerb: fields.conditional(
+          fields.checkbox({ label: 'Abschnitt „Wettbewerb“ anzeigen', defaultValue: false }),
+          {
+            true: fields.object({
+              name: fields.text({ label: 'Name des Wettbewerbs', description: 'z. B. European Rover Challenge' }),
+              link: fields.url({ label: 'Link zur Wettbewerbsseite' }),
+              text: absatzText('Text'),
+            }),
+            false: fields.empty(),
+          },
+        ),
+
+        stand: absatzText('Aktueller Stand'),
+        meilensteine: fields.array(
+          fields.object({
+            zeitpunkt: fields.text({ label: 'Zeitpunkt', description: 'z. B. „Frühjahr 2026“ oder „geplant“' }),
+            text: fields.text({ label: 'Was', multiline: true }),
+            erreicht: fields.checkbox({ label: 'Schon erreicht', defaultValue: false }),
+          }),
+          {
+            label: 'Meilensteine',
+            description: 'Von früh nach spät. Erreichte und geplante Schritte.',
+            itemLabel: (m) => [m.fields.zeitpunkt.value, m.fields.text.value].filter(Boolean).join(': ') || 'Neuer Meilenstein',
+          },
+        ),
+
+        technik: fields.object(
+          {
+            titel: fields.text({ label: 'Überschrift', description: 'z. B. „Technik“ oder „Vertiefung“. Leer lassen, um den Abschnitt auszublenden.' }),
+            text: absatzText('Text'),
+            bild: bild('Bild oder Zeichnung', 'themen'),
+            bildBeschreibung: fields.text({ label: 'Bildbeschreibung' }),
+          },
+          { label: 'Abschnitt „Technik / Vertiefung“ (optional)' },
+        ),
+
+        formate: fields.array(
+          fields.object({
+            titel: fields.text({ label: 'Titel', description: 'z. B. Vortragsreihe, Workshop' }),
+            text: fields.text({ label: 'Beschreibung', multiline: true }),
+          }),
+          {
+            label: 'Formate (optional)',
+            description: 'z. B. Vorträge, Workshops. Leer lassen, um den Abschnitt auszublenden.',
+            itemLabel: (f) => f.fields.titel.value || 'Neues Format',
+          },
+        ),
+
+        ansprechperson: fields.relationship({
+          label: 'Ansprechperson',
+          description: 'Aus der Sammlung „Personen“.',
+          collection: 'personen',
+        }),
+        wenWirSuchen: absatzText('Wen wir suchen'),
+      },
+    }),
+
+    /* ---------- News ---------- */
+    news: collection({
+      label: 'News',
+      path: 'src/content/news/*',
+      slugField: 'titel',
+      format: { contentField: 'inhalt' },
+      entryLayout: 'content',
+      columns: ['titel', 'datum'],
+      schema: {
+        titel: fields.slug({
+          name: { label: 'Titel' },
+          slug: { label: 'Adresse', description: 'Teil der Adresse, z. B. eliaspace.de/news/<adresse>' },
+        }),
+        datum: fields.date({ label: 'Datum', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
+        thema: fields.relationship({
+          label: 'Thema',
+          description: 'Optional. Der Beitrag erscheint dann auch auf der Themenseite.',
+          collection: 'themen',
+        }),
+        kurztext: fields.text({ label: 'Kurztext für die Übersicht', description: 'Ein bis zwei Sätze.', multiline: true }),
+        titelbild: bild('Titelbild', 'news'),
+        titelbildBeschreibung: fields.text({ label: 'Bildbeschreibung' }),
+        inhalt: fields.markdoc({
+          label: 'Text',
+          options: {
+            image: { directory: 'public/bilder/news', publicPath: '/bilder/news/' },
+          },
+        }),
+      },
+    }),
+
+    /* ---------- Personen ---------- */
+    personen: collection({
+      label: 'Personen',
+      path: 'src/content/personen/*',
+      slugField: 'name',
+      format: 'yaml',
+      columns: ['name', 'rolle'],
+      schema: {
+        name: fields.slug({ name: { label: 'Name' } }),
+        rolle: fields.text({ label: 'Rolle', description: 'z. B. Vorsitz, Teamleitung Rover' }),
+        vorstand: fields.checkbox({ label: 'Gehört zum Vorstand', defaultValue: false }),
+        reihenfolge: fields.integer({ label: 'Reihenfolge', description: 'Kleinere Zahl steht weiter vorne.', defaultValue: 1 }),
+        foto: bild('Foto', 'personen', 'Nur mit Einwilligung der Person.'),
+        email: fields.text({ label: 'E-Mail (optional)' }),
+      },
+    }),
+
+    /* ---------- Partner & Sponsoren ---------- */
+    partner: collection({
+      label: 'Partner & Sponsoren',
+      path: 'src/content/partner/*',
+      slugField: 'name',
+      format: 'yaml',
+      columns: ['name', 'art'],
+      schema: {
+        name: fields.slug({ name: { label: 'Name' } }),
+        art: fields.select({
+          label: 'Art',
+          options: [
+            { label: 'Institutioneller Partner (z. B. HTW, DGLR, Kooperation)', value: 'institution' },
+            { label: 'Sponsor', value: 'sponsor' },
+          ],
+          defaultValue: 'sponsor',
+        }),
+        stufe: fields.text({ label: 'Stufe (optional)', description: 'Nur für Sponsoren, z. B. Gold. Gleiche Stufen werden zusammen angezeigt.' }),
+        reihenfolge: fields.integer({ label: 'Reihenfolge', defaultValue: 1 }),
+        logo: bild('Logo', 'partner'),
+        link: fields.url({ label: 'Webseite' }),
+        text: fields.text({ label: 'Kurzbeschreibung (optional)', multiline: true }),
+      },
+    }),
   },
 
   singletons: {
+    /* ---------- Startseite ---------- */
     startseite: singleton({
       label: 'Startseite',
       path: 'src/content/startseite',
@@ -28,41 +214,170 @@ export default config({
         }),
         titel: fields.text({ label: 'Überschrift' }),
         einleitung: fields.text({ label: 'Einleitung unter der Überschrift', multiline: true }),
+        knopfMitmachen: fields.text({ label: 'Button „Mitmachen“' }),
+        knopfThemen: fields.text({ label: 'Button zu den Themen' }),
 
         werWirSindTitel: fields.text({ label: 'Abschnitt „Wer wir sind“: Überschrift' }),
-        werWirSindText: fields.text({
-          label: 'Abschnitt „Wer wir sind“: Text',
-          description: 'Eine Leerzeile beginnt einen neuen Absatz.',
-          multiline: true,
-        }),
+        werWirSindText: absatzText('Abschnitt „Wer wir sind“: Text'),
 
-        projekte: fields.array(
-          fields.object({
-            einordnung: fields.text({ label: 'Kleine Zeile darüber', description: 'z. B. Wettbewerb oder Bereich' }),
-            titel: fields.text({ label: 'Titel' }),
-            text: fields.text({ label: 'Kurzbeschreibung', multiline: true }),
-          }),
-          {
-            label: 'Projektbereiche',
-            description: 'Reihenfolge per Ziehen ändern.',
-            itemLabel: (eintrag) => eintrag.fields.titel.value || 'Neuer Bereich',
-          },
-        ),
-        projekteAufruf: fields.object(
+        themenAufruf: fields.object(
           {
             einordnung: fields.text({ label: 'Kleine Zeile darüber' }),
             titel: fields.text({ label: 'Titel' }),
             text: fields.text({ label: 'Text', multiline: true }),
+            link: fields.text({ label: 'Linktext' }),
           },
-          { label: 'Letztes Feld im Projektraster (Aufruf zum Mitmachen)' },
+          {
+            label: 'Streifen unter dem Themenraster (Aufruf zum Mitmachen)',
+            description: 'Die Themen selbst kommen aus der Sammlung „Themen“.',
+          },
         ),
 
         mitmachenTitel: fields.text({ label: 'Abschnitt „Mach mit“: Überschrift' }),
         mitmachenText: fields.text({ label: 'Abschnitt „Mach mit“: Text', multiline: true }),
-        kontaktEmail: fields.text({
-          label: 'E-Mail-Adresse für „Kontakt aufnehmen“',
-          description: 'Wohin der Button im Abschnitt „Mach mit“ eine E-Mail schickt.',
+        mitmachenKnopf: fields.text({ label: 'Abschnitt „Mach mit“: Button' }),
+      },
+    }),
+
+    /* ---------- Themenübersicht ---------- */
+    themenSeite: singleton({
+      label: 'Themen (Übersicht)',
+      path: 'src/content/seiten/themen',
+      format: 'yaml',
+      schema: {
+        titel: fields.text({ label: 'Überschrift' }),
+        einleitung: absatzText('Einleitung: wie die Themen zusammenhängen'),
+      },
+    }),
+
+    /* ---------- News-Übersicht ---------- */
+    newsSeite: singleton({
+      label: 'News (Übersicht)',
+      path: 'src/content/seiten/news',
+      format: 'yaml',
+      schema: {
+        titel: fields.text({ label: 'Überschrift' }),
+        einleitung: fields.text({ label: 'Einleitung', multiline: true }),
+        filterAlle: fields.text({ label: 'Filter: Beschriftung für „alle“' }),
+        keineBeitraege: fields.text({ label: 'Hinweis, wenn es noch keine Beiträge gibt' }),
+      },
+    }),
+
+    /* ---------- Mitmachen ---------- */
+    mitmachen: singleton({
+      label: 'Mitmachen',
+      path: 'src/content/seiten/mitmachen',
+      format: 'yaml',
+      schema: {
+        titel: fields.text({ label: 'Überschrift' }),
+        einleitung: fields.text({ label: 'Einleitung', multiline: true }),
+        fuerWenTitel: fields.text({ label: 'Für wen: Überschrift' }),
+        fuerWenText: absatzText('Für wen: Text'),
+        wasDuMachstTitel: fields.text({ label: 'Was du bei uns machst: Überschrift' }),
+        wasDuMachstText: absatzText('Was du bei uns machst: Text'),
+        einstiegTitel: fields.text({ label: 'So läuft der Einstieg: Überschrift' }),
+        einstiegSchritte: fields.array(
+          fields.object({
+            titel: fields.text({ label: 'Schritt' }),
+            text: fields.text({ label: 'Beschreibung', multiline: true }),
+          }),
+          { label: 'So läuft der Einstieg: Schritte', itemLabel: (s) => s.fields.titel.value || 'Neuer Schritt' },
+        ),
+        treffenTitel: fields.text({ label: 'Treffen: Überschrift' }),
+        treffenWann: fields.text({ label: 'Wann', description: 'z. B. jeden Dienstag, 18 Uhr' }),
+        treffenWo: fields.text({ label: 'Wo', multiline: true }),
+        treffenHinweis: fields.text({ label: 'Hinweis (optional)', multiline: true }),
+        kontaktTitel: fields.text({ label: 'Kontakt: Überschrift' }),
+        kontaktText: fields.text({ label: 'Kontakt: Text', multiline: true }),
+      },
+    }),
+
+    /* ---------- Partner & Sponsoren ---------- */
+    partnerSeite: singleton({
+      label: 'Partner & Sponsoren',
+      path: 'src/content/seiten/partner',
+      format: 'yaml',
+      schema: {
+        titel: fields.text({ label: 'Überschrift' }),
+        einleitung: fields.text({ label: 'Einleitung', multiline: true }),
+        sponsorenTitel: fields.text({ label: 'Sponsoren: Überschrift' }),
+        institutionenTitel: fields.text({ label: 'Institutionelle Partner: Überschrift' }),
+        warumTitel: fields.text({ label: 'Warum unterstützen: Überschrift' }),
+        warumText: absatzText('Warum unterstützen: Text'),
+        mappeTitel: fields.text({ label: 'Sponsoring: Überschrift' }),
+        mappeText: fields.text({ label: 'Sponsoring: Text', multiline: true }),
+        mappe: fields.file({
+          label: 'Sponsoringmappe (PDF)',
+          directory: 'public/dateien',
+          publicPath: '/dateien/',
         }),
+        mappeKnopf: fields.text({ label: 'Button zum Herunterladen' }),
+        kontaktKnopf: fields.text({ label: 'Button für Kontakt' }),
+      },
+    }),
+
+    /* ---------- Über uns ---------- */
+    ueberUns: singleton({
+      label: 'Über uns',
+      path: 'src/content/seiten/ueber-uns',
+      format: 'yaml',
+      schema: {
+        titel: fields.text({ label: 'Überschrift' }),
+        einleitung: fields.text({ label: 'Einleitung', multiline: true }),
+        werWirSindTitel: fields.text({ label: 'Wer wir sind: Überschrift' }),
+        werWirSindText: absatzText('Wer wir sind / Bedeutung des Namens: Text'),
+        rueckblickTitel: fields.text({ label: 'Rückblick: Überschrift' }),
+        rueckblick: fields.array(
+          fields.object({
+            zeitpunkt: fields.text({ label: 'Zeitpunkt', description: 'z. B. Ende 2025' }),
+            text: fields.text({ label: 'Was', multiline: true }),
+          }),
+          {
+            label: 'Rückblick: Meilensteine',
+            description: 'Von früh nach spät.',
+            itemLabel: (m) => [m.fields.zeitpunkt.value, m.fields.text.value].filter(Boolean).join(': ') || 'Neuer Meilenstein',
+          },
+        ),
+        einordnungTitel: fields.text({ label: 'Einordnung: Überschrift' }),
+        einordnungText: absatzText('Einordnung (DGLR, HTW, Verein): Text'),
+        vorstandTitel: fields.text({ label: 'Vorstand: Überschrift', description: 'Die Personen kommen aus der Sammlung „Personen“ (Häkchen „Gehört zum Vorstand“).' }),
+      },
+    }),
+
+    /* ---------- Allgemein: Menü, Fußzeile, wiederkehrende Beschriftungen ---------- */
+    allgemein: singleton({
+      label: 'Menü & Beschriftungen',
+      path: 'src/content/allgemein',
+      format: 'yaml',
+      schema: {
+        navigation: fields.array(
+          fields.object({
+            text: fields.text({ label: 'Beschriftung' }),
+            link: fields.text({ label: 'Adresse', description: 'z. B. /themen' }),
+          }),
+          {
+            label: 'Menü',
+            description: 'Reihenfolge per Ziehen ändern. Ist die Liste leer, wird kein Menü angezeigt.',
+            itemLabel: (p) => p.fields.text.value || 'Neuer Menüpunkt',
+          },
+        ),
+        menueKnopf: fields.text({ label: 'Menü-Button auf dem Handy' }),
+        kontaktEmail: fields.text({ label: 'Kontakt-E-Mail', description: 'Wird überall verwendet, wo „Kontakt aufnehmen“ steht.' }),
+        kontaktKnopf: fields.text({ label: 'Button „Kontakt aufnehmen“' }),
+        fussText: fields.text({ label: 'Fußzeile: Text links' }),
+        fussImpressum: fields.text({ label: 'Fußzeile: Link Impressum' }),
+        fussDatenschutz: fields.text({ label: 'Fußzeile: Link Datenschutz' }),
+        themaAnsprechperson: fields.text({ label: 'Themenseite: Überschrift Ansprechperson' }),
+        themaWenWirSuchen: fields.text({ label: 'Themenseite: Überschrift „Wen wir suchen“' }),
+        themaWorumEsGeht: fields.text({ label: 'Themenseite: Überschrift „Worum es geht“' }),
+        themaWettbewerb: fields.text({ label: 'Themenseite: Überschrift Wettbewerb' }),
+        themaStand: fields.text({ label: 'Themenseite: Überschrift „Aktueller Stand“' }),
+        themaFormate: fields.text({ label: 'Themenseite: Überschrift Formate' }),
+        themaNews: fields.text({ label: 'Themenseite: Überschrift News' }),
+        mehrNews: fields.text({ label: 'Link „Alle News“' }),
+        zurueckNews: fields.text({ label: 'Link „Zurück zu den News“' }),
+        mehrErfahren: fields.text({ label: 'Link „Mehr erfahren“' }),
+        zumMitmachen: fields.text({ label: 'Link zur Seite „Mitmachen“' }),
       },
     }),
   },

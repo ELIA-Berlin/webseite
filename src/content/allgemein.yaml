@@ -1,0 +1,28 @@
+navigation:
+  - text: Themen
+    link: /themen
+  - text: News
+    link: /news
+  - text: Mitmachen
+    link: /mitmachen
+  - text: Partner
+    link: /partner
+  - text: Über uns
+    link: /ueber-uns
+menueKnopf: Menü
+kontaktEmail: vorstand@elia-space.de
+kontaktKnopf: Kontakt aufnehmen
+fussText: ELIA, HTW Berlin
+fussImpressum: Impressum
+fussDatenschutz: Datenschutz
+themaAnsprechperson: Ansprechperson
+themaWenWirSuchen: Wen wir suchen
+themaWorumEsGeht: Worum es geht
+themaWettbewerb: Wettbewerb
+themaStand: Aktueller Stand
+themaFormate: Formate
+themaNews: Neues aus diesem Thema
+mehrNews: Alle News
+zurueckNews: Zurück zu den News
+mehrErfahren: Mehr erfahren
+zumMitmachen: Mitmachen

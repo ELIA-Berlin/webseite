@@ -3,15 +3,13 @@
  * Startseite. Die Texte kommen aus src/content/startseite.yaml
  * und lassen sich im Editor unter /keystatic → Startseite ändern.
  */
-import { createReader } from '@keystatic/core/reader';
-import keystaticConfig from '../../keystatic.config';
 import Basis from '../layouts/Basis.astro';
+import { absaetze, allgemein, alleThemen, reader } from '../lib/inhalte';
 
-const reader = createReader(process.cwd(), keystaticConfig);
 const start = await reader.singletons.startseite.readOrThrow();
-
-// Leerzeile im Editor = neuer Absatz
-const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+const texte = await allgemein();
+// Die Themen kommen aus der Sammlung „Themen“ (src/content/themen/)
+const themen = await alleThemen();
 ---
 <Basis>
   <section class="hero dunkel">
@@ -24,8 +22,8 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
         <h1>{start.titel}</h1>
         <p class="einleitung">{start.einleitung}</p>
         <p class="aktionen">
-          <a class="knopf" href="#mitmachen">Mitmachen</a>
-          <a class="knopf knopf--rahmen" href="#projekte">Unsere Projekte</a>
+          <a class="knopf" href="/mitmachen">{start.knopfMitmachen}</a>
+          <a class="knopf knopf--rahmen" href="/themen">{start.knopfThemen}</a>
         </p>
       </div>
       <img class="hero__logo" src="/logo.png" width="800" height="800"
@@ -33,7 +31,7 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
     </div>
   </section>
 
-  <section class="abschnitt" id="projekte">
+  <section class="abschnitt" id="themen">
     <div class="huelle">
       <div class="zwei">
         <h2>{start.werWirSindTitel}</h2>
@@ -42,23 +40,25 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
         </div>
       </div>
 
-      <ul class="projekte">
-        {start.projekte.map((projekt) => (
+      <ul class="themen">
+        {themen.map(({ slug, entry }) => (
           <li>
-            {projekt.einordnung && <span class="einordnung">{projekt.einordnung}</span>}
-            <h3>{projekt.titel}</h3>
-            <p>{projekt.text}</p>
+            {entry.einordnung && <span class="einordnung">{entry.einordnung}</span>}
+            <h3><a href={`/themen/${slug}`}>{entry.titel}</a></h3>
+            <p>{entry.kurztext}</p>
           </li>
         ))}
-        {start.projekteAufruf.titel && (
-          <li class="aufruf">
-            {start.projekteAufruf.einordnung && <span class="einordnung">{start.projekteAufruf.einordnung}</span>}
-            <h3>{start.projekteAufruf.titel}</h3>
-            <p>{start.projekteAufruf.text}</p>
-            <a href="#mitmachen">Mitmachen</a>
-          </li>
-        )}
       </ul>
+      {start.themenAufruf.titel && (
+        <div class="aufruf">
+          <div>
+            {start.themenAufruf.einordnung && <span class="einordnung">{start.themenAufruf.einordnung}</span>}
+            <h3>{start.themenAufruf.titel}</h3>
+            <p>{start.themenAufruf.text}</p>
+          </div>
+          <a class="knopf knopf--rahmen" href="/mitmachen">{start.themenAufruf.link}</a>
+        </div>
+      )}
     </div>
   </section>
 
@@ -67,7 +67,7 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
       <h2>{start.mitmachenTitel}</h2>
       <div>
         <p class="gross">{start.mitmachenText}</p>
-        <a class="knopf" href={`mailto:${start.kontaktEmail}`}>Kontakt aufnehmen</a>
+        <a class="knopf" href={`mailto:${texte.kontaktEmail}`}>{start.mitmachenKnopf}</a>
       </div>
     </div>
   </section>
@@ -104,21 +104,30 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
   @media (min-width: 48rem) { .zwei { grid-template-columns: 1fr 1.4fr; } }
   .lesetext { max-width: 38rem; }
 
-  /* Projektraster */
-  .projekte {
+  /* Themenraster: zwei Reihen à zwei Themen, darunter der Aufruf als Streifen */
+  .themen {
     list-style: none; margin: 3rem 0 0; padding: 0;
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    display: grid; grid-template-columns: 1fr;
     border-top: 2px solid var(--navy);
   }
-  .projekte li { padding: 1.6rem 1.6rem 1.8rem 0; border-bottom: 1px solid var(--linie); }
-  @media (min-width: 56rem) {
-    .projekte { grid-template-columns: repeat(3, 1fr); }
-    .projekte li:not(:nth-child(3n + 1)) { padding-left: 1.6rem; border-left: 1px solid var(--linie); }
+  .themen li { padding: 1.6rem 1.6rem 1.8rem 0; border-bottom: 1px solid var(--linie); }
+  @media (min-width: 40rem) {
+    .themen { grid-template-columns: repeat(2, 1fr); }
+    .themen li:nth-child(2n) { padding-left: 1.6rem; border-left: 1px solid var(--linie); }
   }
   .einordnung { font-size: 0.95rem; color: var(--grau); }
-  .projekte h3 { margin: 0.2rem 0 0.4rem; }
-  .projekte p { margin: 0; color: var(--grau); font-size: 1rem; }
-  .aufruf a { display: inline-block; margin-top: 0.6rem; font-family: var(--schrift-titel); font-weight: 600; }
+  .themen h3 { margin: 0.2rem 0 0.4rem; }
+  .themen h3 a { text-decoration: none; }
+  .themen h3 a::after { content: ' →'; font-weight: 500; }
+  .themen h3 a:hover { text-decoration: underline; }
+  .themen p { margin: 0; color: var(--grau); font-size: 1rem; }
+
+  .aufruf {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem;
+    margin-top: 1.6rem; padding: 1.6rem 1.8rem; background: var(--ring);
+  }
+  .aufruf h3 { margin: 0.2rem 0 0.3rem; }
+  .aufruf p { margin: 0; color: var(--grau); font-size: 1rem; }
 
   /* Mach mit */
   .mitmachen { background: var(--navy); color: var(--weiss); }

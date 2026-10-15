@@ -1,0 +1,13 @@
+---
+/** Gestrichelter Hinweis auf fehlenden Inhalt. Nur lokal und in Vorschauen sichtbar. */
+import { zeigePlatzhalter } from '../lib/inhalte';
+interface Props { text: string }
+const { text } = Astro.props;
+---
+{zeigePlatzhalter && <p class="platzhalter">Inhalt folgt: {text}</p>}
+<style>
+  .platzhalter {
+    border: 1.5px dashed currentColor; border-radius: 4px; padding: 0.8rem 1.1rem;
+    opacity: 0.6; font-size: 1rem; margin: 0;
+  }
+</style>

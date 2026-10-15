@@ -1,0 +1,52 @@
+---
+/** Themenübersicht. Texte: src/content/seiten/themen.yaml, Themen: src/content/themen/ */
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import Absaetze from '../../components/Absaetze.astro';
+import Platzhalter from '../../components/Platzhalter.astro';
+import { absaetze, allgemein, alleThemen, reader } from '../../lib/inhalte';
+
+const seite = await reader.singletons.themenSeite.readOrThrow();
+const texte = await allgemein();
+const themen = await alleThemen();
+---
+<Basis titel={seite.titel}>
+  <Seitenkopf titel={seite.titel} />
+
+  <section class="abschnitt">
+    <div class="huelle">
+      <div class="einleitung">
+        {absaetze(seite.einleitung).length
+          ? <Absaetze text={seite.einleitung} />
+          : <Platzhalter text="Einleitung: wie die vier Themen zusammenhängen" />}
+      </div>
+
+      <ul class="themen">
+        {themen.map(({ slug, entry }) => (
+          <li>
+            {entry.einordnung && <span class="einordnung">{entry.einordnung}</span>}
+            <h2><a href={`/themen/${slug}`}>{entry.titel}</a></h2>
+            {entry.teaser ? <p>{entry.teaser}</p> : <Platzhalter text="zwei bis drei Sätze zum Thema" />}
+            <a class="mehr" href={`/themen/${slug}`}>{texte.mehrErfahren} →</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Basis>
+
+<style>
+  .abschnitt { padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3.5rem, 8vw, 5rem); }
+  .einleitung { max-width: 42rem; margin-bottom: 2.5rem; font-size: 1.2rem; }
+  .themen { list-style: none; margin: 0; padding: 0; display: grid; border-top: 2px solid var(--navy); }
+  .themen li { padding: 1.8rem 1.8rem 2rem 0; border-bottom: 1px solid var(--linie); }
+  @media (min-width: 48rem) {
+    .themen { grid-template-columns: repeat(2, 1fr); }
+    .themen li:nth-child(2n) { padding-left: 1.8rem; border-left: 1px solid var(--linie); }
+  }
+  .einordnung { font-size: 0.95rem; color: var(--grau); }
+  h2 { font-size: 1.9rem; margin: 0.2rem 0 0.6rem; }
+  h2 a { text-decoration: none; }
+  .themen p { color: var(--grau); }
+  .mehr { font-family: var(--schrift-titel); font-weight: 600; }
+</style>
