@@ -5,7 +5,7 @@
  * Der Missionslog kommt aus „Über uns“ → Rückblick, die Themen aus der Sammlung „Themen“.
  */
 import Basis from '../layouts/Basis.astro';
-import Raketenzeichnung from '../components/Raketenzeichnung.astro';
+import Flugprofil from '../components/Flugprofil.astro';
 import ThemenBlaetter from '../components/ThemenBlaetter.astro';
 import Missionslog from '../components/Missionslog.astro';
 import { absaetze, allgemein, alleThemen, reader } from '../lib/inhalte';
@@ -17,7 +17,7 @@ const themen = await alleThemen();
 const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
 ---
 <Basis>
-  <section class="hero dunkel raster">
+  <section class="hero dunkel raster leuchten">
     <div class="huelle hero__raster">
       <div class="hero__text">
         {start.unterzeile && <p class="unterzeile">{start.unterzeile}</p>}
@@ -27,13 +27,8 @@ const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
           <a class="knopf" href="/mitmachen">{start.knopfMitmachen}</a>
           <a class="knopf knopf--rahmen" href="/themen">{start.knopfThemen}</a>
         </p>
-        {start.schriftfeld.length > 0 && (
-          <dl class="schriftfeld">
-            {start.schriftfeld.map((f) => <div><dt>{f.name}</dt><dd>{f.wert}</dd></div>)}
-          </dl>
-        )}
       </div>
-      <Raketenzeichnung b={start.zeichnung} />
+      <Flugprofil b={start.flugprofil} />
     </div>
   </section>
 
@@ -89,7 +84,7 @@ const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
 <style>
   /* Kopfbereich: Raster wie auf einer technischen Zeichnung, rechts die Rakete */
   .hero { --raster-y: -73px; color: var(--weiss); overflow: hidden; }
-  .hero__raster { display: grid; gap: 2.5rem; padding-top: clamp(2.5rem, 7vw, 5rem); align-items: center; }
+  .hero__raster { display: grid; gap: 2.5rem; padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4.5rem); align-items: center; }
   .hero__text { padding-bottom: 0; }
   .unterzeile {
     font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem;
@@ -98,22 +93,8 @@ const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
   .einleitung { font-size: 1.25rem; max-width: 33rem; color: rgb(255 255 255 / 0.82); margin: 1.6rem 0 2.2rem; }
   .aktionen { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
 
-  /* Schriftfeld wie unten rechts auf einer technischen Zeichnung */
-  .schriftfeld {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: clamp(2rem, 5vw, 3.5rem) 0 0; border: 1px solid rgb(255 255 255 / 0.35); border-bottom: 0;
-  }
-  .schriftfeld div { padding: 0.55rem 0.8rem; border-bottom: 1px solid rgb(255 255 255 / 0.25); min-width: 0; }
-  .schriftfeld div:nth-child(odd) { border-right: 1px solid rgb(255 255 255 / 0.25); }
-  .schriftfeld dt { font-size: 0.75rem; color: rgb(255 255 255 / 0.55); }
-  .schriftfeld dd { margin: 0; font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem; }
-  @media (min-width: 40rem) {
-    .schriftfeld { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); }
-    .schriftfeld div { border-right: 1px solid rgb(255 255 255 / 0.25); }
-    .schriftfeld div:last-child { border-right: 0; }
-  }
   @media (min-width: 60rem) {
-    .hero__raster { grid-template-columns: 1.15fr 1fr; gap: 3rem; }
+    .hero__raster { grid-template-columns: 1fr 1.05fr; gap: 3rem; }
   }
 
   /* Wer wir sind */

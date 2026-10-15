@@ -108,6 +108,31 @@ export default config({
             text: absatzText('Text'),
             bild: bild('Bild oder Zeichnung', 'themen'),
             bildBeschreibung: fields.text({ label: 'Bildbeschreibung' }),
+            raketenzeichnung: fields.object(
+              {
+                anzeigen: fields.checkbox({ label: 'Raketenzeichnung anzeigen', description: 'Beschriftete Schnittzeichnung von Stella. Nur für das Thema Rakete gedacht.', defaultValue: false }),
+                nasenkonus: fields.text({ label: 'Nasenkonus' }),
+                nutzlast: fields.text({ label: 'Nutzlast' }),
+                avionik: fields.text({ label: 'Avionik' }),
+                bergung: fields.text({ label: 'Bergung' }),
+                motor: fields.text({ label: 'Motor' }),
+                leitwerk: fields.text({ label: 'Leitwerk' }),
+                hinweis: fields.text({ label: 'Hinweis unter der Zeichnung' }),
+                beschreibung: fields.text({ label: 'Beschreibung für Screenreader', multiline: true }),
+                schriftfeld: fields.array(
+                  fields.object({
+                    name: fields.text({ label: 'Feld', description: 'z. B. Benennung' }),
+                    wert: fields.text({ label: 'Eintrag', description: 'z. B. Stella' }),
+                  }),
+                  {
+                    label: 'Schriftfeld unter der Zeichnung',
+                    description: 'Wie auf einer technischen Zeichnung. Am besten vier Felder.',
+                    itemLabel: (f) => [f.fields.name.value, f.fields.wert.value].filter(Boolean).join(': ') || 'Neues Feld',
+                  },
+                ),
+              },
+              { label: 'Raketenzeichnung (optional)' },
+            ),
           },
           { label: 'Abschnitt „Technik / Vertiefung“ (optional)' },
         ),
@@ -226,29 +251,16 @@ export default config({
         werWirSindTitel: fields.text({ label: 'Abschnitt „Wer wir sind“: Überschrift' }),
         werWirSindText: absatzText('Abschnitt „Wer wir sind“: Text'),
 
-        schriftfeld: fields.array(
-          fields.object({
-            name: fields.text({ label: 'Feld', description: 'z. B. Benennung' }),
-            wert: fields.text({ label: 'Eintrag', description: 'z. B. Stella' }),
-          }),
+        flugprofil: fields.object(
           {
-            label: 'Schriftfeld unter den Buttons',
-            description: 'Wie auf einer technischen Zeichnung. Am besten vier Felder.',
-            itemLabel: (f) => [f.fields.name.value, f.fields.wert.value].filter(Boolean).join(': ') || 'Neues Feld',
-          },
-        ),
-        zeichnung: fields.object(
-          {
-            nasenkonus: fields.text({ label: 'Nasenkonus' }),
-            nutzlast: fields.text({ label: 'Nutzlast' }),
-            avionik: fields.text({ label: 'Avionik' }),
-            bergung: fields.text({ label: 'Bergung' }),
-            motor: fields.text({ label: 'Motor' }),
-            leitwerk: fields.text({ label: 'Leitwerk' }),
-            hinweis: fields.text({ label: 'Hinweis unter der Zeichnung' }),
+            start: fields.text({ label: 'Start' }),
+            brennschluss: fields.text({ label: 'Brennschluss' }),
+            apogaeum: fields.text({ label: 'Höchster Punkt (Apogäum)' }),
+            fallschirm: fields.text({ label: 'Fallschirm' }),
+            landung: fields.text({ label: 'Landung' }),
             beschreibung: fields.text({ label: 'Beschreibung für Screenreader', multiline: true }),
           },
-          { label: 'Raketenzeichnung im Kopf: Beschriftungen' },
+          { label: 'Flugprofil im Kopf: Beschriftungen', description: 'Die animierte Flugbahn rechts neben der Überschrift.' },
         ),
 
         themenAufruf: fields.object(

@@ -33,3 +33,24 @@ meilensteine:
     erreicht: false
 technik:
   titel: Technik
+  raketenzeichnung:
+    anzeigen: true
+    nasenkonus: Nasenkonus
+    nutzlast: Nutzlast, CanSat
+    avionik: Avionik
+    bergung: Bergung
+    motor: Feststoffmotor
+    leitwerk: Leitwerk
+    hinweis: Schematisch, nicht maßstäblich
+    beschreibung: >-
+      Schnittzeichnung der Rakete Stella mit Nasenkonus, Nutzlast, Avionik,
+      Bergungssystem, Feststoffmotor und Leitwerk
+    schriftfeld:
+      - name: Benennung
+        wert: Stella
+      - name: Wettbewerb
+        wert: EuRoC
+      - name: Gezeichnet
+        wert: ELIA, HTW Berlin
+      - name: Status
+        wert: Entwurf
