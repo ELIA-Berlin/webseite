@@ -97,7 +97,7 @@ Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Skizze“, 
 
 **Raketenzeichnung (Stella):** steht auf der Themenseite Rakete im Abschnitt „Technik“. Beschriftungen und Schriftfeld in [`src/content/themen/rakete.yaml`](src/content/themen/rakete.yaml) unter `technik` → `raketenzeichnung`; `anzeigen: false` blendet sie aus.
 
-**Missionslog:** Die Zeitleiste steht auf der Startseite und auf „Über uns“. Einträge ändern in [`src/content/seiten/ueber-uns.yaml`](src/content/seiten/ueber-uns.yaml) unter `rueckblick`. Jeder Eintrag hat `zeitpunkt`, `titel`, `text` und `geplant` (`true` = noch nicht erreicht, wird gestrichelt gezeigt).
+**Missionslog:** Die Zeitleiste steht auf der Startseite, über den News und auf „Über uns“, das Neueste zuerst. Einträge ändern in [`src/content/seiten/ueber-uns.yaml`](src/content/seiten/ueber-uns.yaml) unter `rueckblick`. Jeder Eintrag hat `zeitpunkt`, `titel`, `text` und `geplant` (`true` = noch nicht erreicht, wird gestrichelt gezeigt).
 
 ### Skizzen der Themen austauschen
 

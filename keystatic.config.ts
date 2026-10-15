@@ -389,7 +389,7 @@ export default config({
           }),
           {
             label: 'Rückblick (Missionslog)',
-            description: 'Von früh nach spät. Erscheint auf „Über uns“ und auf der Startseite.',
+            description: 'Von früh nach spät eintragen; angezeigt wird das Neueste zuerst. Erscheint auf „Über uns“, der Startseite und über den News.',
             itemLabel: (m) => [m.fields.zeitpunkt.value, m.fields.titel.value].filter(Boolean).join(': ') || 'Neuer Eintrag',
           },
         ),

@@ -7,15 +7,19 @@
 import Basis from '../../layouts/Basis.astro';
 import Seitenkopf from '../../components/Seitenkopf.astro';
 import NewsListe from '../../components/NewsListe.astro';
+import Missionslog from '../../components/Missionslog.astro';
 import { alleNews, alleThemen, reader } from '../../lib/inhalte';
 
 const seite = await reader.singletons.newsSeite.readOrThrow();
+// Zeitstrahl über den News: dieselben Einträge wie auf „Über uns“ (Rückblick)
+const ueberUns = await reader.singletons.ueberUns.readOrThrow();
 const news = await alleNews();
 const themen = await alleThemen();
 const themenNamen = Object.fromEntries(themen.map((t) => [t.slug, t.entry.titel]));
 ---
 <Basis titel={seite.titel}>
   <Seitenkopf titel={seite.titel} einleitung={seite.einleitung} />
+  <Missionslog titel={ueberUns.rueckblickTitel} eintraege={ueberUns.rueckblick} />
 
   <section class="abschnitt">
     <div class="huelle">

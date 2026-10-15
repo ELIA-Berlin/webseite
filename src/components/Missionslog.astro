@@ -2,6 +2,7 @@
 /**
  * Missionslog: Zeitleiste der Geschichte von ELIA auf dunklem Band.
  * Einträge: src/content/seiten/ueber-uns.yaml → rueckblick (Editor: Über uns → Rückblick).
+ * Eingetragen wird von früh nach spät, angezeigt wird das Neueste zuerst.
  * Geplante Einträge werden gestrichelt angezeigt.
  */
 interface Props {
@@ -9,7 +10,8 @@ interface Props {
   eintraege: readonly { zeitpunkt: string; titel: string; text: string; geplant: boolean }[];
   link?: { text: string; href: string } | null;
 }
-const { titel, eintraege, link } = Astro.props;
+const { titel, link } = Astro.props;
+const eintraege = [...Astro.props.eintraege].reverse();
 ---
 {eintraege.length > 0 && (
   <section class="log dunkel">
@@ -45,6 +47,7 @@ const { titel, eintraege, link } = Astro.props;
     box-shadow: 0 0 10px 2px rgb(200 225 245 / 0.45);
   }
   li.geplant { border-left-style: dashed; }
+  /* Zeitstrahl läuft vom Neuesten (oben bzw. links) zum Ältesten */
   li.geplant::before { background: var(--nacht); box-shadow: inset 0 0 0 2px var(--weiss); }
   .zeit { display: block; font-family: var(--schrift-titel); font-weight: 600; color: rgb(255 255 255 / 0.6); }
   h3 { font-size: 1.6rem; margin: 0.2rem 0 0.3rem; line-height: 1.15; }
