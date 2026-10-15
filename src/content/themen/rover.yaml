@@ -3,18 +3,18 @@ reihenfolge: 1
 einordnung: European Rover Challenge
 kurztext: Ein Mars-Rover für den internationalen Wettbewerb.
 teaser: >-
-  Dough ist unser Rover, ausgelegt nach den Vorgaben der European Rover
+  Doug ist unser Rover, ausgelegt nach den Vorgaben der European Rover
   Challenge. Langfristig soll er eine Aufgabe übernehmen, die echten Mehrwert
   schafft, und Platz für eigene Ideen der Mitglieder bieten.
-einzeiler: Dough ist unser Rover, gebaut nach den Vorgaben der European Rover Challenge.
+einzeiler: Doug ist unser Rover, gebaut nach den Vorgaben der European Rover Challenge.
 worumEsGeht: |-
-  Dough ist der Rover, den Mitglieder von ELIA gemeinsam bauen. Sein Design orientiert sich an den technischen Vorgaben der European Rover Challenge.
+  Doug ist der Rover, den Mitglieder von ELIA gemeinsam bauen. Sein Design orientiert sich an den technischen Vorgaben der European Rover Challenge.
 
-  Der Wettbewerb ist ein wichtiges Ziel, aber nicht das einzige. Langfristig soll Dough eine Funktion bekommen, die echten Mehrwert schafft. Gleichzeitig soll er offen bleiben, damit Mitglieder eigene Ideen und Funktionen einbringen können.
+  Der Wettbewerb ist ein wichtiges Ziel, aber nicht das einzige. Langfristig soll Doug eine Funktion bekommen, die echten Mehrwert schafft. Gleichzeitig soll er offen bleiben, damit Mitglieder eigene Ideen und Funktionen einbringen können.
 wettbewerb:
   discriminant: true
   value:
     name: European Rover Challenge
     text: >-
-      Wir wollen mit Dough an der European Rover Challenge teilnehmen. Deshalb
+      Wir wollen mit Doug an der European Rover Challenge teilnehmen. Deshalb
       richtet sich sein Design nach den technischen Vorgaben des Wettbewerbs.
