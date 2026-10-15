@@ -67,7 +67,7 @@ const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).fi
       <h2>{start.mitmachenTitel}</h2>
       <div>
         <p class="gross">{start.mitmachenText}</p>
-        <a class="knopf" href="/kontakt">Kontakt aufnehmen</a>
+        <a class="knopf" href={`mailto:${start.kontaktEmail}`}>Kontakt aufnehmen</a>
       </div>
     </div>
   </section>

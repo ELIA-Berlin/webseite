@@ -1,0 +1,24 @@
+---
+/** Einfache Textseite, z. B. für Impressum und Datenschutz. */
+import Basis from './Basis.astro';
+interface Props { titel: string }
+const { titel } = Astro.props;
+---
+<Basis titel={titel}>
+  <section class="kopfbereich dunkel">
+    <div class="huelle"><h1>{titel}</h1></div>
+  </section>
+  <article class="huelle text">
+    <slot />
+  </article>
+</Basis>
+
+<style>
+  .kopfbereich { background: var(--navy); color: var(--weiss); padding: clamp(2.5rem, 7vw, 4.5rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kopfbereich h1 { margin: 0; }
+  .text { padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3.5rem, 8vw, 5rem); }
+  .text :global(> *) { max-width: 42rem; }
+  .text :global(h2) { font-size: 1.6rem; margin: 2.2rem 0 0.6rem; }
+  .text :global(h2:first-child) { margin-top: 0; }
+  .text :global(ul) { padding-left: 1.2rem; margin: 0 0 1rem; }
+</style>

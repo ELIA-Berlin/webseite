@@ -59,6 +59,10 @@ export default config({
 
         mitmachenTitel: fields.text({ label: 'Abschnitt „Mach mit“: Überschrift' }),
         mitmachenText: fields.text({ label: 'Abschnitt „Mach mit“: Text', multiline: true }),
+        kontaktEmail: fields.text({
+          label: 'E-Mail-Adresse für „Kontakt aufnehmen“',
+          description: 'Wohin der Button im Abschnitt „Mach mit“ eine E-Mail schickt.',
+        }),
       },
     }),
   },

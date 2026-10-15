@@ -2,7 +2,9 @@
 
 Webseite von ELIA, der studentischen Raumfahrtinitiative an der HTW Berlin (Nachwuchsgruppe der DGLR).
 
-**Aktueller Stand:** Die Startseite ist fertig gestaltet. Unterseiten, Online-Editor und Veröffentlichung folgen Schritt für Schritt.
+**Aktueller Stand:** Startseite, Impressum und Datenschutz sind fertig. Unterseiten und Online-Editor folgen Schritt für Schritt.
+
+**Neue Unterseite im Menü anzeigen:** in `src/layouts/Basis.astro` in der Liste `navigation` eintragen.
 
 ## Texte ändern
 
@@ -57,6 +59,9 @@ Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist,
 | `projekte` | Projektbereiche | Raster mit den Bereichen; Reihenfolge in der Datei = Reihenfolge auf der Seite |
 | `projekteAufruf` | Letztes Feld im Projektraster | Feld „Dein Bauteil fehlt noch“ |
 | `mitmachenTitel`, `mitmachenText` | Abschnitt „Mach mit“ | dunkler Bereich unten |
+| `kontaktEmail` | E-Mail-Adresse für „Kontakt aufnehmen“ | Ziel des Buttons im Bereich „Mach mit“ |
+
+**Impressum und Datenschutz** stehen als Textdateien in [`src/content/rechtliches/`](src/content/rechtliches/) und lassen sich wie oben (Weg 1) direkt auf GitHub ändern. Überschriften beginnen mit `##`, ein `\` am Zeilenende erzwingt einen Zeilenumbruch.
 
 Die Beschriftung der Buttons, die Navigation und die Fußzeile stehen noch im Code (`src/pages/index.astro`, `src/layouts/Basis.astro`). Sie kommen in den Editor, sobald die Struktur der Seite feststeht.
 

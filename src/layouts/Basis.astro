@@ -14,14 +14,10 @@ const {
 } = Astro.props;
 const seitentitel = titel ? `${titel} | ELIA` : 'ELIA – Studentische Raumfahrt aus Berlin';
 
-// Die Unterseiten folgen, sobald die Struktur besprochen ist.
-const navigation = [
-  { href: '/projekte', text: 'Projekte' },
-  { href: '/team', text: 'Team' },
-  { href: '/sponsoren', text: 'Sponsoren' },
-  { href: '/news', text: 'News' },
-  { href: '/kontakt', text: 'Kontakt' },
-];
+// Menüpunkte werden ergänzt, sobald die jeweilige Unterseite existiert,
+// z. B. { href: '/projekte', text: 'Projekte' }.
+// Solange die Liste leer ist, wird kein Menü angezeigt.
+const navigation: { href: string; text: string }[] = [];
 ---
 <!doctype html>
 <html lang="de">
@@ -42,6 +38,7 @@ const navigation = [
           <img src="/logo.png" alt="" width="42" height="42" />
           <span>ELIA</span>
         </a>
+        {navigation.length > 0 && (
         <nav aria-label="Hauptnavigation">
           <details class="menue">
             <summary>Menü</summary>
@@ -50,6 +47,7 @@ const navigation = [
             </ul>
           </details>
         </nav>
+        )}
       </div>
     </header>
 
