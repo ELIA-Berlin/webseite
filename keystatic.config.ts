@@ -57,6 +57,12 @@ export default config({
         }),
         einordnung: fields.text({ label: 'Kleine Zeile über dem Namen', description: 'z. B. Wettbewerb oder Bereich' }),
         kurztext: fields.text({ label: 'Kurztext für die Startseite', description: 'Ein kurzer Satz.' }),
+        skizze: fields.image({
+          label: 'Skizze (Startseite, Themenübersicht, Seitenkopf)',
+          description: 'Linienzeichnung mit durchsichtigem Hintergrund, am besten als SVG im Querformat. Auf GitHub austauschbar unter public/grafiken/themen/ (gleicher Dateiname ersetzt die alte Skizze).',
+          directory: 'public/grafiken/themen',
+          publicPath: '/grafiken/themen/',
+        }),
         teaser: fields.text({
           label: 'Text für die Themenübersicht',
           description: 'Zwei bis drei Sätze, etwas ausführlicher als auf der Startseite.',
@@ -220,6 +226,31 @@ export default config({
         werWirSindTitel: fields.text({ label: 'Abschnitt „Wer wir sind“: Überschrift' }),
         werWirSindText: absatzText('Abschnitt „Wer wir sind“: Text'),
 
+        schriftfeld: fields.array(
+          fields.object({
+            name: fields.text({ label: 'Feld', description: 'z. B. Benennung' }),
+            wert: fields.text({ label: 'Eintrag', description: 'z. B. Stella' }),
+          }),
+          {
+            label: 'Schriftfeld unter den Buttons',
+            description: 'Wie auf einer technischen Zeichnung. Am besten vier Felder.',
+            itemLabel: (f) => [f.fields.name.value, f.fields.wert.value].filter(Boolean).join(': ') || 'Neues Feld',
+          },
+        ),
+        zeichnung: fields.object(
+          {
+            nasenkonus: fields.text({ label: 'Nasenkonus' }),
+            nutzlast: fields.text({ label: 'Nutzlast' }),
+            avionik: fields.text({ label: 'Avionik' }),
+            bergung: fields.text({ label: 'Bergung' }),
+            motor: fields.text({ label: 'Motor' }),
+            leitwerk: fields.text({ label: 'Leitwerk' }),
+            hinweis: fields.text({ label: 'Hinweis unter der Zeichnung' }),
+            beschreibung: fields.text({ label: 'Beschreibung für Screenreader', multiline: true }),
+          },
+          { label: 'Raketenzeichnung im Kopf: Beschriftungen' },
+        ),
+
         themenAufruf: fields.object(
           {
             einordnung: fields.text({ label: 'Kleine Zeile darüber' }),
@@ -232,6 +263,12 @@ export default config({
             description: 'Die Themen selbst kommen aus der Sammlung „Themen“.',
           },
         ),
+
+        missionslogTitel: fields.text({
+          label: 'Missionslog: Überschrift',
+          description: 'Die Einträge kommen aus „Über uns“ → Rückblick. Leer lassen, um den Abschnitt auf der Startseite auszublenden.',
+        }),
+        missionslogLink: fields.text({ label: 'Missionslog: Link zu „Über uns“' }),
 
         mitmachenTitel: fields.text({ label: 'Abschnitt „Mach mit“: Überschrift' }),
         mitmachenText: fields.text({ label: 'Abschnitt „Mach mit“: Text', multiline: true }),
@@ -330,12 +367,14 @@ export default config({
         rueckblick: fields.array(
           fields.object({
             zeitpunkt: fields.text({ label: 'Zeitpunkt', description: 'z. B. Ende 2025' }),
-            text: fields.text({ label: 'Was', multiline: true }),
+            titel: fields.text({ label: 'Titel', description: 'z. B. Gründung, ILA Berlin' }),
+            text: fields.text({ label: 'Beschreibung', multiline: true }),
+            geplant: fields.checkbox({ label: 'Noch geplant', description: 'Wird gestrichelt angezeigt.', defaultValue: false }),
           }),
           {
-            label: 'Rückblick: Meilensteine',
-            description: 'Von früh nach spät.',
-            itemLabel: (m) => [m.fields.zeitpunkt.value, m.fields.text.value].filter(Boolean).join(': ') || 'Neuer Meilenstein',
+            label: 'Rückblick (Missionslog)',
+            description: 'Von früh nach spät. Erscheint auf „Über uns“ und auf der Startseite.',
+            itemLabel: (m) => [m.fields.zeitpunkt.value, m.fields.titel.value].filter(Boolean).join(': ') || 'Neuer Eintrag',
           },
         ),
         einordnungTitel: fields.text({ label: 'Einordnung: Überschrift' }),

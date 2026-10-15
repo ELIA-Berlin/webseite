@@ -1,0 +1,51 @@
+---
+/**
+ * Schnittzeichnung der Rakete Stella für den Kopf der Startseite.
+ * Die Beschriftungen stehen in src/content/startseite.yaml (Editor: Startseite → Raketenzeichnung).
+ */
+interface Props {
+  b: {
+    nasenkonus: string; nutzlast: string; avionik: string; bergung: string;
+    motor: string; leitwerk: string; hinweis: string; beschreibung: string;
+  };
+}
+const { b } = Astro.props;
+---
+<svg class="zeichnung" viewBox="0 0 560 700" role="img" aria-label={b.beschreibung}>
+  <line class="achse" x1="280" y1="20" x2="280" y2="690" />
+  <path class="flaeche" d="M280 40 C 300 80, 312 130, 312 175 L 312 600 L 248 600 L 248 175 C 248 130, 260 80, 280 40 Z" />
+  <path class="kontur" d="M280 40 C 300 80, 312 130, 312 175 L 312 600 L 248 600 L 248 175 C 248 130, 260 80, 280 40 Z" />
+  <path class="kontur" d="M248 520 L 196 610 L 196 640 L 248 600 M312 520 L 364 610 L 364 640 L 312 600" />
+  <path class="kontur" d="M266 600 L 262 628 L 298 628 L 294 600" />
+  <line class="innen" x1="248" y1="175" x2="312" y2="175" />
+  <rect class="innen" x="258" y="190" width="44" height="52" />
+  <line class="innen" x1="248" y1="258" x2="312" y2="258" />
+  <rect class="innen" x="262" y="270" width="36" height="46" />
+  <line class="innen" x1="248" y1="330" x2="312" y2="330" />
+  <path class="innen" d="M262 345 q 18 -14 36 0 l -18 52 z" />
+  <line class="innen" x1="248" y1="420" x2="312" y2="420" />
+  <rect class="innen" x="256" y="436" width="48" height="160" />
+
+  <g class="ruf"><circle cx="280" cy="110" r="3" /><path d="M280 110 L 200 110 L 180 92 L 40 92" /><text x="40" y="84">{b.nasenkonus}</text></g>
+  <g class="ruf"><circle cx="280" cy="292" r="3" /><path d="M280 292 L 190 292 L 170 272 L 40 272" /><text x="40" y="264">{b.avionik}</text></g>
+  <g class="ruf"><circle cx="280" cy="516" r="3" /><path d="M280 516 L 190 516 L 170 496 L 40 496" /><text x="40" y="488">{b.motor}</text></g>
+  <g class="ruf"><circle cx="280" cy="216" r="3" /><path d="M280 216 L 370 216 L 390 196 L 530 196" /><text class="rechts" x="530" y="188">{b.nutzlast}</text></g>
+  <g class="ruf"><circle cx="280" cy="372" r="3" /><path d="M280 372 L 370 372 L 390 352 L 530 352" /><text class="rechts" x="530" y="344">{b.bergung}</text></g>
+  <g class="ruf"><circle cx="350" cy="612" r="3" /><path d="M350 612 L 400 612 L 420 592 L 530 592" /><text class="rechts" x="530" y="584">{b.leitwerk}</text></g>
+  {b.hinweis && <text class="hinweis" x="40" y="676">{b.hinweis}</text>}
+</svg>
+
+<style>
+  .zeichnung { width: 100%; max-width: 34rem; display: block; justify-self: center; }
+  text { font-family: var(--schrift-titel); font-size: 16px; font-weight: 500; fill: rgb(255 255 255 / 0.8); }
+  .rechts { text-anchor: end; }
+  /* auf dem Handy wird die Zeichnung kleiner, die Schrift soll lesbar bleiben */
+  @media (max-width: 40rem) { text { font-size: 24px; } .hinweis { font-size: 19px; } }
+  .hinweis { font-size: 13px; fill: rgb(255 255 255 / 0.5); }
+  .kontur { fill: none; stroke: var(--weiss); stroke-width: 1.6; }
+  .flaeche { fill: rgb(255 255 255 / 0.05); }
+  .innen { fill: none; stroke: rgb(255 255 255 / 0.45); stroke-width: 1; stroke-dasharray: 5 4; }
+  .achse { stroke: rgb(255 255 255 / 0.35); stroke-width: 1; stroke-dasharray: 18 4 3 4; }
+  .ruf path { fill: none; stroke: rgb(255 255 255 / 0.5); stroke-width: 1; }
+  .ruf circle { fill: var(--weiss); }
+</style>
