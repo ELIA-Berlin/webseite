@@ -1,0 +1,41 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import { reader, alsHtml, statusText } from '../../lib/inhalte';
+
+export async function getStaticPaths() {
+  const slugs = await reader.collections.projekte.list();
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+const projekt = await reader.collections.projekte.read(slug!);
+if (!projekt) return Astro.redirect('/404');
+const html = await alsHtml(projekt.inhalt);
+---
+<Basis titel={projekt.titel} beschreibung={projekt.kurzbeschreibung}>
+  <Seitenkopf titel={projekt.titel} einleitung={projekt.kurzbeschreibung}>
+    <a slot="ueber" class="zurueck" href="/projekte">Alle Projekte</a>
+    <p class="meta">
+      <span>{statusText[projekt.status] ?? projekt.status}</span>
+      {projekt.wettbewerb && <span>{projekt.wettbewerb}</span>}
+    </p>
+  </Seitenkopf>
+
+  <article class="abschnitt huelle">
+    {projekt.bild && <img class="titelbild" src={projekt.bild} alt={projekt.bildAlt || ''} />}
+    <div class="prosa" set:html={html} />
+  </article>
+</Basis>
+
+<style>
+  .zurueck { display: inline-block; margin-bottom: 1.2rem; color: var(--himmel); }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.5rem 0 0; }
+  .meta span {
+    font-size: var(--s-klein);
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.4);
+  }
+  .titelbild { border-radius: var(--radius); margin-bottom: 2.5rem; max-height: 32rem; width: 100%; object-fit: cover; }
+</style>

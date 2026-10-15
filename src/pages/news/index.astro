@@ -1,0 +1,40 @@
+---
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import { news, formatDatum } from '../../lib/inhalte';
+
+const alle = await news();
+---
+<Basis titel="News" beschreibung="Neuigkeiten aus den Projekten von ELIA.">
+  <Seitenkopf titel="News" einleitung="Starts, Wettbewerbe, Veranstaltungen und was sonst bei uns passiert." />
+  <section class="abschnitt huelle">
+    {alle.length === 0 ? (
+      <p>Noch keine Beiträge. Der erste kommt bald.</p>
+    ) : (
+      <ul class="liste">
+        {alle.map(({ slug, entry }) => (
+          <li class="eintrag">
+            {entry.bild && <img src={entry.bild} alt={entry.bildAlt || ''} loading="lazy" />}
+            <div>
+              <time datetime={entry.datum}>{formatDatum(entry.datum)}</time>
+              <h2><a href={`/news/${slug}`}>{entry.titel}</a></h2>
+              <p>{entry.zusammenfassung}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</Basis>
+
+<style>
+  .liste { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; max-width: 52rem; }
+  .eintrag { display: grid; gap: 1rem 2rem; }
+  @media (min-width: 40rem) { .eintrag:has(img) { grid-template-columns: 14rem 1fr; } }
+  .eintrag img { border-radius: var(--radius); aspect-ratio: 4 / 3; object-fit: cover; }
+  time { font-size: var(--s-klein); color: var(--grau); }
+  h2 { font-size: var(--s-h3); margin: 0.3rem 0 0.5rem; }
+  h2 a { text-decoration: none; }
+  h2 a:hover { text-decoration: underline; }
+  p { margin: 0; }
+</style>

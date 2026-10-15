@@ -1,0 +1,12 @@
+---
+import Basis from '../layouts/Basis.astro';
+import Seitenkopf from '../components/Seitenkopf.astro';
+import { reader, alsHtml } from '../lib/inhalte';
+
+const seite = await reader.singletons.impressum.read();
+const html = seite ? await alsHtml(seite.inhalt) : '';
+---
+<Basis titel="Impressum">
+  <Seitenkopf titel="Impressum" />
+  <section class="abschnitt huelle"><div class="prosa" set:html={html} /></section>
+</Basis>

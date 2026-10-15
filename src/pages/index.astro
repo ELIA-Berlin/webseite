@@ -1,0 +1,195 @@
+---
+import Basis from '../layouts/Basis.astro';
+import Projektliste from '../components/Projektliste.astro';
+import { reader, projekte, news, sponsoren, formatDatum } from '../lib/inhalte';
+
+const start = await reader.singletons.startseite.read();
+const alleProjekte = await projekte();
+const neuesteNews = (await news()).slice(0, 3);
+const partner = await sponsoren();
+---
+<Basis>
+  <section class="hero">
+    <svg class="hero__bahn" viewBox="0 0 800 600" preserveAspectRatio="xMaxYMax meet" aria-hidden="true">
+      <line class="hero__boden" x1="0" y1="560" x2="800" y2="560" />
+      <path class="hero__turm" d="M128 560 V505 M120 560 L128 505 L136 560" />
+      <path class="hero__flugbahn" pathLength="1" d="M128 505 C 200 200, 420 70, 640 90" />
+      <circle class="hero__punkt" cx="640" cy="90" r="9" />
+    </svg>
+
+    <div class="huelle hero__inhalt">
+      <h1>{start?.titel}</h1>
+      <p class="vorspann">{start?.einleitung}</p>
+      <p class="hero__aktionen">
+        <a class="knopf" href="/projekte">Projekte ansehen</a>
+        <a class="knopf knopf--rahmen" href="#mitmachen">Mitmachen</a>
+      </p>
+    </div>
+  </section>
+
+  <section class="abschnitt huelle ueber">
+    <h2>Wer wir sind</h2>
+    <p class="vorspann lesetext">{start?.ueberUns}</p>
+  </section>
+
+  <section class="abschnitt huelle" aria-labelledby="projekte-titel">
+    <div class="kopfzeile">
+      <h2 id="projekte-titel">Unsere Projekte</h2>
+      <a href="/projekte">Alle Projekte</a>
+    </div>
+    <Projektliste projekte={alleProjekte} />
+  </section>
+
+  {neuesteNews.length > 0 && (
+    <section class="abschnitt huelle news" aria-labelledby="news-titel">
+      <div class="kopfzeile">
+        <h2 id="news-titel">Neuigkeiten</h2>
+        <a href="/news">Alle News</a>
+      </div>
+      <ul class="news__liste">
+        {neuesteNews.map(({ slug, entry }) => (
+          <li>
+            <time datetime={entry.datum}>{formatDatum(entry.datum)}</time>
+            <h3><a href={`/news/${slug}`}>{entry.titel}</a></h3>
+            <p>{entry.zusammenfassung}</p>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="mitmachen" id="mitmachen">
+    <div class="huelle mitmachen__raster">
+      <h2>{start?.mitmachenTitel}</h2>
+      <div>
+        <p class="vorspann">{start?.mitmachenText}</p>
+        <a class="knopf" href="/kontakt">Kontakt aufnehmen</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="abschnitt huelle" aria-labelledby="partner-titel">
+    <div class="kopfzeile">
+      <h2 id="partner-titel">Partner und Sponsoren</h2>
+      <a href="/sponsoren">Mehr erfahren</a>
+    </div>
+    <ul class="partner">
+      {partner.map(({ entry }) => (
+        <li>
+          <a href={entry.website || undefined}>
+            {entry.logo ? <img src={entry.logo} alt={entry.name} loading="lazy" /> : <span>{entry.name}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="leise lesetext">{start?.sponsorenText}</p>
+  </section>
+</Basis>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--nacht);
+    color: var(--weiss);
+    padding-block: clamp(3.5rem, 10vw, 8rem) clamp(5rem, 12vw, 9rem);
+  }
+  .hero__inhalt { position: relative; }
+  .hero h1 { max-width: 14ch; }
+  .hero .vorspann { max-width: 34rem; color: rgb(255 255 255 / 0.86); }
+  .hero__aktionen { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
+
+  /* Die Flugbahn: das einzige animierte Element der Seite */
+  .hero__bahn {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: min(62vw, 56rem);
+    height: 100%;
+    opacity: 0.9;
+  }
+  .hero__boden { stroke: rgb(255 255 255 / 0.18); stroke-width: 1.5; }
+  .hero__turm { stroke: rgb(255 255 255 / 0.55); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+  .hero__flugbahn {
+    fill: none;
+    stroke: var(--himmel);
+    stroke-width: 2.5;
+    stroke-dasharray: 1;
+    stroke-linecap: round;
+    animation: aufstieg 2.4s cubic-bezier(0.3, 0, 0.2, 1) 0.3s backwards;
+  }
+  .hero__punkt {
+    fill: var(--zuendung);
+    animation: aufleuchten 0.6s ease-out 2.5s backwards;
+  }
+  @keyframes aufstieg {
+    from { stroke-dashoffset: 1; }
+  }
+  @keyframes aufleuchten {
+    from { opacity: 0; r: 0; }
+  }
+  @media (max-width: 48rem) {
+    .hero__bahn { width: 100%; opacity: 0.35; }
+  }
+
+  .ueber h2 { margin-bottom: 1rem; }
+
+  .kopfzeile {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .kopfzeile h2 { margin: 0; }
+
+  .abschnitt + .abschnitt { padding-top: 0; }
+
+  .news__liste {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2rem;
+  }
+  @media (min-width: 48rem) { .news__liste { grid-template-columns: repeat(3, 1fr); } }
+  .news__liste time { font-size: var(--s-klein); color: var(--grau); }
+  .news__liste h3 { font-size: var(--s-h4); margin: 0.3rem 0 0.5rem; }
+  .news__liste h3 a { text-decoration: none; }
+  .news__liste h3 a:hover { text-decoration: underline; }
+  .news__liste p { margin: 0; }
+
+  .mitmachen {
+    background: var(--nacht);
+    color: var(--weiss);
+    padding-block: clamp(3rem, 8vw, 5.5rem);
+  }
+  .mitmachen__raster { display: grid; gap: 1rem 3rem; }
+  @media (min-width: 48rem) { .mitmachen__raster { grid-template-columns: 1fr 1.5fr; } }
+  .mitmachen h2 { font-size: var(--s-h1); margin: 0; }
+  .mitmachen .vorspann { color: rgb(255 255 255 / 0.86); max-width: 34rem; }
+
+  .partner {
+    list-style: none;
+    margin: 0 0 1.5rem;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .partner a {
+    display: flex;
+    align-items: center;
+    min-height: 4.5rem;
+    padding: 1rem 1.4rem;
+    background: var(--weiss);
+    border: 1px solid var(--linie);
+    border-radius: var(--radius);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+  .partner img { max-height: 3rem; width: auto; }
+</style>

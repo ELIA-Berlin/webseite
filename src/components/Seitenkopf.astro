@@ -1,0 +1,23 @@
+---
+/** Dunkler Kopfbereich für Unterseiten mit Titel und optionalem Einleitungstext. */
+interface Props { titel: string; einleitung?: string }
+const { titel, einleitung } = Astro.props;
+---
+<section class="seitenkopf">
+  <div class="huelle">
+    <slot name="ueber" />
+    <h1>{titel}</h1>
+    {einleitung && <p class="vorspann">{einleitung}</p>}
+    <slot />
+  </div>
+</section>
+
+<style>
+  .seitenkopf {
+    background: var(--nacht);
+    color: var(--weiss);
+    padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4rem);
+  }
+  .seitenkopf h1 { max-width: 20ch; }
+  .vorspann { max-width: var(--lesebreite); color: rgb(255 255 255 / 0.85); margin: 0; }
+</style>

@@ -1,0 +1,70 @@
+---
+import Basis from '../layouts/Basis.astro';
+import Seitenkopf from '../components/Seitenkopf.astro';
+import { reader, sponsoren } from '../lib/inhalte';
+
+const alle = await sponsoren();
+const start = await reader.singletons.startseite.read();
+const stufen = [
+  { wert: 'haupt', titel: 'Hauptsponsoren' },
+  { wert: 'sponsor', titel: 'Sponsoren' },
+  { wert: 'partner', titel: 'Partner' },
+]
+  .map((s) => ({ ...s, eintraege: alle.filter((e) => e.entry.stufe === s.wert) }))
+  .filter((s) => s.eintraege.length > 0);
+---
+<Basis titel="Sponsoren" beschreibung="Partner und Sponsoren, die ELIA unterstützen.">
+  <Seitenkopf titel="Partner und Sponsoren" einleitung={start?.sponsorenText}>
+    <p class="aktion"><a class="knopf" href="/kontakt">Unterstützer werden</a></p>
+  </Seitenkopf>
+
+  {stufen.map((stufe) => (
+    <section class="abschnitt huelle">
+      <h2>{stufe.titel}</h2>
+      <ul class="karten">
+        {stufe.eintraege.map(({ entry }) => (
+          <li class="karte">
+            <div class="karte__logo">
+              {entry.logo ? <img src={entry.logo} alt={entry.name} loading="lazy" /> : <span>{entry.name}</span>}
+            </div>
+            {entry.logo && <h3>{entry.name}</h3>}
+            {entry.beschreibung && <p>{entry.beschreibung}</p>}
+            {entry.website && <a href={entry.website}>Website von {entry.name}</a>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</Basis>
+
+<style>
+  .aktion { margin: 2rem 0 0; }
+  .karten {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  }
+  .karte {
+    background: var(--weiss);
+    border: 1px solid var(--linie);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+  }
+  .karte__logo {
+    min-height: 4rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    line-height: 1.3;
+  }
+  .karte__logo img { max-height: 4rem; width: auto; }
+  .karte h3 { font-size: 1rem; margin: 0 0 0.3rem; }
+  .karte p { margin: 0 0 0.6rem; }
+  .karte a { font-size: var(--s-klein); }
+</style>
