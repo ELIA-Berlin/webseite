@@ -1,0 +1,114 @@
+---
+/**
+ * Grundgerüst jeder Seite: Kopfzeile mit Navigation, Inhalt, Fußzeile.
+ */
+import '../styles/global.css';
+
+interface Props {
+  titel?: string;
+  beschreibung?: string;
+}
+const {
+  titel,
+  beschreibung = 'ELIA ist die studentische Raumfahrtinitiative an der HTW Berlin und Nachwuchsgruppe der DGLR.',
+} = Astro.props;
+const seitentitel = titel ? `${titel} | ELIA` : 'ELIA – Studentische Raumfahrt aus Berlin';
+
+// Die Unterseiten folgen, sobald die Struktur besprochen ist.
+const navigation = [
+  { href: '/projekte', text: 'Projekte' },
+  { href: '/team', text: 'Team' },
+  { href: '/sponsoren', text: 'Sponsoren' },
+  { href: '/news', text: 'News' },
+  { href: '/kontakt', text: 'Kontakt' },
+];
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{seitentitel}</title>
+    <meta name="description" content={beschreibung} />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  </head>
+  <body>
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+    <header class="kopf dunkel">
+      <div class="huelle kopf__zeile">
+        <a class="marke" href="/">
+          <img src="/logo.png" alt="" width="42" height="42" />
+          <span>ELIA</span>
+        </a>
+        <nav aria-label="Hauptnavigation">
+          <details class="menue">
+            <summary>Menü</summary>
+            <ul>
+              {navigation.map((punkt) => <li><a href={punkt.href}>{punkt.text}</a></li>)}
+            </ul>
+          </details>
+        </nav>
+      </div>
+    </header>
+
+    <main id="inhalt">
+      <slot />
+    </main>
+
+    <footer class="fuss">
+      <div class="huelle fuss__zeile">
+        <span>ELIA, HTW Berlin</span>
+        <span class="fuss__links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .kopf { background: var(--navy); color: var(--weiss); border-bottom: 1px solid rgb(255 255 255 / 0.1); position: relative; z-index: 5; }
+  .kopf__zeile { display: flex; align-items: center; justify-content: space-between; min-height: 4.5rem; }
+  .marke {
+    display: inline-flex; align-items: center; gap: 0.7rem;
+    font-family: var(--schrift-titel); font-weight: 700; font-size: 1.45rem; letter-spacing: 0.06em;
+    text-decoration: none;
+  }
+  .marke img { width: 2.6rem; height: 2.6rem; }
+
+  .menue summary {
+    list-style: none; cursor: pointer;
+    font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem;
+    padding: 0.45rem 0.9rem; border-radius: 4px; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.5);
+  }
+  .menue summary::-webkit-details-marker { display: none; }
+  .menue ul {
+    list-style: none; margin: 0; padding: 0.5rem 0;
+    position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--navy); border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  }
+  .menue a {
+    display: block; padding: 0.75rem var(--rand);
+    font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem; text-decoration: none;
+  }
+
+  @media (min-width: 52rem) {
+    .menue summary { display: none; }
+    .menue ul { position: static; display: flex; gap: 2rem; padding: 0; border: 0; background: none; }
+    .menue a { padding: 0.3rem 0; font-size: 1.05rem; opacity: 0.85; }
+    .menue a:hover { opacity: 1; text-decoration: underline; }
+  }
+
+  .fuss { background: var(--navy-tief); color: rgb(255 255 255 / 0.7); padding: 2rem 0; font-size: 0.95rem; }
+  .fuss__zeile { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
+  .fuss__links { display: flex; gap: 1.2rem; }
+</style>
+
+<script>
+  // Auf großen Bildschirmen ist das Menü immer offen, auf Handys klappt es auf.
+  const menue = document.querySelector<HTMLDetailsElement>('.menue');
+  const breit = window.matchMedia('(min-width: 52rem)');
+  const anpassen = () => { if (menue) menue.open = breit.matches; };
+  anpassen();
+  breit.addEventListener('change', anpassen);
+</script>

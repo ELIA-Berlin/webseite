@@ -1,0 +1,127 @@
+---
+/**
+ * Startseite. Die Texte kommen aus src/content/startseite.yaml
+ * und lassen sich im Editor unter /keystatic → Startseite ändern.
+ */
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+import Basis from '../layouts/Basis.astro';
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const start = await reader.singletons.startseite.readOrThrow();
+
+// Leerzeile im Editor = neuer Absatz
+const absaetze = (text: string) => text.split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);
+---
+<Basis>
+  <section class="hero dunkel">
+    <svg class="hero__bahn" viewBox="0 0 1440 640" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M-40 640 C 380 600, 820 420, 1180 120 S 1500 -60, 1520 -80" />
+    </svg>
+    <div class="huelle hero__raster">
+      <div class="hero__text">
+        {start.unterzeile && <p class="unterzeile">{start.unterzeile}</p>}
+        <h1>{start.titel}</h1>
+        <p class="einleitung">{start.einleitung}</p>
+        <p class="aktionen">
+          <a class="knopf" href="#mitmachen">Mitmachen</a>
+          <a class="knopf knopf--rahmen" href="#projekte">Unsere Projekte</a>
+        </p>
+      </div>
+      <img class="hero__logo" src="/logo.png" width="800" height="800"
+        alt="ELIA-Logo: Berliner Fernsehturm, von dem eine Rakete aufsteigt" />
+    </div>
+  </section>
+
+  <section class="abschnitt" id="projekte">
+    <div class="huelle">
+      <div class="zwei">
+        <h2>{start.werWirSindTitel}</h2>
+        <div class="lesetext">
+          {absaetze(start.werWirSindText).map((absatz) => <p>{absatz}</p>)}
+        </div>
+      </div>
+
+      <ul class="projekte">
+        {start.projekte.map((projekt) => (
+          <li>
+            {projekt.einordnung && <span class="einordnung">{projekt.einordnung}</span>}
+            <h3>{projekt.titel}</h3>
+            <p>{projekt.text}</p>
+          </li>
+        ))}
+        {start.projekteAufruf.titel && (
+          <li class="aufruf">
+            {start.projekteAufruf.einordnung && <span class="einordnung">{start.projekteAufruf.einordnung}</span>}
+            <h3>{start.projekteAufruf.titel}</h3>
+            <p>{start.projekteAufruf.text}</p>
+            <a href="#mitmachen">Mitmachen</a>
+          </li>
+        )}
+      </ul>
+    </div>
+  </section>
+
+  <section class="abschnitt mitmachen dunkel" id="mitmachen">
+    <div class="huelle zwei">
+      <h2>{start.mitmachenTitel}</h2>
+      <div>
+        <p class="gross">{start.mitmachenText}</p>
+        <a class="knopf" href="/kontakt">Kontakt aufnehmen</a>
+      </div>
+    </div>
+  </section>
+</Basis>
+
+<style>
+  /* Kopfbereich */
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: var(--navy);
+    color: var(--weiss);
+    padding: clamp(3rem, 8vw, 5rem) 0 clamp(3.5rem, 9vw, 5.5rem);
+  }
+  .hero__bahn { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero__bahn path { fill: none; stroke: rgb(255 255 255 / 0.12); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .hero__raster { position: relative; display: grid; gap: 2.5rem; align-items: center; }
+  .hero__logo { width: min(15rem, 60vw); order: -1; }
+  .unterzeile {
+    font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem;
+    letter-spacing: 0.02em; color: rgb(255 255 255 / 0.65);
+  }
+  .einleitung { font-size: 1.25rem; max-width: 34rem; color: rgb(255 255 255 / 0.82); margin-bottom: 2rem; }
+  .aktionen { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
+
+  @media (min-width: 56rem) {
+    .hero__raster { grid-template-columns: 1.2fr 1fr; gap: 3rem; }
+    .hero__logo { order: 0; justify-self: center; width: min(25rem, 100%); }
+  }
+
+  /* Abschnitte */
+  .abschnitt { padding: clamp(3.5rem, 8vw, 5rem) 0; }
+  .zwei { display: grid; gap: 0.5rem 4rem; }
+  @media (min-width: 48rem) { .zwei { grid-template-columns: 1fr 1.4fr; } }
+  .lesetext { max-width: 38rem; }
+
+  /* Projektraster */
+  .projekte {
+    list-style: none; margin: 3rem 0 0; padding: 0;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    border-top: 2px solid var(--navy);
+  }
+  .projekte li { padding: 1.6rem 1.6rem 1.8rem 0; border-bottom: 1px solid var(--linie); }
+  @media (min-width: 56rem) {
+    .projekte { grid-template-columns: repeat(3, 1fr); }
+    .projekte li:not(:nth-child(3n + 1)) { padding-left: 1.6rem; border-left: 1px solid var(--linie); }
+  }
+  .einordnung { font-size: 0.95rem; color: var(--grau); }
+  .projekte h3 { margin: 0.2rem 0 0.4rem; }
+  .projekte p { margin: 0; color: var(--grau); font-size: 1rem; }
+  .aufruf a { display: inline-block; margin-top: 0.6rem; font-family: var(--schrift-titel); font-weight: 600; }
+
+  /* Mach mit */
+  .mitmachen { background: var(--navy); color: var(--weiss); }
+  .mitmachen .zwei { align-items: center; }
+  .gross { font-size: 1.25rem; color: rgb(255 255 255 / 0.82); max-width: 36rem; }
+</style>
