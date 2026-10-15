@@ -1,0 +1,74 @@
+---
+/**
+ * News-Übersicht mit Filter nach Thema.
+ * Beiträge: src/content/news/, im Editor unter „News“.
+ * Der Filter funktioniert über ?thema=rover in der Adresse; ohne JavaScript werden alle Beiträge gezeigt.
+ */
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import NewsListe from '../../components/NewsListe.astro';
+import { alleNews, alleThemen, reader } from '../../lib/inhalte';
+
+const seite = await reader.singletons.newsSeite.readOrThrow();
+const news = await alleNews();
+const themen = await alleThemen();
+const themenNamen = Object.fromEntries(themen.map((t) => [t.slug, t.entry.titel]));
+---
+<Basis titel={seite.titel}>
+  <Seitenkopf titel={seite.titel} einleitung={seite.einleitung} />
+
+  <section class="abschnitt">
+    <div class="huelle">
+      <nav class="filter" aria-label="Nach Thema filtern">
+        <a href="/news" data-filter="" aria-current="true">{seite.filterAlle}</a>
+        {themen.map((t) => <a href={`/news?thema=${t.slug}`} data-filter={t.slug}>{t.entry.titel}</a>)}
+      </nav>
+
+      {news.length > 0
+        ? <NewsListe eintraege={news} themenNamen={themenNamen} />
+        : <p class="leer">{seite.keineBeitraege}</p>}
+      <p class="leer" data-leer hidden>{seite.keineBeitraege}</p>
+    </div>
+  </section>
+</Basis>
+
+<script>
+  // Filtert die Liste nach ?thema=… und hält die Adresse aktuell.
+  const links = [...document.querySelectorAll<HTMLAnchorElement>('.filter a')];
+  const eintraege = [...document.querySelectorAll<HTMLLIElement>('.news li')];
+  const liste = document.querySelector<HTMLElement>('.news');
+  const leer = document.querySelector<HTMLElement>('[data-leer]');
+
+  function filtern(thema: string) {
+    let sichtbar = 0;
+    for (const li of eintraege) {
+      const passt = !thema || li.dataset.thema === thema;
+      li.hidden = !passt;
+      if (passt) sichtbar++;
+    }
+    if (liste) liste.hidden = sichtbar === 0;
+    if (leer) leer.hidden = sichtbar > 0 || eintraege.length === 0;
+    for (const a of links) a.setAttribute('aria-current', String(a.dataset.filter === thema));
+  }
+
+  for (const a of links) {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      history.replaceState(null, '', a.href);
+      filtern(a.dataset.filter ?? '');
+    });
+  }
+  filtern(new URLSearchParams(location.search).get('thema') ?? '');
+</script>
+
+<style>
+  .abschnitt { padding: clamp(2rem, 5vw, 3rem) 0 clamp(3.5rem, 8vw, 5rem); }
+  .filter { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem; }
+  .filter a {
+    font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem; text-decoration: none;
+    padding: 0.4rem 0.9rem; border-radius: 4px; box-shadow: inset 0 0 0 1.5px var(--linie);
+  }
+  .filter a:hover { box-shadow: inset 0 0 0 1.5px var(--navy); }
+  .filter a[aria-current='true'] { background: var(--navy); color: var(--weiss); box-shadow: none; }
+  .leer { color: var(--grau); padding: 1.5rem 0; border-top: 2px solid var(--navy); }
+</style>

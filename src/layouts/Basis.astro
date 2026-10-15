@@ -3,6 +3,7 @@
  * Grundgerüst jeder Seite: Kopfzeile mit Navigation, Inhalt, Fußzeile.
  */
 import '../styles/global.css';
+import { allgemein } from '../lib/inhalte';
 
 interface Props {
   titel?: string;
@@ -14,10 +15,12 @@ const {
 } = Astro.props;
 const seitentitel = titel ? `${titel} | ELIA` : 'ELIA – Studentische Raumfahrt aus Berlin';
 
-// Menüpunkte werden ergänzt, sobald die jeweilige Unterseite existiert,
-// z. B. { href: '/projekte', text: 'Projekte' }.
-// Solange die Liste leer ist, wird kein Menü angezeigt.
-const navigation: { href: string; text: string }[] = [];
+// Menü, Fußzeile und Beschriftungen stehen in src/content/allgemein.yaml
+// (Editor: „Menü, Fußzeile & Beschriftungen“). Ist das Menü leer, wird keins angezeigt.
+const texte = await allgemein();
+const navigation = texte.navigation;
+const pfad = Astro.url.pathname.replace(/\/$/, '');
+const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
 ---
 <!doctype html>
 <html lang="de">
@@ -41,9 +44,11 @@ const navigation: { href: string; text: string }[] = [];
         {navigation.length > 0 && (
         <nav aria-label="Hauptnavigation">
           <details class="menue">
-            <summary>Menü</summary>
+            <summary>{texte.menueKnopf}</summary>
             <ul>
-              {navigation.map((punkt) => <li><a href={punkt.href}>{punkt.text}</a></li>)}
+              {navigation.map((punkt) => (
+                <li><a href={punkt.link} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
+              ))}
             </ul>
           </details>
         </nav>
@@ -57,8 +62,12 @@ const navigation: { href: string; text: string }[] = [];
 
     <footer class="fuss">
       <div class="huelle fuss__zeile">
-        <span>ELIA, HTW Berlin</span>
-        <span class="fuss__links"><a href="/impressum">Impressum</a><a href="/datenschutz">Datenschutz</a></span>
+        <span>{texte.fussText}</span>
+        <span class="fuss__links">
+          <a href={`mailto:${texte.kontaktEmail}`}>{texte.kontaktEmail}</a>
+          <a href="/impressum">{texte.fussImpressum}</a>
+          <a href="/datenschutz">{texte.fussDatenschutz}</a>
+        </span>
       </div>
     </footer>
   </body>
@@ -95,11 +104,12 @@ const navigation: { href: string; text: string }[] = [];
     .menue ul { position: static; display: flex; gap: 2rem; padding: 0; border: 0; background: none; }
     .menue a { padding: 0.3rem 0; font-size: 1.05rem; opacity: 0.85; }
     .menue a:hover { opacity: 1; text-decoration: underline; }
+    .menue a[aria-current='page'] { opacity: 1; text-decoration: underline; text-decoration-thickness: 2px; }
   }
 
   .fuss { background: var(--navy-tief); color: rgb(255 255 255 / 0.7); padding: 2rem 0; font-size: 0.95rem; }
   .fuss__zeile { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; }
-  .fuss__links { display: flex; gap: 1.2rem; }
+  .fuss__links { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; }
 </style>
 
 <script>

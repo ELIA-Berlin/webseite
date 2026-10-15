@@ -4,33 +4,20 @@ einleitung: >-
   ELIA ist die Raumfahrtinitiative an der HTW Berlin und Nachwuchsgruppe der
   DGLR. Wir bauen Raketen und Rover und beschäftigen uns mit Recht und
   Wirtschaft im All.
+knopfMitmachen: Mitmachen
+knopfThemen: Unsere Themen
 werWirSindTitel: Wer wir sind
 werWirSindText: |-
   Bei uns arbeiten Studierende aus Technik, Informatik, Wirtschaft und Recht an echten Raumfahrtprojekten. Vorwissen brauchst du keins, nur Lust aufs Mitbauen.
 
   Vom ersten Modellraketenstart bis zum Rover für die European Rover Challenge lernen wir, wie Raumfahrt in der Praxis funktioniert.
-projekte:
-  - einordnung: European Rover Challenge
-    titel: Rover
-    text: Ein Mars-Rover für den internationalen Wettbewerb.
-  - einordnung: European Rocketry Challenge
-    titel: Raketenprogramm
-    text: Auf dem Weg zur eigenen Höhenrakete.
-  - einordnung: Einstieg
-    titel: Modellraketen
-    text: Konstruieren, bauen, starten.
-  - einordnung: Recht
-    titel: Space Law
-    text: Wer darf was im All?
-  - einordnung: Wirtschaft
-    titel: Entrepreneurship
-    text: Wie aus Ideen Unternehmen werden.
-projekteAufruf:
+themenAufruf:
   einordnung: Offen für alle
   titel: Dein Bauteil fehlt noch.
   text: Egal ob du lötest, programmierst oder verhandelst.
+  link: Mitmachen
 mitmachenTitel: Mach mit
 mitmachenText: >-
   Du studierst an der HTW Berlin und hast Lust auf Raumfahrt? Schreib uns
   oder komm bei einem unserer Treffen vorbei.
-kontaktEmail: vorstand@elia-space.de
+mitmachenKnopf: Kontakt aufnehmen

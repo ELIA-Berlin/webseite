@@ -1,0 +1,8 @@
+titel: Rover
+reihenfolge: 1
+einordnung: European Rover Challenge
+kurztext: Ein Mars-Rover für den internationalen Wettbewerb.
+wettbewerb:
+  discriminant: true
+  value:
+    name: European Rover Challenge

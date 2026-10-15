@@ -1,0 +1,38 @@
+---
+/** Liste von News-Beiträgen (Datum, Thema, Titel, Kurztext). */
+import { datumLang } from '../lib/inhalte';
+interface Eintrag {
+  slug: string;
+  entry: { titel: string; datum: string | null; thema: string | null; kurztext: string; titelbild: string | null; titelbildBeschreibung: string };
+}
+interface Props { eintraege: Eintrag[]; themenNamen: Record<string, string> }
+const { eintraege, themenNamen } = Astro.props;
+---
+<ul class="news">
+  {eintraege.map(({ slug, entry }) => (
+    <li data-thema={entry.thema ?? ''}>
+      {entry.titelbild && <img src={entry.titelbild} alt={entry.titelbildBeschreibung} loading="lazy" />}
+      <div>
+        <p class="meta">
+          {entry.datum && <time datetime={entry.datum}>{datumLang(entry.datum)}</time>}
+          {entry.thema && themenNamen[entry.thema] && <span>{themenNamen[entry.thema]}</span>}
+        </p>
+        <h3><a href={`/news/${slug}`}>{entry.titel}</a></h3>
+        {entry.kurztext && <p>{entry.kurztext}</p>}
+      </div>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .news { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--navy); }
+  li { display: grid; gap: 1rem 1.6rem; padding: 1.5rem 0; border-bottom: 1px solid var(--linie); }
+  li:has(img) { grid-template-columns: minmax(0, 12rem) 1fr; }
+  img { aspect-ratio: 4 / 3; object-fit: cover; }
+  .meta { display: flex; gap: 1rem; font-size: 0.95rem; color: var(--grau); margin: 0 0 0.2rem; }
+  h3 { margin: 0 0 0.4rem; }
+  h3 a { text-decoration: none; }
+  h3 a:hover { text-decoration: underline; }
+  li p:last-child { margin: 0; color: var(--grau); font-size: 1rem; }
+  @media (max-width: 36rem) { li:has(img) { grid-template-columns: 1fr; } }
+</style>

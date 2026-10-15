@@ -1,0 +1,6 @@
+---
+/** Text aus dem Editor; eine Leerzeile beginnt einen neuen Absatz. */
+import { absaetze } from '../lib/inhalte';
+interface Props { text?: string | null }
+---
+{absaetze(Astro.props.text).map((a) => <p>{a}</p>)}

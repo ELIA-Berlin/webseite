@@ -1,0 +1,10 @@
+titel: Rakete
+reihenfolge: 2
+einordnung: European Rocketry Challenge
+kurztext: Von der Modellrakete zur eigenen Höhenrakete.
+wettbewerb:
+  discriminant: true
+  value:
+    name: European Rocketry Challenge
+technik:
+  titel: Technik
