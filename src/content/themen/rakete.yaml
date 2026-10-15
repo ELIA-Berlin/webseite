@@ -2,9 +2,33 @@ titel: Rakete
 reihenfolge: 2
 einordnung: European Rocketry Challenge
 kurztext: Von der Modellrakete zur eigenen Höhenrakete.
+teaser: >-
+  Der Einstieg sind Modellraketen. Darauf baut Stella auf, unsere eigene
+  Rakete: zuerst mit Feststoffantrieb für die European Rocketry Challenge,
+  langfristig als Flüssigrakete mit Platz für Experimente.
+einzeiler: Stella ist unsere Rakete. Sie steht noch in den Startlöchern, soll aber weit fliegen.
+worumEsGeht: |-
+  Der Einstieg ins Raketenprogramm sind Modellraketen: konstruieren, bauen, starten.
+
+  Darauf baut Stella auf, die eigene Rakete von ELIA. Sie steht noch am Anfang, hat aber ein klares Ziel: Schritt für Schritt höher fliegen.
 wettbewerb:
   discriminant: true
   value:
     name: European Rocketry Challenge
+    text: >-
+      Unser erstes großes Ziel mit Stella ist die European Rocketry Challenge.
+stand: Stella befindet sich noch in den Startlöchern.
+meilensteine:
+  - zeitpunkt: Einstieg
+    text: Modellraketen konstruieren, bauen und starten
+    erreicht: false
+  - zeitpunkt: Kurzfristig
+    text: >-
+      Rakete mit Feststoffbooster und niedriger Flughöhe für die European
+      Rocketry Challenge, möglicherweise mit CanSat
+    erreicht: false
+  - zeitpunkt: Langfristig
+    text: Flüssigrakete mit Nutzlastplatz für Experimente und mittlerer Flughöhe
+    erreicht: false
 technik:
   titel: Technik
