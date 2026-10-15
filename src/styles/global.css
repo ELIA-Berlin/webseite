@@ -21,7 +21,11 @@
   --schrift-titel: 'Barlow Semi Condensed', 'Arial Narrow', sans-serif;
   --schrift-text: 'Source Sans 3', system-ui, sans-serif;
 
-  --breite: 74rem;
+  --breite: 78rem;
+
+  /* Millimeterraster wie auf einer technischen Zeichnung (dunkle Flächen) */
+  --raster-fein: rgb(255 255 255 / 0.025);
+  --raster-grob: rgb(255 255 255 / 0.055);
   --rand: clamp(1.25rem, 4vw, 3rem);
 }
 
@@ -48,8 +52,8 @@ h1, h2, h3 {
   margin: 0 0 1rem;
   text-wrap: balance;
 }
-h1 { font-size: clamp(2.6rem, 1.6rem + 4vw, 4.4rem); }
-h2 { font-size: clamp(2rem, 1.5rem + 2vw, 2.6rem); line-height: 1.1; }
+h1 { font-size: clamp(2.8rem, 1.5rem + 5vw, 5.6rem); line-height: 0.96; letter-spacing: -0.01em; }
+h2 { font-size: clamp(2.1rem, 1.5rem + 2.4vw, 3.2rem); line-height: 1.05; }
 h3 { font-size: 1.5rem; font-weight: 600; }
 
 p { margin: 0 0 1rem; text-wrap: pretty; }
@@ -63,7 +67,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .knopf {
   display: inline-block;
-  padding: 0.8rem 1.5rem;
+  padding: 0.85rem 1.45rem;
   border-radius: 4px;
   font-family: var(--schrift-titel);
   font-weight: 600;
@@ -81,3 +85,36 @@ img { max-width: 100%; height: auto; display: block; }
   background: var(--weiss); color: var(--navy); padding: 0.6rem 1rem;
 }
 .skip-link:focus { top: 1rem; }
+
+/*
+ * Raster: dunkle Flächen mit feinem Millimeterraster (alle 24 px, kräftiger alle 120 px).
+ * Kopfzeile und Seitenkopf liegen übereinander; --raster-y verschiebt das Raster,
+ * damit die Linien über beide Flächen durchlaufen.
+ */
+.raster {
+  background-color: var(--navy);
+  background-image:
+    linear-gradient(var(--raster-grob) 1px, transparent 1px),
+    linear-gradient(90deg, var(--raster-grob) 1px, transparent 1px),
+    linear-gradient(var(--raster-fein) 1px, transparent 1px),
+    linear-gradient(90deg, var(--raster-fein) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 24px 24px, 24px 24px;
+  background-position: -1px var(--raster-y, -1px);
+}
+/* Helles Raster für Skizzenflächen */
+.raster-hell {
+  background-color: var(--ring);
+  background-image:
+    linear-gradient(rgb(24 44 60 / 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(24 44 60 / 0.06) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: -1px -1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .knopf { transition: background-color .15s, color .15s; }
+}
+.knopf:hover { background: var(--navy-tief); }
+.knopf--rahmen:hover { background: rgb(24 44 60 / 0.06); }
+.dunkel .knopf:hover { background: var(--ring); }
+.dunkel .knopf--rahmen:hover { background: rgb(255 255 255 / 0.08); }

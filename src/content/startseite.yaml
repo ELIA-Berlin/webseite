@@ -21,3 +21,25 @@ mitmachenText: >-
   Du studierst an der HTW Berlin und hast Lust auf Raumfahrt? Schreib uns
   oder komm bei einem unserer Treffen vorbei.
 mitmachenKnopf: Kontakt aufnehmen
+schriftfeld:
+  - name: Benennung
+    wert: Stella
+  - name: Wettbewerb
+    wert: EuRoC
+  - name: Gezeichnet
+    wert: ELIA, HTW Berlin
+  - name: Status
+    wert: Entwurf
+zeichnung:
+  nasenkonus: Nasenkonus
+  nutzlast: Nutzlast, CanSat
+  avionik: Avionik
+  bergung: Bergung
+  motor: Feststoffmotor
+  leitwerk: Leitwerk
+  hinweis: Schematisch, nicht maßstäblich
+  beschreibung: >-
+    Schnittzeichnung der Rakete Stella mit Nasenkonus, Nutzlast, Avionik,
+    Bergungssystem, Feststoffmotor und Leitwerk
+missionslogTitel: Missionslog
+missionslogLink: Mehr über uns

@@ -1,0 +1,47 @@
+---
+/**
+ * Raster der Themen mit Skizze, wie Blätter einer Zeichnungsmappe.
+ * Die Skizzen liegen in public/grafiken/themen/ (Feld „Skizze“ im Editor).
+ */
+import Platzhalter from './Platzhalter.astro';
+interface Props {
+  themen: { slug: string; entry: { titel: string; einordnung?: string | null; skizze?: string | null; kurztext?: string | null; teaser?: string | null } }[];
+  /** „kurz“ für die Startseite, „lang“ für die Themenübersicht */
+  text?: 'kurz' | 'lang';
+  mehr?: string;
+}
+const { themen, text = 'kurz', mehr } = Astro.props;
+---
+<ul class="blaetter">
+  {themen.map(({ slug, entry }) => {
+    const beschreibung = text === 'lang' ? entry.teaser : entry.kurztext;
+    return (
+      <li>
+        <a href={`/themen/${slug}`}>
+          <span class="skizze raster-hell">
+            {entry.skizze && <img src={entry.skizze} alt="" loading="lazy" />}
+          </span>
+          {entry.einordnung && <span class="einordnung">{entry.einordnung}</span>}
+          <h3>{entry.titel}</h3>
+          {beschreibung ? <p>{beschreibung}</p> : <Platzhalter text={text === 'lang' ? 'zwei bis drei Sätze zum Thema' : 'ein kurzer Satz'} />}
+          {mehr && <span class="mehr">{mehr} →</span>}
+        </a>
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .blaetter { list-style: none; margin: 0; padding: 0; display: grid; column-gap: 2rem; border-top: 2px solid var(--navy); }
+  li { border-bottom: 1px solid var(--linie); min-width: 0; }
+  a { display: flex; flex-direction: column; gap: 0.25rem; padding: 1.6rem 0 2rem; text-decoration: none; height: 100%; }
+  .skizze { display: grid; place-items: center; height: 9.5rem; margin-bottom: 1.2rem; }
+  .skizze img { max-height: 7.5rem; max-width: 85%; width: auto; height: auto; }
+  .einordnung { font-size: 0.95rem; color: var(--grau); }
+  h3 { font-size: 2rem; margin: 0; }
+  p { margin: 0.2rem 0 0; color: var(--grau); font-size: 1rem; }
+  .mehr { margin-top: auto; padding-top: 1rem; font-family: var(--schrift-titel); font-weight: 600; }
+  a:hover h3 { text-decoration: underline; text-underline-offset: 0.15em; text-decoration-thickness: 2px; }
+  @media (min-width: 40rem) { .blaetter { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 70rem) { .blaetter { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+</style>

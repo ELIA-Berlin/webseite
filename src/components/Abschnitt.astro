@@ -27,13 +27,13 @@ const sichtbar = !leer || zeigePlatzhalter;
 )}
 
 <style>
-  .abschnitt { padding: clamp(2.5rem, 6vw, 4rem) 0; }
-  .abschnitt + .abschnitt:not(.grau) .huelle { border-top: 1px solid var(--linie); padding-top: clamp(2.5rem, 6vw, 4rem); }
+  .abschnitt { padding: clamp(3rem, 7vw, 5rem) 0; }
+  .abschnitt + .abschnitt:not(.grau) .huelle { border-top: 1px solid var(--linie); padding-top: clamp(3rem, 7vw, 5rem); }
   .abschnitt + .abschnitt:not(.grau) { padding-top: 0; }
   .grau { background: var(--ring); }
   .zwei { display: grid; gap: 0.5rem 4rem; }
-  @media (min-width: 48rem) { .zwei { grid-template-columns: 1fr 1.6fr; } }
-  h2 { font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.2rem); }
+  @media (min-width: 48rem) { .zwei { grid-template-columns: 1fr 2fr; gap: 0.5rem 5rem; } }
+  h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem); }
   .inhalt { max-width: 42rem; }
   .inhalt > :global(:last-child) { margin-bottom: 0; }
   .platzhalter {

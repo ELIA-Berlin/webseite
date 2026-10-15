@@ -4,6 +4,8 @@ import Basis from '../layouts/Basis.astro';
 import Seitenkopf from '../components/Seitenkopf.astro';
 import Abschnitt from '../components/Abschnitt.astro';
 import Absaetze from '../components/Absaetze.astro';
+import Missionslog from '../components/Missionslog.astro';
+import Platzhalter from '../components/Platzhalter.astro';
 import { absaetze, reader } from '../lib/inhalte';
 
 const seite = await reader.singletons.ueberUns.readOrThrow();
@@ -19,11 +21,9 @@ const leer = (text?: string | null) => absaetze(text).length === 0;
     <Absaetze text={seite.werWirSindText} />
   </Abschnitt>
 
-  <Abschnitt titel={seite.rueckblickTitel} leer={seite.rueckblick.length === 0} platzhalter="Gründung Ende 2025 und weitere Meilensteine">
-    <ol class="rueckblick">
-      {seite.rueckblick.map((m) => <li><span class="zeitpunkt">{m.zeitpunkt}</span><span>{m.text}</span></li>)}
-    </ol>
-  </Abschnitt>
+  {seite.rueckblick.length > 0
+    ? <Missionslog titel={seite.rueckblickTitel} eintraege={seite.rueckblick} />
+    : <div class="huelle"><Platzhalter text="Missionslog: Gründung Ende 2025 und weitere Meilensteine" /></div>}
 
   <Abschnitt titel={seite.einordnungTitel} leer={leer(seite.einordnungText)} platzhalter="DGLR-Nachwuchsgruppe, HTW Berlin, eingetragener Verein">
     <Absaetze text={seite.einordnungText} />
@@ -43,19 +43,6 @@ const leer = (text?: string | null) => absaetze(text).length === 0;
 </Basis>
 
 <style>
-  .rueckblick { list-style: none; margin: 0; padding: 0; }
-  .rueckblick li {
-    position: relative; display: grid; gap: 0.1rem 1.2rem;
-    padding: 0 0 1.2rem 1.8rem; border-left: 1.5px solid var(--linie); margin-left: 0.4rem;
-  }
-  .rueckblick li:last-child { border-left-color: transparent; padding-bottom: 0; }
-  .rueckblick li::before {
-    content: ''; position: absolute; left: -0.45rem; top: 0.35rem;
-    width: 0.8rem; height: 0.8rem; border-radius: 50%; background: var(--navy);
-  }
-  .zeitpunkt { font-family: var(--schrift-titel); font-weight: 600; }
-  @media (min-width: 40rem) { .rueckblick li { grid-template-columns: 9rem 1fr; } }
-
   .personen { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 1.6rem; }
   .personen img { width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 0.7rem; }
   .personen p { margin: 0; color: var(--grau); font-size: 1rem; }

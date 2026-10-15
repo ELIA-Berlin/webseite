@@ -1,5 +1,22 @@
 titel: Über uns
 werWirSindTitel: Wer wir sind
-rueckblickTitel: Rückblick
+rueckblickTitel: Missionslog
 einordnungTitel: Einordnung
 vorstandTitel: Vorstand
+rueckblick:
+  - zeitpunkt: Ende 2025
+    titel: Gründung
+    text: Studierende der HTW gründen ELIA, Professoren begleiten als Berater.
+    geplant: false
+  - zeitpunkt: '2026'
+    titel: ILA Berlin
+    text: Erster öffentlicher Auftritt auf der Luft- und Raumfahrtmesse.
+    geplant: false
+  - zeitpunkt: '2026'
+    titel: DLRK Aachen
+    text: Dabei beim Deutschen Luft- und Raumfahrtkongress.
+    geplant: false
+  - zeitpunkt: Als Nächstes
+    titel: EuRoC und ERC
+    text: Stella und Doug auf dem Weg zu den europäischen Wettbewerben.
+    geplant: true

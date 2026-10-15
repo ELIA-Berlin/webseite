@@ -85,18 +85,48 @@ Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist,
 
 | Feld in `startseite.yaml` | Auf der Seite |
 |---|---|
-| `unterzeile`, `titel`, `einleitung` | Kopfbereich mit Logo |
+| `unterzeile`, `titel`, `einleitung` | dunkler Kopfbereich mit Raster |
 | `knopfMitmachen`, `knopfThemen` | die beiden Buttons im Kopfbereich |
-| `werWirSindTitel`, `werWirSindText` | weißer Bereich unter dem Kopf |
-| `themenAufruf` | grauer Streifen „Dein Bauteil fehlt noch“ unter dem Themenraster |
-| `mitmachenTitel`, `mitmachenText`, `mitmachenKnopf` | dunkler Bereich unten |
+| `schriftfeld` | Kästchen unter den Buttons (Benennung, Wettbewerb, …) |
+| `zeichnung` | Beschriftungen der Raketenzeichnung rechts im Kopf |
+| `werWirSindTitel`, `werWirSindText` | weißer Bereich unter dem Kopf (erster Absatz groß) |
+| `themenAufruf` | gestrichelter Kasten „Dein Bauteil fehlt noch“ unter den Themen |
+| `missionslogTitel`, `missionslogLink` | dunkles Band mit der Zeitleiste; die Einträge stehen in `seiten/ueber-uns.yaml` unter `rueckblick` |
+| `mitmachenTitel`, `mitmachenText`, `mitmachenKnopf` | grauer Bereich unten |
 
-Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Kleine Zeile über dem Namen“ und „Kurztext für die Startseite“, Reihenfolge über das Feld „Reihenfolge“).
+Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Skizze“, „Kleine Zeile über dem Namen“ und „Kurztext für die Startseite“, Reihenfolge über das Feld „Reihenfolge“).
+
+**Missionslog:** Die Zeitleiste steht auf der Startseite und auf „Über uns“. Einträge ändern in [`src/content/seiten/ueber-uns.yaml`](src/content/seiten/ueber-uns.yaml) unter `rueckblick`. Jeder Eintrag hat `zeitpunkt`, `titel`, `text` und `geplant` (`true` = noch nicht erreicht, wird gestrichelt gezeigt).
+
+### Skizzen der Themen austauschen
+
+Jedes Thema hat eine Linienzeichnung. Sie erscheint auf der Startseite, in der Themenübersicht und (weiß eingefärbt) im Kopf der Themenseite. Die Dateien liegen in [`public/grafiken/themen/`](public/grafiken/themen/):
+
+| Datei | Thema |
+|---|---|
+| `rover.svg` | Rover |
+| `rakete.svg` | Rakete |
+| `space-law.svg` | Space Law |
+| `entrepreneurship.svg` | Entrepreneurship |
+
+**Neue Skizze auf GitHub hochladen:**
+
+1. Ordner [`public/grafiken/themen/`](public/grafiken/themen/) öffnen, oben rechts **Add file → Upload files**.
+2. Die neue Datei mit **genau demselben Namen** hochladen, z. B. `rover.svg`. Sie ersetzt die alte.
+3. Unten „Commit changes“. Nach etwa einer Minute ist die neue Skizze online.
+
+Eine Datei mit anderem Namen oder als PNG geht auch. Dann zusätzlich in der Datei des Themas (z. B. [`src/content/themen/rover.yaml`](src/content/themen/rover.yaml)) die Zeile `skizze:` anpassen, z. B. `skizze: /grafiken/themen/doug.png`.
+
+So sieht eine gute Skizze aus:
+- Linienzeichnung in einer dunklen Farbe (am besten Navy `#182c3c`), **durchsichtiger Hintergrund**. Im dunklen Seitenkopf wird sie automatisch weiß.
+- Querformat, etwa 16 : 10. Am besten SVG (bleibt scharf), sonst PNG mit mindestens 800 px Breite.
+- Keine Fotos: Ein Foto für den Seitenkopf gehört ins Feld „Bild im Seitenkopf“ und hat dort Vorrang vor der Skizze.
 
 **Impressum und Datenschutz** stehen als Textdateien in [`src/content/rechtliches/`](src/content/rechtliches/) und lassen sich wie oben (Weg 1) direkt auf GitHub ändern. Überschriften beginnen mit `##`, ein `\` am Zeilenende erzwingt einen Zeilenumbruch.
 
 ## Gestaltung
 
+- **Leitidee: technische Zeichnung.** Dunkle Flächen tragen ein feines Millimeterraster, die Startseite zeigt Stella als beschriftete Schnittzeichnung mit Schriftfeld, jedes Thema hat eine eigene Skizze.
 - **Farben** aus dem Logo: Navy `#182c3c`, Ring-Grau `#eeeeee`, Weiß. Keine weiteren Akzentfarben.
 - **Schriften:** Barlow Semi Condensed für Überschriften (an DIN angelehnt, passt zur Logo-Umschrift), Source Sans 3 für Fließtext. Beide liegen auf dem eigenen Server, es gehen keine Daten an Google.
 - Festgelegt in [`src/styles/global.css`](src/styles/global.css).
@@ -118,6 +148,7 @@ src/lib/inhalte.ts         liest die Inhalte, Hilfsfunktionen
 src/layouts/Basis.astro    Kopfzeile, Navigation, Fußzeile
 src/styles/global.css      Farben, Schriften, Grundgestaltung
 public/                    Logo, Favicon, hochgeladene Bilder und Dateien
+public/grafiken/themen/    Skizzen der vier Themen
 ```
 
 `npm run build` erzeugt die fertige Seite in `dist/`, `npm run check` prüft den Code.

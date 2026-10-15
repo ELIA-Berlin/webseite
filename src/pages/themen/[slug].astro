@@ -34,6 +34,7 @@ const technikDa = Boolean(thema.technik.titel);
     einleitung={thema.einzeiler || (zeigePlatzhalter ? 'Inhalt folgt: Einzeiler' : null)}
     bild={thema.bild}
     bildBeschreibung={thema.bildBeschreibung}
+    skizze={thema.skizze}
   />
 
   <Abschnitt titel={texte.themaWorumEsGeht} leer={leer(thema.worumEsGeht)} platzhalter="Worum geht es in diesem Thema?">
@@ -141,7 +142,7 @@ const technikDa = Boolean(thema.technik.titel);
   .mitmachen { background: var(--ring); padding: clamp(2.5rem, 6vw, 4rem) 0; }
   .zwei { display: grid; gap: 2.5rem 4rem; }
   @media (min-width: 48rem) { .zwei { grid-template-columns: 1.4fr 1fr; } }
-  .mitmachen h2 { font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.2rem); }
+  .mitmachen h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem); }
   .person { display: flex; gap: 1.2rem; align-items: flex-start; }
   .person img { width: 6rem; height: 6rem; object-fit: cover; border-radius: 50%; }
   .person p { margin: 0 0 0.2rem; }
@@ -149,6 +150,6 @@ const technikDa = Boolean(thema.technik.titel);
   .platzhalter { border: 1.5px dashed var(--linie); border-radius: 4px; padding: 1rem 1.2rem; color: var(--grau); font-size: 1rem; }
 
   .abschnitt-news { padding: clamp(2.5rem, 6vw, 4rem) 0 clamp(3.5rem, 8vw, 5rem); }
-  .abschnitt-news h2 { font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.2rem); }
+  .abschnitt-news h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem); }
   .alle { margin-top: 1.2rem; font-family: var(--schrift-titel); font-weight: 600; }
 </style>
