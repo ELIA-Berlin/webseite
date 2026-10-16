@@ -19,3 +19,23 @@ wettbewerb:
     text: >-
       Wir wollen mit Doug an der European Rover Challenge teilnehmen. Deshalb
       richtet sich sein Design nach den technischen Vorgaben des Wettbewerbs.
+team:
+  foto: /bilder/themen/rover-team.jpg
+  fotoBeschreibung: >-
+    Micha und Victor hocken hinter einer Betonmauer, auf der Doug steht, ein
+    kleiner sechsrädriger Rover mit schwarzen Rädern und offener Verkabelung.
+  fotoFelder:
+    - name: Links
+      wert: Micha
+    - name: Rechts
+      wert: Victor
+    - name: Vorne
+      wert: Doug
+  text: |-
+    Micha und Victor leiten das Rover-Team gemeinsam. Beide studieren Informatik in Kultur und Gesundheit an der HTW Berlin.
+
+    Was sie antreibt: das Team, die Leidenschaft für die Technik und eine schlichte Erkenntnis: „Ein atziger Rover ist cool.“
+ansprechpersonen:
+  - micha
+  - victor
+ansprechpersonenBezeichnung: Teamleitung

@@ -10,6 +10,7 @@ import Abschnitt from '../../components/Abschnitt.astro';
 import Absaetze from '../../components/Absaetze.astro';
 import NewsListe from '../../components/NewsListe.astro';
 import Raketenzeichnung from '../../components/Raketenzeichnung.astro';
+import Schriftfeld from '../../components/Schriftfeld.astro';
 import { absaetze, allgemein, alleNews, alleThemen, reader, sichererLink, zeigePlatzhalter } from '../../lib/inhalte';
 
 export async function getStaticPaths() {
@@ -20,11 +21,17 @@ export async function getStaticPaths() {
 const { slug } = Astro.params;
 const thema = await reader.collections.themen.readOrThrow(slug!);
 const texte = await allgemein();
-const person = thema.ansprechperson ? await reader.collections.personen.read(thema.ansprechperson) : null;
+const personen = (
+  await Promise.all(thema.ansprechpersonen.filter(Boolean).map((p) => reader.collections.personen.read(p!)))
+).filter((p) => p !== null);
+const team = thema.team;
+const teamDa = Boolean(team.foto) || !leerText(team.text);
 const news = (await alleNews()).filter((n) => n.entry.thema === slug).slice(0, 3);
 const themenNamen = { [slug!]: thema.titel };
+function leerText(text?: string | null) { return absaetze(text).length === 0; }
+const leer = leerText;
 
-const leer = (text?: string | null) => absaetze(text).length === 0;
+
 const wettbewerb = thema.wettbewerb.discriminant ? thema.wettbewerb.value : null;
 const zeichnung = thema.technik.raketenzeichnung;
 const technikDa = Boolean(thema.technik.titel);
@@ -39,7 +46,7 @@ const technikDa = Boolean(thema.technik.titel);
     schriftfeld={[
       { name: texte.themaBereich || 'Bereich', wert: thema.einordnung !== wettbewerb?.name ? thema.einordnung : null },
       { name: texte.themaWettbewerb, wert: wettbewerb?.name },
-      { name: texte.themaAnsprechpersonKurz || 'Ansprechperson', wert: person?.name },
+      { name: thema.ansprechpersonenBezeichnung || texte.themaAnsprechpersonKurz || 'Ansprechperson', wert: personen.map((p) => p.name).join(', ') || null },
     ]}
   />
 
@@ -93,6 +100,20 @@ const technikDa = Boolean(thema.technik.titel);
     </Abschnitt>
   )}
 
+  {teamDa && (
+    <Abschnitt titel={texte.themaTeam || 'Das Team'}>
+      {team.foto && (
+        <figure class="teamfoto">
+          <img src={team.foto} alt={team.fotoBeschreibung || ''} width="1600" height="1067" loading="lazy" decoding="async" />
+          {team.fotoFelder.length > 0 && (
+            <figcaption><Schriftfeld felder={[...team.fotoFelder]} klein /></figcaption>
+          )}
+        </figure>
+      )}
+      <Absaetze text={team.text} />
+    </Abschnitt>
+  )}
+
   <section class="mitmachen">
     <div class="huelle zwei">
       <div>
@@ -103,22 +124,24 @@ const technikDa = Boolean(thema.technik.titel);
         <a class="knopf" href="/mitmachen">{texte.zumMitmachen}</a>
       </div>
       <div>
-        <h2>{texte.themaAnsprechperson}</h2>
-        {person ? (
-          <div class="person">
-            {person.foto && <img src={person.foto} alt="" width="96" height="96" />}
-            <div>
-              <p class="name">{person.name}</p>
-              {person.rolle && <p>{person.rolle}</p>}
-              <p><a href={`mailto:${person.email || texte.kontaktEmail}`}>{person.email || texte.kontaktEmail}</a></p>
-            </div>
-          </div>
+        <h2>{personen.length > 1 ? (texte.themaAnsprechpersonen || texte.themaAnsprechperson) : texte.themaAnsprechperson}</h2>
+        {personen.length > 0 ? (
+          <ul class="personen">
+            {personen.map((person) => (
+              <li class="person">
+                {person.foto && <img src={person.foto} alt="" width="96" height="96" />}
+                <div>
+                  <p class="name">{person.name}</p>
+                  {person.rolle && <p>{person.rolle}</p>}
+                  {person.email && <p><a href={`mailto:${person.email}`}>{person.email}</a></p>}
+                </div>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <>
-            {zeigePlatzhalter && <p class="platzhalter">Inhalt folgt: Person aus der Sammlung „Personen“</p>}
-            <p><a href={`mailto:${texte.kontaktEmail}`}>{texte.kontaktEmail}</a></p>
-          </>
+          zeigePlatzhalter && <p class="platzhalter">Inhalt folgt: Person aus der Sammlung „Personen“</p>
         )}
+        <p class="kontakt"><a href={`mailto:${personen.length === 1 && personen[0].email ? personen[0].email : texte.kontaktEmail}`}>{personen.length === 1 && personen[0].email ? personen[0].email : texte.kontaktEmail}</a></p>
       </div>
     </div>
   </section>
@@ -177,7 +200,19 @@ const technikDa = Boolean(thema.technik.titel);
   .zwei { display: grid; gap: 2.5rem 4rem; }
   @media (min-width: 48rem) { .zwei { grid-template-columns: 1.4fr 1fr; } }
   .mitmachen h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.6rem); }
+  .personen { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
   .person { display: flex; gap: 1.2rem; align-items: flex-start; }
+  .kontakt { margin-top: 1.2rem; }
+
+  /* Teamfoto als Zeichnungsblatt: Rahmen, darunter Schriftfeld mit Namen */
+  .teamfoto { margin: 0 0 2rem; border: 1.5px solid var(--navy); padding: 0.5rem 0.5rem 0; background: var(--weiss); }
+  .teamfoto img { display: block; width: 100%; height: auto; }
+  /* wie in anderen Abschnitten: erster Absatz als Einstieg größer */
+  .teamfoto + :global(p) { font-size: 1.3rem; line-height: 1.5; }
+  .teamfoto figcaption { margin: 0.5rem -0.5rem 0; }
+  .teamfoto figcaption :global(.schriftfeld) { border-left: 0; grid-template-columns: repeat(auto-fit, minmax(min(100%, 5.5rem), 1fr)); }
+  .teamfoto figcaption :global(.schriftfeld > div:last-child) { border-right: 0; }
+  .teamfoto figcaption :global(.schriftfeld > div) { border-bottom: 0; }
   .person img { width: 6rem; height: 6rem; object-fit: cover; border-radius: 50%; }
   .person p { margin: 0 0 0.2rem; }
   .name { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.3rem; }

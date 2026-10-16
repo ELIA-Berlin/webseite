@@ -149,10 +149,34 @@ export default config({
           },
         ),
 
-        ansprechperson: fields.relationship({
-          label: 'Ansprechperson',
-          description: 'Aus der Sammlung „Personen“.',
+        team: fields.object(
+          {
+            foto: bild('Teamfoto', 'themen', 'Querformat. Nur mit Einwilligung aller Personen auf dem Bild.'),
+            fotoBeschreibung: fields.text({ label: 'Bildbeschreibung', description: 'Für Screenreader: Wer und was ist auf dem Bild zu sehen?' }),
+            fotoFelder: fields.array(
+              fields.object({
+                name: fields.text({ label: 'Bezeichnung', description: 'z. B. Links, Rechts, Im Bild' }),
+                wert: fields.text({ label: 'Eintrag', description: 'z. B. ein Name' }),
+              }),
+              {
+                label: 'Schriftfeld unter dem Foto',
+                description: 'Wer steht wo? Leere Liste = kein Schriftfeld.',
+                itemLabel: (f) => [f.fields.name.value, f.fields.wert.value].filter(Boolean).join(': ') || 'Neues Feld',
+              },
+            ),
+            text: absatzText('Text zum Team'),
+          },
+          { label: 'Abschnitt „Team“ (optional)', description: 'Erscheint, sobald Foto oder Text ausgefüllt sind.' },
+        ),
+
+        ansprechpersonen: fields.multiRelationship({
+          label: 'Ansprechpersonen',
+          description: 'Eine oder mehrere Personen aus der Sammlung „Personen“.',
           collection: 'personen',
+        }),
+        ansprechpersonenBezeichnung: fields.text({
+          label: 'Bezeichnung im Schriftfeld (optional)',
+          description: 'z. B. „Teamleitung“. Leer lassen für „Ansprechperson“.',
         }),
         wenWirSuchen: absatzText('Wen wir suchen'),
       },
@@ -568,6 +592,8 @@ export default config({
         themaWettbewerb: fields.text({ label: 'Themenseite: Überschrift Wettbewerb' }),
         themaBereich: fields.text({ label: 'Schriftfeld: Bezeichnung für den Bereich eines Themas', description: 'z. B. Bereich' }),
         themaAnsprechpersonKurz: fields.text({ label: 'Schriftfeld: Bezeichnung für die Ansprechperson' }),
+        themaTeam: fields.text({ label: 'Themenseite: Überschrift Team' }),
+        themaAnsprechpersonen: fields.text({ label: 'Themenseite: Überschrift bei mehreren Ansprechpersonen' }),
         themaStand: fields.text({ label: 'Themenseite: Überschrift „Aktueller Stand“' }),
         themaFormate: fields.text({ label: 'Themenseite: Überschrift Formate' }),
         themaNews: fields.text({ label: 'Themenseite: Überschrift News' }),
