@@ -161,6 +161,7 @@ public/grafiken/themen/    Skizzen der vier Themen
 ## Banner „Nächstes Treffen“ auf „Mitmachen“
 
 - Oben auf der Seite steht das nächste Treffen, darunter (falls eingetragen) das nächste Event.
-- **Rhythmus** in `src/content/seiten/mitmachen.yaml` → `treffenRegel` (erstes Datum, alle … Wochen, Uhrzeit), **Ort** in `treffenWo`.
-- **Events, einzelne Treffen und Ausfälle** in `src/content/termine/`. Ein Ausfall ist ein Eintrag mit Häkchen „fällt aus“ am Tag des Treffens; das Banner springt dann auf das nächste Treffen.
+- **Quelle 1: Google Kalender.** Einmal pro Woche (montags früh) gleicht eine automatische Aufgabe die nächsten Termine mit dem Titel **„ELIA Treffen“** aus dem Kalender `raumfahrthtw@gmail.com` ab und schreibt sie nach `src/content/kalender.yaml` (nur Datum, Uhrzeit, Ort; andere Kalendertermine werden nie übernommen). Treffen verschieben, absagen oder einen Raum eintragen also einfach im Kalender – spätestens am nächsten Montag steht es auf der Webseite.
+- **Quelle 2: Rhythmus** in `src/content/seiten/mitmachen.yaml` → `treffenRegel`. Wird nur nach dem letzten Kalendertermin verwendet, damit das Banner auch stimmt, falls der Abgleich einmal ausfällt. **Ort** als Rückfallwert in `treffenWo`.
+- **Events, einzelne Treffen und Ausfälle** können zusätzlich von Hand in `src/content/termine/` stehen. Ein Ausfall ist ein Eintrag mit Häkchen „fällt aus“ am Tag des Treffens.
 - Ist ein Termin vorbei, springt das Banner von selbst weiter, auch ohne neues Veröffentlichen.
