@@ -174,6 +174,10 @@ export default config({
           description: 'Eine oder mehrere Personen aus der Sammlung „Personen“.',
           collection: 'personen',
         }),
+        kontaktEmail: fields.text({
+          label: 'Kontakt-E-Mail für dieses Thema (optional)',
+          description: 'z. B. doug@elia-space.de. Leer lassen für die allgemeine Kontaktadresse.',
+        }),
         ansprechpersonenBezeichnung: fields.text({
           label: 'Bezeichnung im Schriftfeld (optional)',
           description: 'z. B. „Teamleitung“. Leer lassen für „Ansprechperson“.',

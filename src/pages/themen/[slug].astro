@@ -25,6 +25,7 @@ const personen = (
   await Promise.all(thema.ansprechpersonen.filter(Boolean).map((p) => reader.collections.personen.read(p!)))
 ).filter((p) => p !== null);
 const team = thema.team;
+const kontakt = thema.kontaktEmail || (personen.length === 1 && personen[0].email) || texte.kontaktEmail;
 const teamDa = Boolean(team.foto) || !leerText(team.text);
 const news = (await alleNews()).filter((n) => n.entry.thema === slug).slice(0, 3);
 const themenNamen = { [slug!]: thema.titel };
@@ -141,7 +142,7 @@ const technikDa = Boolean(thema.technik.titel);
         ) : (
           zeigePlatzhalter && <p class="platzhalter">Inhalt folgt: Person aus der Sammlung „Personen“</p>
         )}
-        <p class="kontakt"><a href={`mailto:${personen.length === 1 && personen[0].email ? personen[0].email : texte.kontaktEmail}`}>{personen.length === 1 && personen[0].email ? personen[0].email : texte.kontaktEmail}</a></p>
+        <p class="kontakt"><a href={`mailto:${kontakt}`}>{kontakt}</a></p>
       </div>
     </div>
   </section>
