@@ -6,6 +6,20 @@ import keystaticConfig from '../../keystatic.config';
 
 export const reader = createReader(process.cwd(), keystaticConfig);
 
+/**
+ * Lässt nur ungefährliche Link-Ziele durch: https/http, mailto, tel und Pfade auf der eigenen Seite.
+ * Alles andere (z. B. „javascript:…“) wird verworfen, damit ein Tippfehler oder ein
+ * manipulierter Eintrag im Editor keinen Schadcode in die Seite bringen kann.
+ */
+export const sichererLink = (url?: string | null): string | undefined => {
+  const u = (url ?? '').trim();
+  if (!u) return undefined;
+  if (/^(https?:|mailto:|tel:)/i.test(u)) return u;
+  if (u.startsWith('/') && !u.startsWith('//')) return u;
+  if (u.startsWith('#')) return u;
+  return undefined;
+};
+
 /** Leerzeile im Editor = neuer Absatz */
 export const absaetze = (text?: string | null) =>
   (text ?? '').split(/\n\s*\n/).map((a) => a.trim()).filter(Boolean);

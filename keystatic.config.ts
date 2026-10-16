@@ -506,7 +506,7 @@ export default config({
       schema: {
         hinweis: fields.text({
           label: 'Hinweis',
-          description: 'Diese Seite wird dienstags automatisch aus dem Google Kalender (raumfahrthtw@gmail.com, Termine „ELIA Treffen“) überschrieben. Änderungen bitte im Kalender machen, nicht hier.',
+          description: 'Diese Seite wird dienstags automatisch aus dem Google Kalender des Vereins (Termine „ELIA Treffen“) überschrieben. Änderungen bitte im Kalender machen, nicht hier.',
         }),
         aktualisiert: fields.date({ label: 'Zuletzt abgeglichen' }),
         treffen: fields.array(

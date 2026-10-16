@@ -10,7 +10,7 @@ import Abschnitt from '../../components/Abschnitt.astro';
 import Absaetze from '../../components/Absaetze.astro';
 import NewsListe from '../../components/NewsListe.astro';
 import Raketenzeichnung from '../../components/Raketenzeichnung.astro';
-import { absaetze, allgemein, alleNews, alleThemen, reader, zeigePlatzhalter } from '../../lib/inhalte';
+import { absaetze, allgemein, alleNews, alleThemen, reader, sichererLink, zeigePlatzhalter } from '../../lib/inhalte';
 
 export async function getStaticPaths() {
   const themen = await alleThemen();
@@ -46,7 +46,7 @@ const technikDa = Boolean(thema.technik.titel);
   {wettbewerb && (
     <Abschnitt titel={wettbewerb.name || texte.themaWettbewerb} leer={leer(wettbewerb.text)} platzhalter="Was ist der Wettbewerb, was ist unser Ziel?">
       <Absaetze text={wettbewerb.text} />
-      {wettbewerb.link && <p><a href={wettbewerb.link}>{wettbewerb.name || texte.themaWettbewerb} ↗</a></p>}
+      {sichererLink(wettbewerb.link) && <p><a href={sichererLink(wettbewerb.link)}>{wettbewerb.name || texte.themaWettbewerb} ↗</a></p>}
     </Abschnitt>
   )}
 

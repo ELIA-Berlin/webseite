@@ -81,7 +81,14 @@ Die Änderung landet in der passenden Datei unter `src/content/` und wird wie ge
 
 ### Weg 3: Online-Editor (folgt)
 
-Sobald die Seite bei Netlify läuft und der Login über GitHub eingerichtet ist, funktioniert derselbe Editor direkt unter `https://<unsere-domain>/keystatic`. Dann reicht ein GitHub-Account mit Schreibrechten, und jede gespeicherte Änderung ist nach ein bis zwei Minuten online.
+Sobald der Login über GitHub eingerichtet ist, funktioniert derselbe Editor direkt unter `https://eliaspace.de/keystatic`. Dann reicht ein GitHub-Account mit Schreibrechten, und jede gespeicherte Änderung ist nach ein bis zwei Minuten online.
+
+**Wichtig für die Einrichtung:** Bis dahin ist der Editor absichtlich *nicht* Teil der Live-Seite (siehe `astro.config.mjs`). Im lokalen Modus hat er keine Anmeldung; mit ausgeliefert könnte jeder ihn öffnen und die Dateiliste des Servers abrufen. Für den Online-Editor müssen zusammen passieren:
+
+1. In `keystatic.config.ts` den Speicher auf `{ kind: 'github', repo: 'ELIA-Berlin/webseite' }` umstellen (nur außerhalb von `npm run dev`).
+2. In `astro.config.mjs` Keystatic auch im Build einbinden und einen Adapter für den Hoster ergänzen (z. B. `@astrojs/netlify` oder `@astrojs/cloudflare`).
+3. Die vier `KEYSTATIC_…`-Werte beim Hoster als Umgebungsvariablen eintragen, niemals ins Repo.
+4. Die Content-Security-Policy in `netlify.toml` für `/keystatic` um `https://api.github.com` (connect-src) und `https://avatars.githubusercontent.com` (img-src) erweitern.
 
 ### Welches Feld steht wo? (Startseite)
 
@@ -140,7 +147,7 @@ So sieht eine gute Skizze aus:
 |---|---|
 | [Astro](https://docs.astro.build) | baut die Seite als statisches HTML |
 | [Keystatic](https://keystatic.com/docs) | Editor unter `/keystatic`, Felder definiert in `keystatic.config.ts` |
-| Netlify | Hosting, Einstellungen in `netlify.toml` (Einrichtung folgt) |
+| Netlify | Hosting und Sicherheits-Header, Einstellungen in `netlify.toml` |
 
 ```
 keystatic.config.ts        welche Texte im Editor bearbeitbar sind
@@ -161,7 +168,14 @@ public/grafiken/themen/    Skizzen der vier Themen
 ## Banner „Nächstes Treffen“ auf „Mitmachen“
 
 - Oben auf der Seite steht das nächste Treffen, darunter (falls eingetragen) das nächste Event.
-- **Quelle 1: Google Kalender.** Dienstags um 07:35 und 17:35 Uhr gleicht eine automatische Aufgabe die nächsten Termine mit dem Titel **„ELIA Treffen“** aus dem Kalender `raumfahrthtw@gmail.com` ab und schreibt sie nach `src/content/kalender.yaml` (nur Datum, Uhrzeit, Ort; andere Kalendertermine werden nie übernommen). Treffen verschieben, absagen oder einen Raum eintragen also einfach im Kalender – am Treffen-Tag steht es auf der Webseite.
+- **Quelle 1: Google Kalender.** Dienstags um 07:35 und 17:35 Uhr gleicht eine automatische Aufgabe die nächsten Termine mit dem Titel **„ELIA Treffen“** aus dem Google Kalender des Vereins ab (Zugang beim Vorstand) und schreibt sie nach `src/content/kalender.yaml` (nur Datum, Uhrzeit, Ort; andere Kalendertermine werden nie übernommen). Treffen verschieben, absagen oder einen Raum eintragen also einfach im Kalender – am Treffen-Tag steht es auf der Webseite.
 - **Quelle 2: Rhythmus** in `src/content/seiten/mitmachen.yaml` → `treffenRegel`. Wird nur nach dem letzten Kalendertermin verwendet, damit das Banner auch stimmt, falls der Abgleich einmal ausfällt. **Ort** als Rückfallwert in `treffenWo`.
 - **Events, einzelne Treffen und Ausfälle** können zusätzlich von Hand in `src/content/termine/` stehen. Ein Ausfall ist ein Eintrag mit Häkchen „fällt aus“ am Tag des Treffens.
 - Ein Treffen steht bis zu seiner Startzeit im Banner, danach rückt das nächste nach (Events bis zum Ende ihres Tages) – das prüft der Browser selbst, auch ohne neues Veröffentlichen.
+
+## Sicherheit
+
+- **Keine Geheimnisse ins Repo.** Das Repo ist öffentlich. Passwörter, API-Schlüssel und die `KEYSTATIC_…`-Werte gehören nur in die Umgebungsvariablen des Hosters. `.env`-Dateien sind über `.gitignore` ausgeschlossen.
+- **Keine privaten E-Mail-Adressen in Commits.** Jeder Commit zeigt öffentlich Name und E-Mail des Autors. Am besten auf GitHub unter *Settings → Emails* „Keep my email addresses private“ aktivieren und lokal die angezeigte `…@users.noreply.github.com`-Adresse verwenden (`git config user.email …`).
+- **Keine personenbezogenen Daten ohne Einverständnis** (Fotos, private Kontaktdaten). Für Ansprechpersonen die Vereinsadressen `…@elia-space.de` nutzen.
+- **Externe Inhalte** (Videos, Karten, fremde Bilder) werden von der Content-Security-Policy in `netlify.toml` blockiert. Wer so etwas einbaut, muss die Policy erweitern und die Datenschutzerklärung ergänzen.

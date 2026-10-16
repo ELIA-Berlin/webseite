@@ -10,7 +10,7 @@ import Basis from '../layouts/Basis.astro';
 import Seitenkopf from '../components/Seitenkopf.astro';
 import Abschnitt from '../components/Abschnitt.astro';
 import Absaetze from '../components/Absaetze.astro';
-import { absaetze, allgemein, alleThemen, kommendeTermine, reader } from '../lib/inhalte';
+import { absaetze, allgemein, alleThemen, kommendeTermine, reader, sichererLink } from '../lib/inhalte';
 
 const seite = await reader.singletons.mitmachen.readOrThrow();
 const texte = await allgemein();
@@ -59,7 +59,7 @@ const datumText = (iso: string) =>
             {events.map((e, i) => (
               <p data-datum={e.datum} data-bis={sichtbarBis(e)} hidden={i > 0}>
                 <span class="banner__label">{seite.bannerEvent}</span>
-                <span><time datetime={e.datum}>{datumText(e.datum)}</time>: {e.link ? <a href={e.link}>{e.titel}</a> : e.titel}</span>
+                <span><time datetime={e.datum}>{datumText(e.datum)}</time>: {sichererLink(e.link) ? <a href={sichererLink(e.link)}>{e.titel}</a> : e.titel}</span>
               </p>
             ))}
           </div>

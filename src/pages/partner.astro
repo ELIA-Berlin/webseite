@@ -4,7 +4,7 @@ import Basis from '../layouts/Basis.astro';
 import Seitenkopf from '../components/Seitenkopf.astro';
 import Abschnitt from '../components/Abschnitt.astro';
 import Absaetze from '../components/Absaetze.astro';
-import { absaetze, allgemein, reader } from '../lib/inhalte';
+import { absaetze, allgemein, reader, sichererLink } from '../lib/inhalte';
 
 const seite = await reader.singletons.partnerSeite.readOrThrow();
 const texte = await allgemein();
@@ -29,7 +29,7 @@ for (const s of sponsoren) {
         <ul class="logos">
           {liste.map(({ entry }) => (
             <li>
-              <a href={entry.link || undefined}>
+              <a href={sichererLink(entry.link)}>
                 {entry.logo ? <img src={entry.logo} alt={entry.name} loading="lazy" /> : <span>{entry.name}</span>}
               </a>
             </li>
@@ -45,7 +45,7 @@ for (const s of sponsoren) {
         <li>
           {entry.logo && <img src={entry.logo} alt="" loading="lazy" />}
           <div>
-            <h3>{entry.link ? <a href={entry.link}>{entry.name}</a> : entry.name}</h3>
+            <h3>{sichererLink(entry.link) ? <a href={sichererLink(entry.link)}>{entry.name}</a> : entry.name}</h3>
             {entry.text && <p>{entry.text}</p>}
           </div>
         </li>
@@ -60,7 +60,7 @@ for (const s of sponsoren) {
   <Abschnitt titel={seite.mappeTitel} grau>
     {seite.mappeText && <p>{seite.mappeText}</p>}
     <p class="knoepfe">
-      {seite.mappe && <a class="knopf" href={seite.mappe} download>{seite.mappeKnopf}</a>}
+      {sichererLink(seite.mappe) && <a class="knopf" href={sichererLink(seite.mappe)} download>{seite.mappeKnopf}</a>}
       <a class:list={['knopf', { 'knopf--rahmen': seite.mappe }]} href={`mailto:${texte.kontaktEmail}`}>{seite.kontaktKnopf}</a>
     </p>
   </Abschnitt>

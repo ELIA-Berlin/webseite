@@ -3,7 +3,7 @@
  * Grundgerüst jeder Seite: Kopfzeile mit Navigation, Inhalt, Fußzeile.
  */
 import '../styles/global.css';
-import { allgemein } from '../lib/inhalte';
+import { allgemein, sichererLink } from '../lib/inhalte';
 
 interface Props {
   titel?: string;
@@ -47,7 +47,7 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
             <summary>{texte.menueKnopf}</summary>
             <ul>
               {navigation.map((punkt) => (
-                <li><a href={punkt.link} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
+                <li><a href={sichererLink(punkt.link)} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
               ))}
             </ul>
           </details>
