@@ -3,7 +3,7 @@
  * Grundgerüst jeder Seite: Kopfzeile mit Navigation, Inhalt, Fußzeile.
  */
 import '../styles/global.css';
-import { allgemein, sichererLink } from '../lib/inhalte';
+import { allgemein, alleThemen, sichererLink } from '../lib/inhalte';
 import Schriftfeld from '../components/Schriftfeld.astro';
 
 interface Props {
@@ -20,6 +20,8 @@ const seitentitel = titel ? `${titel} | ELIA` : 'ELIA – Studentische Raumfahrt
 // (Editor: „Menü, Fußzeile & Beschriftungen“). Ist das Menü leer, wird keins angezeigt.
 const texte = await allgemein();
 const navigation = texte.navigation;
+// Unter dem Menüpunkt „/themen“ erscheinen automatisch alle Themen als Untermenü.
+const themen = await alleThemen();
 const pfad = Astro.url.pathname.replace(/\/$/, '');
 const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
 ---
@@ -58,7 +60,30 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
           <details class="menue">
             <summary>{texte.menueKnopf}</summary>
             <ul>
-              {navigation.map((punkt) => (
+              {navigation.map((punkt) => punkt.link === '/themen' && themen.length > 0 ? (
+                <li class="mit-unter">
+                  <span class="unter__zeile">
+                    <a href={sichererLink(punkt.link)} aria-current={pfad === punkt.link ? 'page' : undefined} class:list={{ teil: pfad.startsWith(`${punkt.link}/`) }}>{punkt.text}</a>
+                    <button class="unter__knopf" type="button" aria-expanded="false" aria-controls="untermenue-themen">
+                      <span class="sr">{texte.menueUnterKnopf || 'Untermenü'}: {punkt.text}</span>
+                      <svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 L6 6.5 L11 1.5" /></svg>
+                    </button>
+                  </span>
+                  <ul class="unter" id="untermenue-themen">
+                    {themen.map(({ slug, entry }) => (
+                      <li>
+                        <a href={`/themen/${slug}`} aria-current={pfad === `/themen/${slug}` ? 'page' : undefined}>
+                          <span class="unter__skizze">{entry.skizze && <img src={entry.skizze} alt="" width="48" height="32" />}</span>
+                          <span class="unter__text">
+                            <span class="unter__titel">{entry.titel}</span>
+                            {entry.einordnung && <span class="unter__einordnung">{entry.einordnung}</span>}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ) : (
                 <li><a href={sichererLink(punkt.link)} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
               ))}
             </ul>
@@ -115,22 +140,62 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
     padding: 0.45rem 0.9rem; border-radius: 4px; box-shadow: inset 0 0 0 1.5px rgb(255 255 255 / 0.5);
   }
   .menue summary::-webkit-details-marker { display: none; }
-  .menue ul {
-    list-style: none; margin: 0; padding: 0.5rem 0;
+  .menue ul { list-style: none; margin: 0; padding: 0; }
+  .menue > ul {
+    padding: 0.5rem 0;
     position: absolute; left: 0; right: 0; top: 100%;
     background: var(--nacht); border-bottom: 1px solid rgb(255 255 255 / 0.14);
   }
-  .menue a {
+  .menue > ul > li > a, .unter__zeile > a {
     display: block; padding: 0.75rem var(--rand);
     font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem; text-decoration: none;
   }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+  /* Untermenü Themen: auf dem Handy immer ausgeklappt und eingerückt */
+  .unter__zeile { display: flex; align-items: center; }
+  .unter__knopf { display: none; }
+  .menue .unter { padding: 0 var(--rand) 0.4rem calc(var(--rand) + 0.9rem); }
+  .unter a { display: flex; align-items: center; gap: 0.8rem; padding: 0.45rem 0; text-decoration: none; }
+  .unter__skizze { display: grid; place-items: center; width: 3rem; height: 2rem; flex: none; }
+  .unter__skizze img { max-width: 100%; max-height: 100%; width: auto; height: auto; filter: brightness(0) invert(1); opacity: 0.85; }
+  .unter__text { display: grid; line-height: 1.2; }
+  .unter__titel { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.1rem; }
+  .unter__einordnung { font-size: 0.85rem; color: rgb(255 255 255 / 0.58); }
+  .unter a[aria-current='page'] .unter__titel { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
 
   @media (min-width: 52rem) {
     .menue summary { display: none; }
-    .menue ul { position: static; display: flex; gap: 2rem; padding: 0; border: 0; background: none; }
-    .menue a { padding: 0.3rem 0; font-size: 1.05rem; opacity: 0.85; }
-    .menue a:hover { opacity: 1; text-decoration: underline; }
-    .menue a[aria-current='page'] { opacity: 1; text-decoration: underline; text-decoration-thickness: 2px; }
+    .menue > ul { position: static; display: flex; align-items: center; gap: 2rem; padding: 0; border: 0; background: none; }
+    .menue > ul > li > a, .unter__zeile > a { padding: 0.3rem 0; font-size: 1.05rem; opacity: 0.85; }
+    .menue > ul > li > a:hover, .unter__zeile > a:hover { opacity: 1; text-decoration: underline; }
+    .menue > ul > li > a[aria-current='page'], .unter__zeile > a[aria-current='page'], .unter__zeile > a.teil {
+      opacity: 1; text-decoration: underline; text-decoration-thickness: 2px;
+    }
+
+    /* Untermenü als Tafel unter „Themen“: öffnet bei Maus, Tastatur oder Klick auf den Pfeil */
+    .mit-unter { position: relative; }
+    .unter__knopf {
+      display: grid; place-items: center; width: 1.6rem; height: 1.6rem; margin-left: 0.15rem;
+      background: none; border: 0; border-radius: 3px; color: inherit; cursor: pointer; opacity: 0.85;
+    }
+    .unter__knopf svg { width: 0.7rem; fill: none; stroke: currentColor; stroke-width: 1.6; }
+    .unter__knopf:hover { opacity: 1; background: rgb(255 255 255 / 0.08); }
+    .menue .unter {
+      display: none;
+      position: absolute; top: calc(100% + 0.9rem); left: -1rem; z-index: 10;
+      min-width: 19rem; padding: 0.5rem;
+      background: var(--nacht); border: 1px solid rgb(255 255 255 / 0.22);
+      box-shadow: 0 18px 40px rgb(0 0 0 / 0.45);
+    }
+    /* unsichtbare Brücke, damit die Maus auf dem Weg zur Tafel das Menü nicht schließt */
+    .unter::before { content: ''; position: absolute; left: 0; right: 0; top: -1rem; height: 1rem; }
+    .mit-unter:hover .unter, .mit-unter:focus-within .unter, .mit-unter[data-offen] .unter { display: block; }
+    .mit-unter[data-zu] .unter { display: none; }
+    .mit-unter[data-offen] .unter__knopf svg, .mit-unter:hover .unter__knopf svg { transform: rotate(180deg); }
+    .unter a { padding: 0.55rem 0.7rem; border-radius: 3px; }
+    .unter a:hover, .unter a:focus-visible { background: rgb(255 255 255 / 0.07); }
+    .unter a:hover .unter__titel { text-decoration: underline; text-underline-offset: 0.2em; }
   }
 
   .fuss { --raster-y: -1px; color: var(--weiss); padding: clamp(3rem, 7vw, 4.5rem) 0 clamp(2.5rem, 6vw, 3.5rem); border-top: 1px solid rgb(255 255 255 / 0.14); }
@@ -151,4 +216,23 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
   const anpassen = () => { if (menue) menue.open = breit.matches; };
   anpassen();
   breit.addEventListener('change', anpassen);
+
+  // Untermenü „Themen“: Pfeil öffnet und schließt per Klick, Escape schließt.
+  for (const eintrag of document.querySelectorAll<HTMLElement>('.mit-unter')) {
+    const knopf = eintrag.querySelector<HTMLButtonElement>('.unter__knopf');
+    if (!knopf) continue;
+    const setzen = (offen: boolean) => {
+      knopf.setAttribute('aria-expanded', String(offen));
+      eintrag.toggleAttribute('data-offen', offen);
+      eintrag.toggleAttribute('data-zu', !offen);
+    };
+    knopf.addEventListener('click', () => setzen(knopf.getAttribute('aria-expanded') !== 'true'));
+    eintrag.addEventListener('mouseleave', () => eintrag.removeAttribute('data-zu'));
+    eintrag.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { setzen(false); knopf.focus(); }
+    });
+    document.addEventListener('click', (e) => {
+      if (!eintrag.contains(e.target as Node) && eintrag.hasAttribute('data-offen')) setzen(false);
+    });
+  }
 </script>

@@ -572,6 +572,7 @@ export default config({
           },
         ),
         menueKnopf: fields.text({ label: 'Menü-Button auf dem Handy' }),
+        menueUnterKnopf: fields.text({ label: 'Menü: Vorlesetext für den Pfeil am Untermenü', description: 'Für Screenreader, z. B. „Untermenü“' }),
         kontaktEmail: fields.text({ label: 'Kontakt-E-Mail', description: 'Wird überall verwendet, wo „Kontakt aufnehmen“ steht.' }),
         kontaktKnopf: fields.text({ label: 'Button „Kontakt aufnehmen“' }),
         fussText: fields.text({ label: 'Fußzeile: Text links' }),

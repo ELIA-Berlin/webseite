@@ -10,6 +10,7 @@ navigation:
   - text: Über uns
     link: /ueber-uns
 menueKnopf: Menü
+menueUnterKnopf: Untermenü
 kontaktEmail: vorstand@elia-space.de
 kontaktKnopf: Kontakt aufnehmen
 fussText: Exploration, Learning & Innovation in Aerospace
