@@ -32,7 +32,7 @@ export default config({
     brand: { name: 'ELIA Webseite' },
     navigation: {
       Seiten: ['startseite', 'themenSeite', 'newsSeite', 'mitmachen', 'partnerSeite', 'ueberUns'],
-      Inhalte: ['themen', 'news', 'personen', 'partner'],
+      Inhalte: ['themen', 'news', 'positionen', 'termine', 'personen', 'partner'],
       Allgemein: ['allgemein'],
     },
   },
@@ -189,6 +189,76 @@ export default config({
       },
     }),
 
+    /* ---------- Offene Positionen (Seite „Mitmachen“) ---------- */
+    positionen: collection({
+      label: 'Offene Positionen',
+      path: 'src/content/positionen/*',
+      slugField: 'titel',
+      format: 'yaml',
+      columns: ['titel', 'aktiv', 'grosserBedarf'],
+      schema: {
+        titel: fields.slug({
+          name: { label: 'Titel', description: 'z. B. „Elektronik für Doug“ oder „Social Media“' },
+        }),
+        aktiv: fields.checkbox({
+          label: 'Wird gerade gesucht',
+          description: 'Häkchen entfernen, um die Position auszublenden, ohne sie zu löschen.',
+          defaultValue: true,
+        }),
+        grosserBedarf: fields.checkbox({
+          label: 'Großer Bedarf',
+          description: 'Wird hervorgehoben und steht oben.',
+          defaultValue: false,
+        }),
+        thema: fields.relationship({
+          label: 'Thema (optional)',
+          description: 'Leer lassen für Aufgaben im ganzen Verein, z. B. Öffentlichkeitsarbeit.',
+          collection: 'themen',
+        }),
+        bereich: fields.text({
+          label: 'Bereich (optional)',
+          description: 'Statt eines Themas, z. B. „Verein“ oder „Öffentlichkeitsarbeit“.',
+        }),
+        beschreibung: fields.text({ label: 'Was du machst', multiline: true }),
+        mitbringen: fields.text({
+          label: 'Was du mitbringen solltest (optional)',
+          description: 'Kurz halten. Vorwissen ist bei uns keine Pflicht.',
+          multiline: true,
+        }),
+        reihenfolge: fields.integer({ label: 'Reihenfolge', description: 'Kleinere Zahl steht weiter vorne.', defaultValue: 1 }),
+      },
+    }),
+
+    /* ---------- Termine (Seite „Mitmachen“) ---------- */
+    termine: collection({
+      label: 'Termine',
+      path: 'src/content/termine/*',
+      slugField: 'titel',
+      format: 'yaml',
+      columns: ['titel', 'datum'],
+      schema: {
+        titel: fields.slug({ name: { label: 'Titel', description: 'z. B. „Raketenstart in Brandenburg“' } }),
+        datum: fields.date({ label: 'Datum', validation: { isRequired: true } }),
+        uhrzeit: fields.text({ label: 'Uhrzeit (optional)', description: 'z. B. 17:30 oder 10–16 Uhr' }),
+        art: fields.select({
+          label: 'Art',
+          options: [
+            { label: 'Event (z. B. Messe, Start, Vortrag)', value: 'event' },
+            { label: 'Treffen (einzelnes Treffen außerhalb des Rhythmus)', value: 'treffen' },
+          ],
+          defaultValue: 'event',
+        }),
+        ort: fields.text({ label: 'Ort (optional)' }),
+        beschreibung: fields.text({ label: 'Beschreibung (optional)', multiline: true }),
+        link: fields.url({ label: 'Link (optional)', description: 'z. B. zur Anmeldung oder zur Veranstaltung' }),
+        faelltAus: fields.checkbox({
+          label: 'Regelmäßiges Treffen fällt an diesem Tag aus',
+          description: 'Nur für Ausfälle: Titel z. B. „Kein Treffen“, Datum = Tag des Treffens. Das Treffen verschwindet dann aus der Liste.',
+          defaultValue: false,
+        }),
+      },
+    }),
+
     /* ---------- Personen ---------- */
     personen: collection({
       label: 'Personen',
@@ -336,12 +406,44 @@ export default config({
           }),
           { label: 'So läuft der Einstieg: Schritte', itemLabel: (s) => s.fields.titel.value || 'Neuer Schritt' },
         ),
-        treffenTitel: fields.text({ label: 'Treffen: Überschrift' }),
-        treffenWann: fields.text({ label: 'Wann', description: 'z. B. jeden Dienstag, 18 Uhr' }),
-        treffenWo: fields.text({ label: 'Wo', multiline: true }),
-        treffenHinweis: fields.text({ label: 'Hinweis (optional)', multiline: true }),
+        positionenTitel: fields.text({ label: 'Offene Positionen: Überschrift' }),
+        positionenText: fields.text({
+          label: 'Offene Positionen: Einleitung (optional)',
+          description: 'Die Positionen selbst stehen unter Inhalte → Offene Positionen.',
+          multiline: true,
+        }),
+        positionenBedarf: fields.text({ label: 'Offene Positionen: Markierung „großer Bedarf“' }),
+        positionenMitbringen: fields.text({ label: 'Offene Positionen: Beschriftung „Mitbringen“' }),
+        positionenKnopf: fields.text({ label: 'Offene Positionen: Button', description: 'Öffnet eine E-Mail mit der Position im Betreff.' }),
+        positionenBetreff: fields.text({ label: 'Offene Positionen: Betreff der E-Mail', description: 'Der Titel der Position wird angehängt.' }),
+
+        treffenTitel: fields.text({ label: 'Termine: Überschrift' }),
+        treffenWann: fields.text({ label: 'Regelmäßiges Treffen: wann (Text)', description: 'z. B. „Dienstags, 17:30 Uhr“' }),
+        treffenWo: fields.text({ label: 'Regelmäßiges Treffen: wo', multiline: true }),
+        treffenHinweis: fields.text({ label: 'Regelmäßiges Treffen: Hinweis (optional)', multiline: true }),
+        treffenRegel: fields.object(
+          {
+            name: fields.text({ label: 'Name in der Terminliste', description: 'z. B. Teamtreffen' }),
+            erstesDatum: fields.date({ label: 'Erstes Treffen in diesem Rhythmus' }),
+            alleWochen: fields.integer({ label: 'Alle … Wochen', description: '1 = jede Woche, 2 = alle zwei Wochen', defaultValue: 2 }),
+            uhrzeit: fields.text({ label: 'Uhrzeit', description: 'z. B. 17:30' }),
+          },
+          {
+            label: 'Regelmäßiges Treffen: Rhythmus für die Terminliste',
+            description: 'Daraus werden die nächsten Treffen automatisch berechnet. Einzelne Ausfälle unter Inhalte → Termine eintragen.',
+          },
+        ),
+        termineAnzahl: fields.integer({ label: 'Wie viele kommende Termine angezeigt werden', defaultValue: 6 }),
+        termineKeine: fields.text({ label: 'Hinweis, wenn keine Termine anstehen' }),
+        terminTreffen: fields.text({ label: 'Beschriftung „Treffen“' }),
+        terminEvent: fields.text({ label: 'Beschriftung „Event“' }),
+
         kontaktTitel: fields.text({ label: 'Kontakt: Überschrift' }),
         kontaktText: fields.text({ label: 'Kontakt: Text', multiline: true }),
+        kontaktEmail: fields.text({
+          label: 'Kontakt: E-Mail',
+          description: 'Für „Kontakt aufnehmen“ und die Buttons bei den Positionen. Leer lassen = allgemeine Kontakt-E-Mail.',
+        }),
       },
     }),
 

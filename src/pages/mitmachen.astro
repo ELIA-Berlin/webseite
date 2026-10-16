@@ -1,17 +1,65 @@
 ---
-/** Mitmachen. Texte: src/content/seiten/mitmachen.yaml */
+/**
+ * Mitmachen.
+ * Texte: src/content/seiten/mitmachen.yaml (Editor: Seiten → Mitmachen)
+ * Positionen: src/content/positionen/ (Editor: Inhalte → Offene Positionen)
+ * Termine: src/content/termine/ (Editor: Inhalte → Termine) plus das regelmäßige Treffen,
+ * das aus dem Rhythmus in mitmachen.yaml berechnet wird.
+ */
 import Basis from '../layouts/Basis.astro';
 import Seitenkopf from '../components/Seitenkopf.astro';
 import Abschnitt from '../components/Abschnitt.astro';
 import Absaetze from '../components/Absaetze.astro';
-import { absaetze, allgemein, reader } from '../lib/inhalte';
+import { absaetze, allgemein, alleThemen, kommendeTermine, reader } from '../lib/inhalte';
 
 const seite = await reader.singletons.mitmachen.readOrThrow();
 const texte = await allgemein();
+const email = seite.kontaktEmail || texte.kontaktEmail;
 const leer = (text?: string | null) => absaetze(text).length === 0;
+
+// Offene Positionen: nur aktive, „großer Bedarf“ zuerst, dann nach Reihenfolge
+const themenNamen = Object.fromEntries((await alleThemen()).map((t) => [t.slug, t.entry.titel]));
+const positionen = (await reader.collections.positionen.all())
+  .filter((p) => p.entry.aktiv)
+  .sort((a, b) =>
+    Number(b.entry.grosserBedarf) - Number(a.entry.grosserBedarf) ||
+    (a.entry.reihenfolge ?? 99) - (b.entry.reihenfolge ?? 99));
+const bewerben = (titel: string) =>
+  `mailto:${email}?subject=${encodeURIComponent(`${seite.positionenBetreff ?? ''} ${titel}`.trim())}`;
+
+// Termine: Alle kommenden stehen im HTML, das Skript unten blendet Vergangenes aus
+// und zeigt höchstens „termineAnzahl“ Stück.
+const termine = (await kommendeTermine()).slice(0, 40);
+const anzahl = Math.max(1, seite.termineAnzahl ?? 6);
+const tag = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('de-DE', { day: 'numeric', timeZone: 'UTC' });
+const monat = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('de-DE', { month: 'short', timeZone: 'UTC' }).replace('.', '');
+const wochentag = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('de-DE', { weekday: 'long', timeZone: 'UTC' });
 ---
 <Basis titel={seite.titel}>
   <Seitenkopf titel={seite.titel} einleitung={seite.einleitung} />
+
+  <Abschnitt titel={seite.positionenTitel} leer={positionen.length === 0} platzhalter="offene Positionen unter Inhalte → Offene Positionen" id="positionen">
+    {seite.positionenText && <p class="vorspann">{seite.positionenText}</p>}
+    <ul class="positionen">
+      {positionen.map(({ entry }) => {
+        const einordnung = (entry.thema && themenNamen[entry.thema]) || entry.bereich;
+        return (
+          <li class:list={{ bedarf: entry.grosserBedarf }}>
+            <div class="position__kopf">
+              {einordnung && <span class="einordnung">{einordnung}</span>}
+              {entry.grosserBedarf && <span class="marke-bedarf">{seite.positionenBedarf}</span>}
+            </div>
+            <h3>{entry.titel}</h3>
+            {entry.beschreibung && <p>{entry.beschreibung}</p>}
+            {entry.mitbringen && (
+              <p class="mitbringen"><strong>{seite.positionenMitbringen}:</strong> {entry.mitbringen}</p>
+            )}
+            <a class="knopf knopf--rahmen" href={bewerben(entry.titel)}>{seite.positionenKnopf}</a>
+          </li>
+        );
+      })}
+    </ul>
+  </Abschnitt>
 
   <Abschnitt titel={seite.fuerWenTitel} leer={leer(seite.fuerWenText)} platzhalter="alle Studiengänge, kein Vorwissen nötig">
     <Absaetze text={seite.fuerWenText} />
@@ -27,21 +75,78 @@ const leer = (text?: string | null) => absaetze(text).length === 0;
     </ol>
   </Abschnitt>
 
-  <Abschnitt titel={seite.treffenTitel} leer={!seite.treffenWann && !seite.treffenWo} platzhalter="Tag, Uhrzeit, Raum" grau>
-    <dl class="treffen">
-      {seite.treffenWann && <><dt>Wann</dt><dd>{seite.treffenWann}</dd></>}
-      {seite.treffenWo && <><dt>Wo</dt><dd>{seite.treffenWo}</dd></>}
-    </dl>
-    {seite.treffenHinweis && <p>{seite.treffenHinweis}</p>}
+  <Abschnitt titel={seite.treffenTitel} id="termine" grau>
+    {(seite.treffenWann || seite.treffenWo) && (
+      <dl class="treffen">
+        {seite.treffenWann && <><dt>Wann</dt><dd>{seite.treffenWann}</dd></>}
+        {seite.treffenWo && <><dt>Wo</dt><dd>{seite.treffenWo}</dd></>}
+      </dl>
+    )}
+    {seite.treffenHinweis && <p class="hinweis">{seite.treffenHinweis}</p>}
+
+    <ol class="termine" data-anzahl={anzahl}>
+      {termine.map((t, i) => (
+        <li class:list={['termin', `termin--${t.art}`]} data-datum={t.datum} hidden={i >= anzahl}>
+          <time class="termin__datum" datetime={t.datum}>
+            <span class="termin__tag">{tag(t.datum)}</span>
+            <span class="termin__monat">{monat(t.datum)}</span>
+          </time>
+          <div class="termin__text">
+            <p class="termin__meta">
+              <span class="termin__art">{t.art === 'event' ? seite.terminEvent : seite.terminTreffen}</span>
+              <span>{wochentag(t.datum)}{t.uhrzeit && `, ${t.uhrzeit}`}</span>
+            </p>
+            <h3>{t.link ? <a href={t.link}>{t.titel} ↗</a> : t.titel}</h3>
+            {t.ort && <p class="termin__ort">{t.ort}</p>}
+            {t.beschreibung && <p class="termin__beschreibung">{t.beschreibung}</p>}
+          </div>
+        </li>
+      ))}
+    </ol>
+    <p class="keine" data-keine hidden={termine.length > 0}>{seite.termineKeine}</p>
   </Abschnitt>
 
   <Abschnitt titel={seite.kontaktTitel} id="kontakt">
     {seite.kontaktText && <p>{seite.kontaktText}</p>}
-    <a class="knopf" href={`mailto:${texte.kontaktEmail}`}>{texte.kontaktKnopf}</a>
+    <a class="knopf" href={`mailto:${email}`}>{texte.kontaktKnopf}</a>
   </Abschnitt>
 </Basis>
 
+<script>
+  // Die Seite wird nur beim Veröffentlichen gebaut. Damit vergangene Termine trotzdem
+  // verschwinden, prüft der Browser das Datum noch einmal selbst.
+  const liste = document.querySelector<HTMLOListElement>('.termine');
+  if (liste) {
+    const heute = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' });
+    const anzahl = Number(liste.dataset.anzahl) || 6;
+    let gezeigt = 0;
+    for (const li of liste.querySelectorAll<HTMLLIElement>('li[data-datum]')) {
+      const kommend = (li.dataset.datum ?? '') >= heute;
+      li.hidden = !kommend || gezeigt >= anzahl;
+      if (kommend && gezeigt < anzahl) gezeigt++;
+    }
+    const keine = document.querySelector<HTMLElement>('[data-keine]');
+    if (keine) keine.hidden = gezeigt > 0;
+  }
+</script>
+
 <style>
+  /* Offene Positionen */
+  .vorspann { margin-bottom: 1.6rem; }
+  .positionen { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--navy); }
+  .positionen li { padding: 1.5rem 0 1.7rem; border-bottom: 1px solid var(--linie); }
+  .position__kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; min-height: 1.6rem; }
+  .einordnung { font-size: 0.95rem; color: var(--grau); }
+  .marke-bedarf {
+    font-family: var(--schrift-titel); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.1rem 0.5rem; border-radius: 3px; background: var(--navy); color: var(--weiss);
+  }
+  .positionen h3 { margin: 0.3rem 0 0.5rem; }
+  .positionen p { color: var(--grau); margin-bottom: 0.7rem; }
+  .mitbringen strong { color: var(--navy); font-weight: 600; }
+  .positionen .knopf { margin-top: 0.3rem; font-size: 1rem; padding: 0.6rem 1.1rem; }
+
+  /* Einstieg */
   .schritte { list-style: none; margin: 0; padding: 0; counter-reset: schritt; }
   .schritte li { counter-increment: schritt; position: relative; padding-left: 3rem; }
   .schritte li + li { margin-top: 1.4rem; }
@@ -52,7 +157,29 @@ const leer = (text?: string | null) => absaetze(text).length === 0;
   }
   .schritte h3 { margin: 0.15rem 0 0.3rem; font-size: 1.3rem; }
   .schritte p { margin: 0; color: var(--grau); }
-  .treffen { display: grid; grid-template-columns: auto 1fr; gap: 0.4rem 1.5rem; margin: 0 0 1rem; }
+
+  /* Termine */
+  .treffen { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1.5rem; margin: 0 0 0.6rem; font-size: 1.2rem; }
   .treffen dt { font-family: var(--schrift-titel); font-weight: 600; }
   .treffen dd { margin: 0; white-space: pre-line; }
+  .hinweis { color: var(--grau); }
+
+  .termine { list-style: none; margin: 1.8rem 0 0; padding: 0; border-top: 2px solid var(--navy); }
+  .termin { display: grid; grid-template-columns: 4.2rem 1fr; gap: 1.2rem; padding: 1.1rem 0; border-bottom: 1px solid var(--linie); }
+  .termin__datum {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 4.2rem; border: 1.5px solid var(--navy); border-radius: 4px; background: var(--weiss);
+    font-family: var(--schrift-titel); line-height: 1;
+  }
+  .termin__tag { font-size: 1.8rem; font-weight: 700; }
+  .termin__monat { font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.15rem; }
+  .termin--event .termin__datum { background: var(--navy); color: var(--weiss); }
+  .termin__text { min-width: 0; align-self: center; }
+  .termin__meta { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; margin: 0 0 0.1rem; font-size: 0.95rem; color: var(--grau); }
+  .termin__art { font-family: var(--schrift-titel); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--navy); }
+  .termin h3 { font-size: 1.3rem; margin: 0; }
+  .termin h3 a { text-decoration: none; }
+  .termin h3 a:hover { text-decoration: underline; }
+  .termin__ort, .termin__beschreibung { margin: 0.2rem 0 0; color: var(--grau); font-size: 1rem; }
+  .keine { color: var(--grau); margin-top: 1.4rem; }
 </style>
