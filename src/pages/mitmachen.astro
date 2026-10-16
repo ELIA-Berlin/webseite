@@ -32,6 +32,13 @@ const bewerben = (titel: string) =>
 const termine = await kommendeTermine();
 const treffen = termine.filter((t) => t.art === 'treffen').slice(0, 12);
 const events = termine.filter((t) => t.art === 'event').slice(0, 12);
+// Bis wann ein Termin im Banner steht: Treffen bis zu ihrer Startzeit, Events bis zum Ende des Tages.
+const uhr = (text?: string) => {
+  const m = text?.match(/(\d{1,2})[:.](\d{2})/);
+  return m ? `${m[1].padStart(2, '0')}:${m[2]}` : null;
+};
+const sichtbarBis = (t: { datum: string; uhrzeit?: string; art: string }) =>
+  `${t.datum}T${(t.art === 'treffen' && uhr(t.uhrzeit)) || '23:59'}`;
 const datumText = (iso: string) =>
   new Date(`${iso}T12:00:00Z`).toLocaleDateString('de-DE', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
 ---
@@ -41,7 +48,7 @@ const datumText = (iso: string) =>
       <div class="banner">
         <p class="banner__label">{seite.bannerTitel}</p>
         {treffen.map((t, i) => (
-          <div class="banner__termin" data-datum={t.datum} hidden={i > 0}>
+          <div class="banner__termin" data-datum={t.datum} data-bis={sichtbarBis(t)} hidden={i > 0}>
             <p class="banner__datum"><time datetime={t.datum}>{datumText(t.datum)}</time>{t.uhrzeit && <span>, {t.uhrzeit} Uhr</span>}</p>
             {t.ort && <p class="banner__ort">{t.ort}</p>}
           </div>
@@ -50,7 +57,7 @@ const datumText = (iso: string) =>
         {events.length > 0 && (
           <div class="banner__event">
             {events.map((e, i) => (
-              <p data-datum={e.datum} hidden={i > 0}>
+              <p data-datum={e.datum} data-bis={sichtbarBis(e)} hidden={i > 0}>
                 <span class="banner__label">{seite.bannerEvent}</span>
                 <span><time datetime={e.datum}>{datumText(e.datum)}</time>: {e.link ? <a href={e.link}>{e.titel}</a> : e.titel}</span>
               </p>
@@ -106,11 +113,12 @@ const datumText = (iso: string) =>
 
 <script>
   // Die Seite wird nur beim Veröffentlichen gebaut. Damit das Banner trotzdem stimmt,
-  // zeigt der Browser jeweils den ersten Termin, der heute oder später ist.
-  const heute = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Berlin' });
+  // prüft der Browser selbst: Ein Treffen steht bis zu seiner Startzeit im Banner,
+  // danach rückt das nächste nach. Events bleiben bis zum Ende ihres Tages stehen.
+  const jetzt = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Berlin' }).replace(' ', 'T').slice(0, 16);
   for (const gruppe of document.querySelectorAll('.banner, .banner__event')) {
-    const kandidaten = [...gruppe.querySelectorAll<HTMLElement>(':scope > [data-datum]')];
-    const naechster = kandidaten.find((el) => (el.dataset.datum ?? '') >= heute);
+    const kandidaten = [...gruppe.querySelectorAll<HTMLElement>(':scope > [data-bis]')];
+    const naechster = kandidaten.find((el) => (el.dataset.bis ?? '') > jetzt);
     for (const el of kandidaten) el.hidden = el !== naechster;
     if (!naechster && gruppe.classList.contains('banner__event')) (gruppe as HTMLElement).hidden = true;
   }
