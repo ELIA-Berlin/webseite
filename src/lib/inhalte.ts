@@ -26,10 +26,11 @@ export const absaetze = (text?: string | null) =>
 
 /**
  * Leere Abschnitte werden als gestrichelter Platzhalter angezeigt, damit man die Struktur sieht.
- * Das passiert nur lokal und in Netlify-Vorschauen. Auf der echten Seite (eliaspace.de)
+ * Das passiert nur lokal (npm run dev). Auf der echten Seite (eliaspace.de)
  * werden leere Abschnitte einfach weggelassen.
+ * Zum Testen eines Builds mit Platzhaltern: PLATZHALTER=ja npm run build
  */
-export const zeigePlatzhalter = process.env.CONTEXT !== 'production';
+export const zeigePlatzhalter = import.meta.env.DEV || process.env.PLATZHALTER === 'ja';
 
 export const allgemein = () => reader.singletons.allgemein.readOrThrow();
 

@@ -21,7 +21,7 @@ Startseite                /
 └── Impressum, Datenschutz
 ```
 
-**Leere Abschnitte:** Solange ein Abschnitt leer ist, zeigt er lokal und in Netlify-Vorschauen einen gestrichelten Kasten „Inhalt folgt“. Auf der echten Seite (eliaspace.de) wird ein leerer Abschnitt einfach weggelassen.
+**Leere Abschnitte:** Solange ein Abschnitt leer ist, zeigt er lokal (`npm run dev`) einen gestrichelten Kasten „Inhalt folgt“. Auf der echten Seite (eliaspace.de) wird ein leerer Abschnitt einfach weggelassen.
 
 **Optionale Abschnitte auf Themenseiten:** „Wettbewerb“ erscheint nur mit Häkchen, „Technik / Vertiefung“ nur mit Überschrift, „Formate“ nur mit mindestens einem Eintrag. Die neuesten News zum Thema erscheinen automatisch.
 
@@ -81,14 +81,12 @@ Die Änderung landet in der passenden Datei unter `src/content/` und wird wie ge
 
 ### Weg 3: Online-Editor (folgt)
 
-Sobald der Login über GitHub eingerichtet ist, funktioniert derselbe Editor direkt unter `https://eliaspace.de/keystatic`. Dann reicht ein GitHub-Account mit Schreibrechten, und jede gespeicherte Änderung ist nach ein bis zwei Minuten online.
+Die Seite liegt auf GitHub Pages. Das ist kostenlos, liefert aber nur fertige Dateien aus und hat keinen Server. Keystatic braucht für die Anmeldung über GitHub einen kleinen Server-Teil und läuft deshalb **online nicht direkt**. Möglichkeiten für später:
 
-**Wichtig für die Einrichtung:** Bis dahin ist der Editor absichtlich *nicht* Teil der Live-Seite (siehe `astro.config.mjs`). Im lokalen Modus hat er keine Anmeldung; mit ausgeliefert könnte jeder ihn öffnen und die Dateiliste des Servers abrufen. Für den Online-Editor müssen zusammen passieren:
+- **Sveltia CMS** (kostenlos, läuft komplett im Browser): Login über GitHub mit einem kleinen kostenlosen Anmelde-Dienst, z. B. als Cloudflare Worker. Die Felder aus `keystatic.config.ts` müssten dafür in die Sveltia-Konfiguration übertragen werden.
+- **Keystatic auf einem Hoster mit Server-Funktionen** (z. B. Cloudflare), dann aber Umzug des Hostings.
 
-1. In `keystatic.config.ts` den Speicher auf `{ kind: 'github', repo: 'ELIA-Berlin/webseite' }` umstellen (nur außerhalb von `npm run dev`).
-2. In `astro.config.mjs` Keystatic auch im Build einbinden und einen Adapter für den Hoster ergänzen (z. B. `@astrojs/netlify` oder `@astrojs/cloudflare`).
-3. Die vier `KEYSTATIC_…`-Werte beim Hoster als Umgebungsvariablen eintragen, niemals ins Repo.
-4. Die Content-Security-Policy in `netlify.toml` für `/keystatic` um `https://api.github.com` (connect-src) und `https://avatars.githubusercontent.com` (img-src) erweitern.
+Bis dahin ist der Editor absichtlich *nicht* Teil der Live-Seite (siehe `astro.config.mjs`): Im lokalen Modus hat er keine Anmeldung, mit ausgeliefert könnte ihn jeder öffnen. Wer ihn online einrichtet: Speicher auf `{ kind: 'github', repo: 'ELIA-Berlin/webseite' }` umstellen, Zugangsdaten nur als geheime Variablen beim Hoster hinterlegen (niemals ins Repo) und die Content-Security-Policy in `src/layouts/Basis.astro` um `https://api.github.com` und `https://avatars.githubusercontent.com` erweitern.
 
 ### Welches Feld steht wo? (Startseite)
 
@@ -141,13 +139,22 @@ So sieht eine gute Skizze aus:
 - **Schriften:** Barlow Semi Condensed für Überschriften (an DIN angelehnt, passt zur Logo-Umschrift), Source Sans 3 für Fließtext. Beide liegen auf dem eigenen Server, es gehen keine Daten an Google.
 - Festgelegt in [`src/styles/global.css`](src/styles/global.css).
 
+## Veröffentlichen (GitHub Pages)
+
+Jede Änderung auf `main` wird automatisch gebaut und nach etwa zwei Minuten auf eliaspace.de veröffentlicht. Zusätzlich baut die Seite jede Nacht einmal neu.
+
+- **Stand prüfen:** Repo → Reiter **Actions** → „Webseite veröffentlichen“. Grüner Haken = online, rotes Kreuz = Fehler (anklicken zeigt die Ursache; die alte Version bleibt dann online).
+- **Von Hand neu veröffentlichen:** Actions → „Webseite veröffentlichen“ → **Run workflow**.
+- **Einstellungen:** Repo → Settings → Pages (Quelle „GitHub Actions“, eigene Domain `eliaspace.de`, „Enforce HTTPS“).
+- **Domain bei Strato:** A-Einträge für `eliaspace.de` auf `185.199.108.153` (weitere: `.109.153`, `.110.153`, `.111.153`), CNAME für `www` auf `elia-berlin.github.io`.
+
 ## Für Entwickler
 
 | Teil | Wofür |
 |---|---|
 | [Astro](https://docs.astro.build) | baut die Seite als statisches HTML |
 | [Keystatic](https://keystatic.com/docs) | Editor unter `/keystatic`, Felder definiert in `keystatic.config.ts` |
-| Netlify | Hosting und Sicherheits-Header, Einstellungen in `netlify.toml` |
+| GitHub Pages | Hosting, kostenlos. Gebaut und veröffentlicht von `.github/workflows/veroeffentlichen.yml` |
 
 ```
 keystatic.config.ts        welche Texte im Editor bearbeitbar sind
@@ -158,6 +165,7 @@ src/lib/inhalte.ts         liest die Inhalte, Hilfsfunktionen
 src/layouts/Basis.astro    Kopfzeile, Navigation, Fußzeile
 src/styles/global.css      Farben, Schriften, Grundgestaltung
 public/                    Logo, Favicon, hochgeladene Bilder und Dateien
+.github/workflows/         automatisches Veröffentlichen auf GitHub Pages
 public/grafiken/themen/    Skizzen der vier Themen
 ```
 
@@ -175,7 +183,7 @@ public/grafiken/themen/    Skizzen der vier Themen
 
 ## Sicherheit
 
-- **Keine Geheimnisse ins Repo.** Das Repo ist öffentlich. Passwörter, API-Schlüssel und die `KEYSTATIC_…`-Werte gehören nur in die Umgebungsvariablen des Hosters. `.env`-Dateien sind über `.gitignore` ausgeschlossen.
+- **Keine Geheimnisse ins Repo.** Das Repo ist öffentlich. Passwörter und API-Schlüssel gehören nur in die geheimen Variablen des Hosters bzw. unter *Settings → Secrets and variables*. `.env`-Dateien sind über `.gitignore` ausgeschlossen.
 - **Keine privaten E-Mail-Adressen in Commits.** Jeder Commit zeigt öffentlich Name und E-Mail des Autors. Am besten auf GitHub unter *Settings → Emails* „Keep my email addresses private“ aktivieren und lokal die angezeigte `…@users.noreply.github.com`-Adresse verwenden (`git config user.email …`).
 - **Keine personenbezogenen Daten ohne Einverständnis** (Fotos, private Kontaktdaten). Für Ansprechpersonen die Vereinsadressen `…@elia-space.de` nutzen.
-- **Externe Inhalte** (Videos, Karten, fremde Bilder) werden von der Content-Security-Policy in `netlify.toml` blockiert. Wer so etwas einbaut, muss die Policy erweitern und die Datenschutzerklärung ergänzen.
+- **Externe Inhalte** (Videos, Karten, fremde Bilder) werden von der Content-Security-Policy in `src/layouts/Basis.astro` blockiert. Wer so etwas einbaut, muss die Policy erweitern und die Datenschutzerklärung ergänzen.

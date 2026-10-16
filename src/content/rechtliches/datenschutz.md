@@ -12,9 +12,9 @@ Diese Webseite setzt keine Cookies, verwendet keine Analyse- oder Tracking-Werkz
 
 ## Hosting
 
-Die Webseite wird bei Netlify, Inc., 101 2nd Street, San Francisco, CA 94105, USA, gehostet. Beim Aufruf der Seite verarbeitet Netlify technisch notwendige Daten, insbesondere IP-Adresse, Datum und Uhrzeit des Abrufs, aufgerufene Adresse sowie Informationen zu Browser und Betriebssystem. Diese Daten sind nötig, um die Seite auszuliefern und vor Missbrauch zu schützen.
+Die Webseite wird über GitHub Pages bereitgestellt, einen Dienst der GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA. Beim Aufruf der Seite verarbeitet GitHub technisch notwendige Daten, insbesondere die IP-Adresse, Datum und Uhrzeit des Abrufs, die aufgerufene Adresse sowie Informationen zu Browser und Betriebssystem. Laut GitHub wird die IP-Adresse aus Sicherheitsgründen protokolliert und gespeichert.
 
-Rechtsgrundlage ist unser berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung der Webseite (Art. 6 Abs. 1 lit. f DSGVO). Mit Netlify besteht ein Vertrag über Auftragsverarbeitung. Da Daten in die USA übermittelt werden können, stützt sich die Übermittlung auf die EU-Standardvertragsklauseln (Art. 46 Abs. 2 lit. c DSGVO).
+Rechtsgrundlage ist unser berechtigtes Interesse an einer sicheren und zuverlässigen Bereitstellung der Webseite (Art. 6 Abs. 1 lit. f DSGVO). Dabei können Daten in die USA übermittelt werden. GitHub ist nach dem EU-US Data Privacy Framework zertifiziert; die Übermittlung stützt sich auf den Angemessenheitsbeschluss der EU-Kommission (Art. 45 DSGVO) sowie ergänzend auf die EU-Standardvertragsklauseln. Weitere Informationen: [Datenschutzerklärung von GitHub](https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement).
 
 ## Kontakt per E-Mail
 
