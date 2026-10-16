@@ -82,11 +82,30 @@ export async function kommendeTermine(): Promise<Termin[]> {
     }));
 
   const regel = seite.treffenRegel;
+  const einzeln = new Set(termine.filter((t) => t.art === 'treffen').map((t) => t.datum));
+
+  // 1. Treffen aus dem Google Kalender (src/content/kalender.yaml, wöchentlich automatisch abgeglichen)
+  const kalender = await reader.singletons.kalender.read();
+  let letzterKalenderTag = '';
+  for (const t of kalender?.treffen ?? []) {
+    if (!t.datum) continue;
+    if (t.datum > letzterKalenderTag) letzterKalenderTag = t.datum;
+    if (ausfaelle.has(t.datum) || einzeln.has(t.datum)) continue;
+    termine.push({
+      datum: t.datum,
+      titel: regel.name || 'Treffen',
+      art: 'treffen',
+      uhrzeit: t.uhrzeit || regel.uhrzeit || undefined,
+      ort: t.ort || seite.treffenWo || undefined,
+    });
+  }
+
+  // 2. Nach dem letzten Kalendertermin (oder ohne Kalender) aus dem Rhythmus weiterrechnen,
+  //    damit das Banner auch dann stimmt, wenn der Abgleich einmal ausfällt.
   const schritt = Math.max(1, regel.alleWochen ?? 1) * 7;
   if (regel.erstesDatum) {
-    const einzeln = new Set(termine.filter((t) => t.art === 'treffen').map((t) => t.datum));
     for (let d = regel.erstesDatum; d <= bis; d = plusTage(d, schritt)) {
-      if (d < heute || ausfaelle.has(d) || einzeln.has(d)) continue;
+      if (d < heute || d <= letzterKalenderTag || ausfaelle.has(d) || einzeln.has(d)) continue;
       termine.push({
         datum: d,
         titel: regel.name || 'Treffen',

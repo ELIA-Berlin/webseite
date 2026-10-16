@@ -33,7 +33,7 @@ export default config({
     navigation: {
       Seiten: ['startseite', 'themenSeite', 'newsSeite', 'mitmachen', 'partnerSeite', 'ueberUns'],
       Inhalte: ['themen', 'news', 'positionen', 'termine', 'personen', 'partner'],
-      Allgemein: ['allgemein'],
+      Allgemein: ['allgemein', 'kalender'],
     },
   },
 
@@ -495,6 +495,31 @@ export default config({
         einordnungTitel: fields.text({ label: 'Einordnung: Überschrift' }),
         einordnungText: absatzText('Einordnung (DGLR, HTW, Verein): Text'),
         vorstandTitel: fields.text({ label: 'Vorstand: Überschrift', description: 'Die Personen kommen aus der Sammlung „Personen“ (Häkchen „Gehört zum Vorstand“).' }),
+      },
+    }),
+
+    /* ---------- Treffen aus dem Google Kalender (wird automatisch geschrieben) ---------- */
+    kalender: singleton({
+      label: 'Treffen aus dem Kalender',
+      path: 'src/content/kalender',
+      format: 'yaml',
+      schema: {
+        hinweis: fields.text({
+          label: 'Hinweis',
+          description: 'Diese Seite wird einmal pro Woche automatisch aus dem Google Kalender (raumfahrthtw@gmail.com, Termine „ELIA Treffen“) überschrieben. Änderungen bitte im Kalender machen, nicht hier.',
+        }),
+        aktualisiert: fields.date({ label: 'Zuletzt abgeglichen' }),
+        treffen: fields.array(
+          fields.object({
+            datum: fields.date({ label: 'Datum', validation: { isRequired: true } }),
+            uhrzeit: fields.text({ label: 'Uhrzeit', description: 'z. B. 17:30' }),
+            ort: fields.text({ label: 'Ort' }),
+          }),
+          {
+            label: 'Nächste Treffen laut Kalender',
+            itemLabel: (t) => [t.fields.datum.value, t.fields.uhrzeit.value].filter(Boolean).join(', ') || 'Treffen',
+          },
+        ),
       },
     }),
 
