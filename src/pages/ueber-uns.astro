@@ -22,7 +22,7 @@ const leer = (text?: string | null) => absaetze(text).length === 0;
   </Abschnitt>
 
   {seite.rueckblick.length > 0
-    ? <Missionslog titel={seite.rueckblickTitel} eintraege={seite.rueckblick} />
+    ? <Missionslog titel={seite.rueckblickTitel} eintraege={seite.rueckblick} hell />
     : <div class="huelle"><Platzhalter text="Missionslog: Gründung Ende 2025 und weitere Meilensteine" /></div>}
 
   <Abschnitt titel={seite.einordnungTitel} leer={leer(seite.einordnungText)} platzhalter="DGLR-Nachwuchsgruppe, HTW Berlin, eingetragener Verein">

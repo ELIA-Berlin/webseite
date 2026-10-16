@@ -1,0 +1,67 @@
+---
+/**
+ * Schriftfeld wie auf einer technischen Zeichnung: ein Raster aus Kästchen,
+ * jedes mit kleiner Bezeichnung oben und dem Eintrag darunter.
+ * Wird in Seitenköpfen (Angaben zur Seite), auf Themenkarten und in der Fußzeile verwendet.
+ * Leere Einträge werden weggelassen.
+ */
+export interface Feld {
+  name: string;
+  wert?: string | null;
+  link?: string | null;
+}
+interface Props {
+  felder: Feld[];
+  /** helle Linien auf dunklem Grund */
+  dunkel?: boolean;
+  /** kleinere Schrift, z. B. auf Karten */
+  klein?: boolean;
+  class?: string;
+}
+const { felder, dunkel = false, klein = false, class: klasse } = Astro.props;
+const sichtbar = felder.filter((f) => f.wert);
+const zusatz = Astro.slots.has('default');
+---
+{(sichtbar.length > 0 || zusatz) && (
+  <dl class:list={['schriftfeld', klasse, { 'schriftfeld--dunkel': dunkel, 'schriftfeld--klein': klein }]}>
+    {sichtbar.map((f) => (
+      <div>
+        <dt>{f.name}</dt>
+        <dd>{f.link ? <a href={f.link}>{f.wert}</a> : f.wert}</dd>
+      </div>
+    ))}
+    <slot />
+  </dl>
+)}
+
+<style>
+  .schriftfeld {
+    --strich: var(--navy);
+    --bezeichnung: var(--grau);
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr));
+    border-top: 1.5px solid var(--strich);
+    border-left: 1px solid var(--strich);
+  }
+  .schriftfeld > :global(div) {
+    padding: 0.55rem 0.8rem 0.65rem;
+    border-right: 1px solid var(--strich);
+    border-bottom: 1px solid var(--strich);
+    min-width: 0;
+  }
+  .schriftfeld :global(dt) {
+    font-size: 0.8rem; line-height: 1.3; color: var(--bezeichnung);
+  }
+  .schriftfeld :global(dd) {
+    margin: 0.15rem 0 0;
+    font-family: var(--schrift-titel); font-weight: 600; font-size: 1.15rem; line-height: 1.25;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  .schriftfeld :global(dd a) { text-decoration-thickness: 1px; }
+
+  .schriftfeld--dunkel { --strich: rgb(255 255 255 / 0.32); --bezeichnung: rgb(255 255 255 / 0.58); color: var(--weiss); }
+  .schriftfeld--klein :global(dd) { font-size: 1rem; }
+  .schriftfeld--klein > :global(div) { padding: 0.4rem 0.65rem 0.5rem; }
+</style>

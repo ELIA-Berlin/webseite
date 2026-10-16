@@ -1,47 +1,64 @@
 ---
 /**
- * Raster der Themen mit Skizze, wie Blätter einer Zeichnungsmappe.
+ * Themen als kleine Zeichnungsblätter (Startseite): Rahmen, Skizze auf Millimeterpapier,
+ * Titel und Kurztext, unten ein Schriftfeld mit der Einordnung (z. B. Wettbewerb).
  * Die Skizzen liegen in public/grafiken/themen/ (Feld „Skizze“ im Editor).
  */
 import Platzhalter from './Platzhalter.astro';
+import Schriftfeld from './Schriftfeld.astro';
 interface Props {
-  themen: { slug: string; entry: { titel: string; einordnung?: string | null; skizze?: string | null; kurztext?: string | null; teaser?: string | null } }[];
-  /** „kurz“ für die Startseite, „lang“ für die Themenübersicht */
-  text?: 'kurz' | 'lang';
-  mehr?: string;
+  themen: { slug: string; entry: { titel: string; einordnung?: string | null; skizze?: string | null; kurztext?: string | null; wettbewerb?: { readonly discriminant: boolean; readonly value?: { readonly name?: string } | null } } }[];
+  /** Bezeichnung im Schriftfeld, z. B. „Bereich“ */
+  einordnungName?: string;
+  wettbewerbName?: string;
 }
-const { themen, text = 'kurz', mehr } = Astro.props;
+const { themen, einordnungName = 'Bereich', wettbewerbName = 'Wettbewerb' } = Astro.props;
+const istWettbewerb = (e: Props['themen'][number]['entry']) =>
+  Boolean(e.wettbewerb?.discriminant && e.wettbewerb.value?.name && e.wettbewerb.value.name === e.einordnung);
 ---
 <ul class="blaetter">
-  {themen.map(({ slug, entry }) => {
-    const beschreibung = text === 'lang' ? entry.teaser : entry.kurztext;
-    return (
-      <li>
-        <a href={`/themen/${slug}`}>
-          <span class="skizze raster-hell">
-            {entry.skizze && <img src={entry.skizze} alt="" loading="lazy" />}
-          </span>
-          {entry.einordnung && <span class="einordnung">{entry.einordnung}</span>}
+  {themen.map(({ slug, entry }) => (
+    <li>
+      <a class="blatt" href={`/themen/${slug}`}>
+        <span class="skizze raster-hell">
+          {entry.skizze && <img src={entry.skizze} alt="" loading="lazy" />}
+        </span>
+        <span class="text">
           <h3>{entry.titel}</h3>
-          {beschreibung ? <p>{beschreibung}</p> : <Platzhalter text={text === 'lang' ? 'zwei bis drei Sätze zum Thema' : 'ein kurzer Satz'} />}
-          {mehr && <span class="mehr">{mehr} →</span>}
-        </a>
-      </li>
-    );
-  })}
+          {entry.kurztext ? <p>{entry.kurztext}</p> : <Platzhalter text="ein kurzer Satz" />}
+        </span>
+        <Schriftfeld klein class="feld" felder={[{ name: istWettbewerb(entry) ? wettbewerbName : einordnungName, wert: entry.einordnung }]} />
+      </a>
+    </li>
+  ))}
 </ul>
 
 <style>
-  .blaetter { list-style: none; margin: 0; padding: 0; display: grid; column-gap: 2rem; border-top: 2px solid var(--navy); }
-  li { border-bottom: 1px solid var(--linie); min-width: 0; }
-  a { display: flex; flex-direction: column; gap: 0.25rem; padding: 1.6rem 0 2rem; text-decoration: none; height: 100%; }
-  .skizze { display: grid; place-items: center; height: 9.5rem; margin-bottom: 1.2rem; }
-  .skizze img { max-height: 7.5rem; max-width: 85%; width: auto; height: auto; }
-  .einordnung { font-size: 0.95rem; color: var(--grau); }
-  h3 { font-size: 2rem; margin: 0; }
-  p { margin: 0.2rem 0 0; color: var(--grau); font-size: 1rem; }
-  .mehr { margin-top: auto; padding-top: 1rem; font-family: var(--schrift-titel); font-weight: 600; }
-  a:hover h3 { text-decoration: underline; text-underline-offset: 0.15em; text-decoration-thickness: 2px; }
+  .blaetter {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 1.25rem;
+  }
   @media (min-width: 40rem) { .blaetter { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (min-width: 70rem) { .blaetter { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (min-width: 72rem) { .blaetter { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  /* Rahmen wie ein Zeichnungsblatt: außen eine Linie, das Schriftfeld schließt unten ab */
+  .blatt {
+    display: flex; flex-direction: column; height: 100%;
+    border: 1.5px solid var(--navy);
+    text-decoration: none; background: var(--weiss);
+  }
+  .skizze { display: grid; place-items: center; aspect-ratio: 16 / 9; border-bottom: 1px solid var(--navy); }
+  .skizze img { max-height: 70%; max-width: 75%; width: auto; height: auto; }
+  .text { display: block; padding: 1.1rem 1rem 1.3rem; flex: 1; }
+  h3 { font-size: 2rem; margin: 0 0 0.35rem; }
+  p { margin: 0; color: var(--grau); font-size: 1rem; line-height: 1.5; }
+
+  /* Das Schriftfeld liegt bündig im Rahmen: keine doppelten Außenlinien */
+  .blatt :global(.feld) { border-left: 0; border-top-width: 1px; }
+  .blatt :global(.feld > div) { border-bottom: 0; }
+  .blatt :global(.feld > div:last-child) { border-right: 0; }
+
+  .blatt:hover h3 { text-decoration: underline; text-underline-offset: 0.12em; text-decoration-thickness: 2px; }
+  .blatt:hover .skizze { background-color: var(--ring-tief); }
+  .blatt:focus-visible { outline-offset: 4px; }
 </style>

@@ -12,17 +12,28 @@ navigation:
 menueKnopf: Menü
 kontaktEmail: vorstand@elia-space.de
 kontaktKnopf: Kontakt aufnehmen
-fussText: ELIA, HTW Berlin
+fussText: Exploration, Learning & Innovation in Aerospace
+fussFelder:
+  - name: Verein
+    wert: ELIA e. V.
+  - name: Sitz
+    wert: HTW Berlin, Treskowallee 8, 10318 Berlin
+  - name: Nachwuchsgruppe der
+    wert: DGLR
+fussKontakt: Kontakt
+fussRechtliches: Rechtliches
 fussImpressum: Impressum
 fussDatenschutz: Datenschutz
 themaAnsprechperson: Ansprechperson
 themaWenWirSuchen: Wen wir suchen
 themaWorumEsGeht: Worum es geht
 themaWettbewerb: Wettbewerb
+themaBereich: Bereich
+themaAnsprechpersonKurz: Ansprechperson
 themaStand: Aktueller Stand
 themaFormate: Formate
 themaNews: Neues aus diesem Thema
 mehrNews: Alle News
 zurueckNews: Zurück zu den News
-mehrErfahren: Mehr erfahren
+mehrErfahren: Zum Thema
 zumMitmachen: Mitmachen

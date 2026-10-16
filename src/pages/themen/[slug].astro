@@ -32,11 +32,15 @@ const technikDa = Boolean(thema.technik.titel);
 <Basis titel={thema.titel} beschreibung={thema.einzeiler || undefined}>
   <Seitenkopf
     titel={thema.titel}
-    einordnung={thema.einordnung}
     einleitung={thema.einzeiler || (zeigePlatzhalter ? 'Inhalt folgt: Einzeiler' : null)}
     bild={thema.bild}
     bildBeschreibung={thema.bildBeschreibung}
     skizze={thema.skizze}
+    schriftfeld={[
+      { name: texte.themaBereich || 'Bereich', wert: thema.einordnung !== wettbewerb?.name ? thema.einordnung : null },
+      { name: texte.themaWettbewerb, wert: wettbewerb?.name },
+      { name: texte.themaAnsprechpersonKurz || 'Ansprechperson', wert: person?.name },
+    ]}
   />
 
   <Abschnitt titel={texte.themaWorumEsGeht} leer={leer(thema.worumEsGeht)} platzhalter="Worum geht es in diesem Thema?">
@@ -124,7 +128,7 @@ const technikDa = Boolean(thema.technik.titel);
       <div class="huelle">
         <h2>{texte.themaNews}</h2>
         <NewsListe eintraege={news} themenNamen={themenNamen} />
-        <p class="alle"><a href={`/news?thema=${slug}`}>{texte.mehrNews} →</a></p>
+        <p class="alle"><a href={`/news?thema=${slug}`}>{texte.mehrNews}</a></p>
       </div>
     </section>
   )}

@@ -31,7 +31,7 @@ const html = Markdoc.renderers.html(Markdoc.transform(node));
     <div class="huelle schmal text">
       {beitrag.titelbild && <img class="titelbild" src={beitrag.titelbild} alt={beitrag.titelbildBeschreibung} />}
       <Fragment set:html={html} />
-      <p class="zurueck"><a href="/news">← {texte.zurueckNews}</a></p>
+      <p class="zurueck"><a href="/news">{texte.zurueckNews}</a></p>
     </div>
   </article>
 </Basis>

@@ -18,6 +18,8 @@
   /* Leuchten: weiches Licht auf dunklen Flächen */
   --schein: rgb(150 190 225 / 0.13);
   --ring: #eeeeee;
+  /* etwas dunkleres Papier für Hover auf hellen Flächen */
+  --ring-tief: #e3e7ea;
   --weiss: #ffffff;
   /* abgeleitete Grautöne */
   --grau: #5a6a78;

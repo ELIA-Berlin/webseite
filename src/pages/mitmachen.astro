@@ -45,26 +45,40 @@ const datumText = (iso: string) =>
 <Basis titel={seite.titel}>
   <Seitenkopf titel={seite.titel} einleitung={seite.einleitung}>
     {treffen.length > 0 && (
-      <div class="banner">
-        <p class="banner__label">{seite.bannerTitel}</p>
-        {treffen.map((t, i) => (
-          <div class="banner__termin" data-datum={t.datum} data-bis={sichtbarBis(t)} hidden={i > 0}>
-            <p class="banner__datum"><time datetime={t.datum}>{datumText(t.datum)}</time>{t.uhrzeit && <span>, {t.uhrzeit} Uhr</span>}</p>
-            {t.ort && <p class="banner__ort">{t.ort}</p>}
-          </div>
-        ))}
-        {seite.treffenWann && <p class="banner__regel">{seite.treffenWann}</p>}
-        {events.length > 0 && (
-          <div class="banner__event">
-            {events.map((e, i) => (
-              <p data-datum={e.datum} data-bis={sichtbarBis(e)} hidden={i > 0}>
-                <span class="banner__label">{seite.bannerEvent}</span>
-                <span><time datetime={e.datum}>{datumText(e.datum)}</time>: {sichererLink(e.link) ? <a href={sichererLink(e.link)}>{e.titel}</a> : e.titel}</span>
-              </p>
-            ))}
+      <Fragment slot="feld">
+        <div class="termin-feld">
+          <dt>{seite.bannerTitel}</dt>
+          <dd>{treffen.map((t, i) => (
+            <span data-treffen={i} data-bis={sichtbarBis(t)} hidden={i > 0}><time datetime={t.datum}>{datumText(t.datum)}</time></span>
+          ))}</dd>
+        </div>
+        <div>
+          <dt>{seite.bannerBeginn || 'Beginn'}</dt>
+          <dd>{treffen.map((t, i) => <span data-treffen={i} hidden={i > 0}>{t.uhrzeit ? `${t.uhrzeit} Uhr` : '–'}</span>)}</dd>
+        </div>
+        {treffen.some((t) => t.ort) && (
+          <div>
+            <dt>{seite.bannerOrt || 'Ort'}</dt>
+            <dd>{treffen.map((t, i) => <span data-treffen={i} hidden={i > 0}>{t.ort || '–'}</span>)}</dd>
           </div>
         )}
-      </div>
+        {seite.treffenWann && (
+          <div>
+            <dt>{seite.bannerRhythmus || 'Rhythmus'}</dt>
+            <dd>{seite.treffenWann}</dd>
+          </div>
+        )}
+        {events.length > 0 && (
+          <div class="event-feld">
+            <dt>{seite.bannerEvent}</dt>
+            <dd>{events.map((e, i) => (
+              <span data-event data-bis={sichtbarBis(e)} hidden={i > 0}>
+                <time datetime={e.datum}>{datumText(e.datum)}</time>: {sichererLink(e.link) ? <a href={sichererLink(e.link)}>{e.titel}</a> : e.titel}
+              </span>
+            ))}</dd>
+          </div>
+        )}
+      </Fragment>
     )}
   </Seitenkopf>
 
@@ -112,16 +126,20 @@ const datumText = (iso: string) =>
 </Basis>
 
 <script>
-  // Die Seite wird nur beim Veröffentlichen gebaut. Damit das Banner trotzdem stimmt,
-  // prüft der Browser selbst: Ein Treffen steht bis zu seiner Startzeit im Banner,
-  // danach rückt das nächste nach. Events bleiben bis zum Ende ihres Tages stehen.
+  // Die Seite wird nur beim Veröffentlichen gebaut. Damit die Angaben zum nächsten Treffen
+  // trotzdem stimmen, prüft der Browser selbst: Ein Treffen steht bis zu seiner Startzeit da,
+  // danach rückt das nächste nach (Datum, Beginn und Ort gemeinsam). Events bis Tagesende.
   const jetzt = new Date().toLocaleString('sv-SE', { timeZone: 'Europe/Berlin' }).replace(' ', 'T').slice(0, 16);
-  for (const gruppe of document.querySelectorAll('.banner, .banner__event')) {
-    const kandidaten = [...gruppe.querySelectorAll<HTMLElement>(':scope > [data-bis]')];
-    const naechster = kandidaten.find((el) => (el.dataset.bis ?? '') > jetzt);
-    for (const el of kandidaten) el.hidden = el !== naechster;
-    if (!naechster && gruppe.classList.contains('banner__event')) (gruppe as HTMLElement).hidden = true;
-  }
+
+  const treffen = [...document.querySelectorAll<HTMLElement>('[data-treffen][data-bis]')];
+  const naechstes = treffen.find((el) => (el.dataset.bis ?? '') > jetzt)?.dataset.treffen;
+  for (const el of document.querySelectorAll<HTMLElement>('[data-treffen]')) el.hidden = el.dataset.treffen !== naechstes;
+  if (naechstes === undefined) document.querySelector<HTMLElement>('.termin-feld')?.closest('section')?.querySelector<HTMLElement>('.seitenkopf__feld')?.setAttribute('hidden', '');
+
+  const events = [...document.querySelectorAll<HTMLElement>('[data-event]')];
+  const naechstesEvent = events.find((el) => (el.dataset.bis ?? '') > jetzt);
+  for (const el of events) el.hidden = el !== naechstesEvent;
+  if (!naechstesEvent) document.querySelector<HTMLElement>('.event-feld')?.setAttribute('hidden', '');
 </script>
 
 <style>
@@ -132,7 +150,7 @@ const datumText = (iso: string) =>
   .position__kopf { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.8rem; min-height: 1.6rem; }
   .einordnung { font-size: 0.95rem; color: var(--grau); }
   .marke-bedarf {
-    font-family: var(--schrift-titel); font-weight: 600; font-size: 0.85rem; letter-spacing: 0.04em; text-transform: uppercase;
+    font-family: var(--schrift-titel); font-weight: 600; font-size: 0.95rem;
     padding: 0.1rem 0.5rem; border-radius: 3px; background: var(--navy); color: var(--weiss);
   }
   .positionen h3 { margin: 0.3rem 0 0.5rem; }
@@ -152,20 +170,6 @@ const datumText = (iso: string) =>
   .schritte h3 { margin: 0.15rem 0 0.3rem; font-size: 1.3rem; }
   .schritte p { margin: 0; color: var(--grau); }
 
-  /* Banner im Seitenkopf */
-  .banner {
-    margin-top: 2rem; max-width: 34rem; padding: 1.2rem 1.4rem 1.3rem;
-    border: 1.5px solid rgb(255 255 255 / 0.55); border-radius: 4px;
-    background: rgb(8 19 28 / 0.6); box-shadow: 0 0 24px rgb(150 190 225 / 0.12);
-  }
-  .banner p { margin: 0; }
-  .banner__label {
-    font-family: var(--schrift-titel); font-weight: 600; font-size: 0.9rem;
-    letter-spacing: 0.08em; text-transform: uppercase; color: rgb(255 255 255 / 0.62);
-  }
-  .banner__datum { font-family: var(--schrift-titel); font-weight: 700; font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.1rem); line-height: 1.15; margin-top: 0.2rem !important; }
-  .banner__ort { color: rgb(255 255 255 / 0.85); margin-top: 0.2rem !important; }
-  .banner__regel { color: rgb(255 255 255 / 0.62); font-size: 1rem; margin-top: 0.5rem !important; }
-  .banner__event { margin-top: 0.9rem; padding-top: 0.8rem; border-top: 1px solid rgb(255 255 255 / 0.2); }
-  .banner__event p { display: flex; flex-wrap: wrap; gap: 0.2rem 0.8rem; align-items: baseline; color: rgb(255 255 255 / 0.85); }
+  /* Angaben zum nächsten Treffen im Schriftfeld des Seitenkopfs */
+  .termin-feld :global(dd) { font-size: 1.35rem !important; }
 </style>

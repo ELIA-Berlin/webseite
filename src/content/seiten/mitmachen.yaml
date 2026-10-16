@@ -1,6 +1,9 @@
 titel: Mitmachen
 bannerTitel: Nächstes Treffen
 bannerEvent: Nächstes Event
+bannerBeginn: Beginn
+bannerOrt: Ort
+bannerRhythmus: Rhythmus
 treffenWann: Alle zwei Wochen dienstags, 17:30 Uhr
 treffenRegel:
   name: Teamtreffen

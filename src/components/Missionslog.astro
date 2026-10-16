@@ -10,12 +10,14 @@ interface Props {
   titel?: string | null;
   eintraege: readonly { zeitpunkt: string; titel: string; text: string; geplant: boolean }[];
   link?: { text: string; href: string } | null;
+  /** helle Variante (Papier statt Nacht), z. B. direkt unter einem dunklen Seitenkopf */
+  hell?: boolean;
 }
-const { titel, link } = Astro.props;
+const { titel, link, hell = false } = Astro.props;
 const eintraege = [...Astro.props.eintraege].reverse();
 ---
 {eintraege.length > 0 && (
-  <section class="log dunkel">
+  <section class:list={['log', hell ? 'log--hell raster-hell' : 'dunkel']}>
     <div class="huelle">
       <div class="log__kopf">
         {titel && <h2>{titel}</h2>}
@@ -35,27 +37,36 @@ const eintraege = [...Astro.props.eintraege].reverse();
 )}
 
 <style>
-  .log { background: var(--nacht); color: var(--weiss); padding: clamp(3rem, 7vw, 4.5rem) 0; }
+  .log {
+    --grund: var(--nacht); --text: var(--weiss); --leise: rgb(255 255 255 / 0.62); --mittel: rgb(255 255 255 / 0.74);
+    --strich: rgb(255 255 255 / 0.3); --punkt: var(--weiss); --schein: 0 0 10px 2px rgb(200 225 245 / 0.45);
+    background-color: var(--grund); color: var(--text); padding: clamp(3rem, 7vw, 4.5rem) 0;
+  }
+  .log--hell {
+    --grund: var(--ring); --text: var(--navy); --leise: var(--grau); --mittel: var(--grau);
+    --strich: rgb(24 44 60 / 0.35); --punkt: var(--navy); --schein: none;
+    border-bottom: 1px solid var(--linie);
+  }
   .log__kopf { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 2rem; margin-bottom: 2rem; }
-  h2 { font-size: 1.4rem; font-weight: 600; color: rgb(255 255 255 / 0.7); margin: 0; }
+  h2 { font-size: 1.4rem; font-weight: 600; color: var(--leise); margin: 0; }
   .log__kopf a { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.05rem; }
   ol { list-style: none; margin: 0; padding: 0; display: grid; }
-  li { position: relative; padding: 0 0 1.8rem 2rem; border-left: 1.5px solid rgb(255 255 255 / 0.3); min-width: 0; }
+  li { position: relative; padding: 0 0 1.8rem 2rem; border-left: 1.5px solid var(--strich); min-width: 0; }
   li:last-child { padding-bottom: 0.2rem; }
   li::before {
     content: ''; position: absolute; left: -0.5rem; top: 0.35rem;
-    width: 0.85rem; height: 0.85rem; border-radius: 50%; background: var(--weiss);
-    box-shadow: 0 0 10px 2px rgb(200 225 245 / 0.45);
+    width: 0.85rem; height: 0.85rem; border-radius: 50%; background: var(--punkt);
+    box-shadow: var(--schein);
   }
   li.geplant { border-left-style: dashed; }
   /* Zeitstrahl läuft vom Neuesten (oben bzw. links) zum Ältesten */
-  li.geplant::before { background: var(--nacht); box-shadow: inset 0 0 0 2px var(--weiss); }
-  .zeit { display: block; font-family: var(--schrift-titel); font-weight: 600; color: rgb(255 255 255 / 0.6); }
+  li.geplant::before { background: var(--grund); box-shadow: inset 0 0 0 2px var(--punkt); }
+  .zeit { display: block; font-family: var(--schrift-titel); font-weight: 600; color: var(--leise); }
   h3 { font-size: 1.6rem; margin: 0.2rem 0 0.3rem; line-height: 1.15; }
-  p { margin: 0; color: rgb(255 255 255 / 0.74); font-size: 1rem; }
+  p { margin: 0; color: var(--mittel); font-size: 1rem; }
   @media (min-width: 52rem) {
     ol { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); column-gap: 2rem; }
-    li { border-left: 0; border-top: 1.5px solid rgb(255 255 255 / 0.3); padding: 1.6rem 0 0; }
+    li { border-left: 0; border-top: 1.5px solid var(--strich); padding: 1.6rem 0 0; }
     li.geplant { border-top-style: dashed; }
     li::before { left: 0; top: -0.5rem; }
   }

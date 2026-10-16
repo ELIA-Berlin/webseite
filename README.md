@@ -139,6 +139,9 @@ So sieht eine gute Skizze aus:
 - **Schriften:** Barlow Semi Condensed für Überschriften (an DIN angelehnt, passt zur Logo-Umschrift), Source Sans 3 für Fließtext. Beide liegen auf dem eigenen Server, es gehen keine Daten an Google.
 - Festgelegt in [`src/styles/global.css`](src/styles/global.css).
 
+- **Schriftfeld** (wie auf technischen Zeichnungen) ist das durchgehende Gestaltungsmerkmal: unten im Seitenkopf der Themenseiten (Bereich, Wettbewerb, Ansprechperson) und von „Mitmachen“ (nächstes Treffen), auf den Themenkarten und als Fußzeile. Baustein: `src/components/Schriftfeld.astro`. Die Angaben der Fußzeile stehen in `src/content/allgemein.yaml` → `fussFelder`.
+- Keine Labels in Großbuchstaben, keine Pfeile hinter Links. Einzige Animation ist das Flugprofil auf der Startseite.
+
 ## Veröffentlichen (GitHub Pages)
 
 Jede Änderung auf `main` wird automatisch gebaut und nach etwa zwei Minuten auf eliaspace.de veröffentlicht. Zusätzlich baut die Seite jede Nacht einmal neu.
