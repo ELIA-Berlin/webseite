@@ -1,23 +1,22 @@
 titel: Mitmachen
-positionenTitel: Offene Positionen
-positionenBedarf: Großer Bedarf
-positionenMitbringen: Gut, wenn du mitbringst
-positionenKnopf: Interesse?
-positionenBetreff: 'Interesse an der Position:'
-fuerWenTitel: Für wen
-wasDuMachstTitel: Was du bei uns machst
-einstiegTitel: So läuft der Einstieg
-treffenTitel: Termine
-treffenWann: Dienstags, 17:30 Uhr
-treffenHinweis: Ab dem 27. Oktober treffen wir uns alle zwei Wochen.
+bannerTitel: Nächstes Treffen
+bannerEvent: Nächstes Event
+treffenWann: Alle zwei Wochen dienstags, 17:30 Uhr
 treffenRegel:
   name: Teamtreffen
   erstesDatum: 2026-10-27
   alleWochen: 2
   uhrzeit: '17:30'
-termineAnzahl: 6
-termineKeine: Gerade stehen keine Termine an.
-terminTreffen: Treffen
-terminEvent: Event
+positionenTitel: Positionen & Bereiche
+positionenText: >-
+  Hier siehst du, wo du bei uns einsteigen kannst und wo wir gerade besonders
+  Unterstützung brauchen. Vorwissen ist nirgends Pflicht.
+positionenBedarf: Großer Bedarf
+positionenMitbringen: Gut, wenn du mitbringst
+positionenKnopf: Interesse?
+positionenBetreff: 'Interesse an:'
+fuerWenTitel: Für wen
+wasDuMachstTitel: Was du bei uns machst
+einstiegTitel: So läuft der Einstieg
 kontaktTitel: Kontakt
 kontaktEmail: personal@elia-space.de
