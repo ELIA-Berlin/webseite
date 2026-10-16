@@ -30,6 +30,9 @@ const sichtbar = !leer || zeigePlatzhalter;
   .abschnitt { padding: clamp(3rem, 7vw, 5rem) 0; }
   .abschnitt + .abschnitt:not(.grau) .huelle { border-top: 1px solid var(--linie); padding-top: clamp(3rem, 7vw, 5rem); }
   .abschnitt + .abschnitt:not(.grau) { padding-top: 0; }
+  /* nach einem grauen Band keine zusätzliche Linie */
+  .grau + .abschnitt:not(.grau) { padding-top: clamp(3rem, 7vw, 5rem); }
+  .grau + .abschnitt:not(.grau) .huelle { border-top: 0; padding-top: 0; }
   .grau { background: var(--ring); }
   .zwei { display: grid; gap: 0.5rem 4rem; }
   @media (min-width: 48rem) { .zwei { grid-template-columns: 1fr 2fr; gap: 0.5rem 5rem; } }

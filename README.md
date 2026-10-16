@@ -35,6 +35,8 @@ Alle Texte stehen als Dateien in [`src/content/`](src/content/), nichts davon st
 | `seiten/themen.yaml`, `seiten/news.yaml`, `seiten/mitmachen.yaml`, `seiten/partner.yaml`, `seiten/ueber-uns.yaml` | Seiten → … | Texte der jeweiligen Seite |
 | `themen/` | Inhalte → Themen | eine Datei pro Thema; erscheint auf Startseite, Themenübersicht und als eigene Seite |
 | `news/` | Inhalte → News | eine Datei pro Beitrag |
+| `positionen/` | Inhalte → Offene Positionen | eine Datei pro gesuchter Position; Häkchen „Wird gerade gesucht“ blendet ein/aus, „Großer Bedarf“ stellt nach oben |
+| `termine/` | Inhalte → Termine | einzelne Events und Treffen außerhalb des Rhythmus; mit Häkchen „fällt aus“ auch Ausfälle |
 | `personen/` | Inhalte → Personen | Ansprechpersonen und Vorstand (Fotos nur mit Einwilligung) |
 | `partner/` | Inhalte → Partner & Sponsoren | eine Datei pro Partner oder Sponsor mit Logo |
 | `allgemein.yaml` | Allgemein → Menü & Beschriftungen | Menü, Fußzeile, Kontakt-E-Mail, wiederkehrende Beschriftungen |
@@ -155,3 +157,10 @@ public/grafiken/themen/    Skizzen der vier Themen
 `npm run build` erzeugt die fertige Seite in `dist/`, `npm run check` prüft den Code.
 
 **Englisch später:** Deutsch bleibt auf der Hauptadresse, Englisch käme unter `/en/…`. Deshalb stehen alle Texte, auch Menü und Buttons, in `src/content/` und nicht im Code.
+
+## Termine auf „Mitmachen“
+
+- **Regelmäßiges Treffen:** Rhythmus in `src/content/seiten/mitmachen.yaml` → `treffenRegel` (erstes Datum, alle … Wochen, Uhrzeit). Daraus werden die nächsten Treffen automatisch berechnet.
+- **Einzelne Termine** (Messen, Starts, Vorträge) und **Ausfälle** stehen in `src/content/termine/`. Ein Ausfall ist ein Eintrag mit Häkchen „fällt aus“ am Tag des Treffens.
+- Angezeigt werden nur kommende Termine (Anzahl: `termineAnzahl`). Vergangene verschwinden von selbst, auch ohne neues Veröffentlichen.
+
