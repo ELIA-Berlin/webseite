@@ -1,51 +1,157 @@
 ---
 /**
- * Schnittzeichnung der Rakete Stella für den Kopf der Startseite.
- * Die Beschriftungen stehen in src/content/startseite.yaml (Editor: Startseite → Raketenzeichnung).
+ * Stella als Explosionszeichnung (Themenseite Rakete, Abschnitt „Technik“).
+ *
+ * Beim Scrollen fährt die Rakete in ihre Baugruppen auseinander – Nasenkonus, Nutzlast,
+ * Avionik, Bergung, Motor mit Leitwerk – und die Beschriftungen erscheinen nacheinander.
+ * Die Zeichnung läuft dabei im normalen Scrollen mit und hält nichts an.
+ *
+ * Bei „Bewegung reduzieren“ steht die Zeichnung auseinandergezogen mit allen Beschriftungen da,
+ * ohne JavaScript zusammengebaut mit allen Beschriftungen.
+ *
+ * Beschriftungen: src/content/themen/rakete.yaml → technik → raketenzeichnung.
  */
+import Schriftfeld from './Schriftfeld.astro';
+
 interface Props {
   b: {
     nasenkonus: string; nutzlast: string; avionik: string; bergung: string;
     motor: string; leitwerk: string; hinweis: string; beschreibung: string;
+    schriftfeld?: readonly { name: string; wert: string }[];
   };
 }
 const { b } = Astro.props;
----
-<svg class="zeichnung" viewBox="0 0 560 700" role="img" aria-label={b.beschreibung}>
-  <line class="achse" x1="280" y1="20" x2="280" y2="690" />
-  <path class="flaeche" d="M280 40 C 300 80, 312 130, 312 175 L 312 600 L 248 600 L 248 175 C 248 130, 260 80, 280 40 Z" />
-  <path class="kontur" d="M280 40 C 300 80, 312 130, 312 175 L 312 600 L 248 600 L 248 175 C 248 130, 260 80, 280 40 Z" />
-  <path class="kontur" d="M248 520 L 196 610 L 196 640 L 248 600 M312 520 L 364 610 L 364 640 L 312 600" />
-  <path class="kontur" d="M266 600 L 262 628 L 298 628 L 294 600" />
-  <line class="innen" x1="248" y1="175" x2="312" y2="175" />
-  <rect class="innen" x="258" y="190" width="44" height="52" />
-  <line class="innen" x1="248" y1="258" x2="312" y2="258" />
-  <rect class="innen" x="262" y="270" width="36" height="46" />
-  <line class="innen" x1="248" y1="330" x2="312" y2="330" />
-  <path class="innen" d="M262 345 q 18 -14 36 0 l -18 52 z" />
-  <line class="innen" x1="248" y1="420" x2="312" y2="420" />
-  <rect class="innen" x="256" y="436" width="48" height="160" />
 
-  <g class="ruf"><circle cx="280" cy="110" r="3" /><path d="M280 110 L 200 110 L 180 92 L 40 92" /><text x="40" y="84">{b.nasenkonus}</text></g>
-  <g class="ruf"><circle cx="280" cy="292" r="3" /><path d="M280 292 L 190 292 L 170 272 L 40 272" /><text x="40" y="264">{b.avionik}</text></g>
-  <g class="ruf"><circle cx="280" cy="516" r="3" /><path d="M280 516 L 190 516 L 170 496 L 40 496" /><text x="40" y="488">{b.motor}</text></g>
-  <g class="ruf"><circle cx="280" cy="216" r="3" /><path d="M280 216 L 370 216 L 390 196 L 530 196" /><text class="rechts" x="530" y="188">{b.nutzlast}</text></g>
-  <g class="ruf"><circle cx="280" cy="372" r="3" /><path d="M280 372 L 370 372 L 390 352 L 530 352" /><text class="rechts" x="530" y="344">{b.bergung}</text></g>
-  <g class="ruf"><circle cx="350" cy="612" r="3" /><path d="M350 612 L 400 612 L 420 592 L 530 592" /><text class="rechts" x="530" y="584">{b.leitwerk}</text></g>
-  {b.hinweis && <text class="hinweis" x="40" y="676">{b.hinweis}</text>}
-</svg>
+/*
+ * Baugruppen von oben nach unten. „weg“ ist die Verschiebung im auseinandergezogenen Zustand.
+ * Rumpf: x 248–312, Mitte 280.
+ */
+const gruppen = [
+  { name: 'nase', weg: -112 },
+  { name: 'nutzlast', weg: -66 },
+  { name: 'avionik', weg: -22 },
+  { name: 'bergung', weg: 24 },
+  { name: 'motor', weg: 78 },
+];
+---
+<div class="explosion" data-explosion>
+  <figure class="blatt dunkel raster">
+    <svg class="zeichnung" viewBox="0 -100 560 880" role="img" aria-label={b.beschreibung}>
+      <line class="achse" x1="280" y1="-90" x2="280" y2="770" />
+
+      <g class="gruppe" data-weg={gruppen[0].weg}>
+        <path class="flaeche kontur" d="M280 40 C 300 80, 312 130, 312 175 L 248 175 C 248 130, 260 80, 280 40 Z" />
+        <g class="ruf" data-reihe="0"><circle cx="280" cy="120" r="3" /><path d="M280 120 L 200 120 L 180 102 L 40 102" /><text x="40" y="94">{b.nasenkonus}</text></g>
+      </g>
+
+      <g class="gruppe" data-weg={gruppen[1].weg}>
+        <rect class="flaeche kontur" x="248" y="175" width="64" height="83" />
+        <rect class="innen" x="258" y="190" width="44" height="52" />
+        <g class="ruf" data-reihe="1"><circle cx="280" cy="216" r="3" /><path d="M280 216 L 370 216 L 390 196 L 530 196" /><text class="rechts" x="530" y="188">{b.nutzlast}</text></g>
+      </g>
+
+      <g class="gruppe" data-weg={gruppen[2].weg}>
+        <rect class="flaeche kontur" x="248" y="258" width="64" height="72" />
+        <rect class="innen" x="262" y="270" width="36" height="46" />
+        <g class="ruf" data-reihe="2"><circle cx="280" cy="292" r="3" /><path d="M280 292 L 190 292 L 170 272 L 40 272" /><text x="40" y="264">{b.avionik}</text></g>
+      </g>
+
+      <g class="gruppe" data-weg={gruppen[3].weg}>
+        <rect class="flaeche kontur" x="248" y="330" width="64" height="90" />
+        <path class="innen" d="M262 345 q 18 -14 36 0 l -18 52 z" />
+        <g class="ruf" data-reihe="3"><circle cx="280" cy="372" r="3" /><path d="M280 372 L 370 372 L 390 352 L 530 352" /><text class="rechts" x="530" y="344">{b.bergung}</text></g>
+      </g>
+
+      <g class="gruppe" data-weg={gruppen[4].weg}>
+        <rect class="flaeche kontur" x="248" y="420" width="64" height="180" />
+        <rect class="innen" x="256" y="436" width="48" height="160" />
+        <path class="kontur" d="M248 520 L 196 610 L 196 640 L 248 600 M312 520 L 364 610 L 364 640 L 312 600" />
+        <path class="kontur" d="M266 600 L 262 628 L 298 628 L 294 600" />
+        <g class="ruf" data-reihe="4"><circle cx="280" cy="516" r="3" /><path d="M280 516 L 190 516 L 170 496 L 40 496" /><text x="40" y="488">{b.motor}</text></g>
+        <g class="ruf" data-reihe="5"><circle cx="350" cy="612" r="3" /><path d="M350 612 L 400 612 L 420 592 L 530 592" /><text class="rechts" x="530" y="584">{b.leitwerk}</text></g>
+      </g>
+
+      {b.hinweis && <text class="hinweis" x="40" y="764">{b.hinweis}</text>}
+    </svg>
+    {b.schriftfeld && b.schriftfeld.length > 0 && (
+      <Schriftfeld dunkel klein class="blatt__feld" felder={[...b.schriftfeld]} />
+    )}
+  </figure>
+</div>
 
 <style>
-  .zeichnung { width: 100%; max-width: 34rem; display: block; justify-self: center; }
-  text { font-family: var(--schrift-titel); font-size: 16px; font-weight: 500; fill: rgb(255 255 255 / 0.8); }
+  .explosion { position: relative; margin-top: 1.5rem; }
+  .blatt { --raster-y: -1px; margin: 0; padding: clamp(1rem, 3vw, 2rem) clamp(0.5rem, 3vw, 2rem) 0; color: var(--weiss); }
+  /* höchstens so groß, dass das ganze Blatt auf den Bildschirm passt */
+  .zeichnung { width: 100%; max-width: min(30rem, calc((100vh - 13rem) * 0.636)); display: block; margin-inline: auto; overflow: visible; }
+  @media (max-width: 56rem) { .zeichnung { max-width: 30rem; } }
+  .blatt :global(.blatt__feld) { margin: 1.2rem calc(-1 * clamp(0.5rem, 3vw, 2rem)) 0; border-left: 0; }
+  .blatt :global(.blatt__feld > div:last-child) { border-right: 0; }
+
+
+  text { font-family: var(--schrift-titel); font-size: 17px; font-weight: 500; fill: rgb(255 255 255 / 0.85); }
   .rechts { text-anchor: end; }
-  /* auf dem Handy wird die Zeichnung kleiner, die Schrift soll lesbar bleiben */
-  @media (max-width: 40rem) { text { font-size: 24px; } .hinweis { font-size: 19px; } }
   .hinweis { font-size: 13px; fill: rgb(255 255 255 / 0.5); }
   .kontur { fill: none; stroke: var(--weiss); stroke-width: 1.6; }
   .flaeche { fill: rgb(255 255 255 / 0.05); }
   .innen { fill: none; stroke: rgb(255 255 255 / 0.45); stroke-width: 1; stroke-dasharray: 5 4; }
-  .achse { stroke: rgb(255 255 255 / 0.35); stroke-width: 1; stroke-dasharray: 18 4 3 4; }
+  .achse { stroke: rgb(255 255 255 / 0.3); stroke-width: 1; stroke-dasharray: 18 4 3 4; }
   .ruf path { fill: none; stroke: rgb(255 255 255 / 0.5); stroke-width: 1; }
-  .ruf circle { fill: var(--weiss); }
+  .ruf circle { fill: var(--weiss); filter: drop-shadow(0 0 4px rgb(210 230 248 / 0.9)); }
+  @media (max-width: 40rem) { text { font-size: 24px; } .hinweis { font-size: 19px; } }
+
+  /* Ohne Skript: zusammengebaut mit allen Beschriftungen */
 </style>
+
+<script>
+  /*
+   * Fortschritt 0 = zusammengebaut, 1 = auseinandergezogen.
+   * Der Fortschritt läuft, während das Blatt von unten in die Bildschirmmitte wandert.
+   */
+  const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-explosion]').forEach((box) => {
+    const gruppen = [...box.querySelectorAll<SVGGElement>('.gruppe')].map((g) => ({ g, weg: Number(g.dataset.weg) }));
+    const rufe = [...box.querySelectorAll<SVGGElement>('.ruf')];
+
+    const setze = (e: number, beschriftung: number) => {
+      gruppen.forEach(({ g, weg }) => g.setAttribute('transform', `translate(0 ${weg * e})`));
+      rufe.forEach((r, i) => {
+        // Beschriftungen erscheinen nacheinander von oben nach unten
+        const a = Math.min(1, Math.max(0, (beschriftung - i * 0.13) / 0.2));
+        r.style.opacity = String(a);
+      });
+    };
+
+    if (ruhig.matches) { setze(1, 2); return; }
+
+    const weich = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+    let ziel = 0, jetzt = 0, laeuft = false;
+    const messen = () => {
+      const r = box.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // Mitte des Blatts: unten am Bildschirmrand = 0, in der Bildschirmmitte = 1
+      const mitte = r.top + r.height / 2;
+      ziel = Math.min(1, Math.max(0, (vh * 1.05 - mitte) / (vh * 0.55)));
+      if (!laeuft) { laeuft = true; requestAnimationFrame(schritt); }
+    };
+    const zeichne = (t: number) => {
+      const e = weich(Math.min(1, Math.max(0, (t - 0.1) / 0.6)));
+      setze(e, Math.min(1, Math.max(0, (t - 0.25) / 0.65)) * 1.9);
+    };
+    function schritt() {
+      jetzt += (ziel - jetzt) * 0.12;
+      if (Math.abs(ziel - jetzt) < 0.0005) jetzt = ziel;
+      zeichne(jetzt);
+      if (jetzt !== ziel) requestAnimationFrame(schritt);
+      else laeuft = false;
+    }
+
+    window.addEventListener('scroll', messen, { passive: true });
+    window.addEventListener('resize', messen);
+    messen();
+    jetzt = ziel;
+    zeichne(jetzt);
+  });
+</script>

@@ -102,7 +102,7 @@ Bis dahin ist der Editor absichtlich *nicht* Teil der Live-Seite (siehe `astro.c
 
 Das Themenraster selbst kommt aus der Sammlung **Themen** (Felder „Skizze“, „Kleine Zeile über dem Namen“ und „Kurztext für die Startseite“, Reihenfolge über das Feld „Reihenfolge“).
 
-**Raketenzeichnung (Stella):** steht auf der Themenseite Rakete im Abschnitt „Technik“. Beschriftungen und Schriftfeld in [`src/content/themen/rakete.yaml`](src/content/themen/rakete.yaml) unter `technik` → `raketenzeichnung`; `anzeigen: false` blendet sie aus.
+**Raketenzeichnung (Stella):** steht auf der Themenseite Rakete im Abschnitt „Technik“ und fährt beim Scrollen als Explosionszeichnung auseinander. Beschriftungen und Schriftfeld in [`src/content/themen/rakete.yaml`](src/content/themen/rakete.yaml) unter `technik` → `raketenzeichnung`; `anzeigen: false` blendet sie aus.
 
 **Missionslog:** Die Zeitleiste steht auf der Startseite, über den News und auf „Über uns“, das Neueste zuerst. Einträge ändern in [`src/content/seiten/ueber-uns.yaml`](src/content/seiten/ueber-uns.yaml) unter `rueckblick`. Jeder Eintrag hat `zeitpunkt`, `titel`, `text` und `geplant` (`true` = noch nicht erreicht, wird gestrichelt gezeigt).
 
@@ -134,13 +134,18 @@ So sieht eine gute Skizze aus:
 
 ## Gestaltung
 
-- **Leitidee: technische Zeichnung.** Dunkle Flächen sind fast schwarz (`--nacht`) mit feinem Millimeterraster und weichem Leuchten oben rechts. Die Startseite zeigt ein animiertes Flugprofil (`src/components/Flugprofil.astro`; bei „Bewegung reduzieren“ steht es still), die Raketenseite Stella als beschriftete Schnittzeichnung, jedes Thema hat eine eigene Skizze.
+- **Leitidee: technische Zeichnung.** Dunkle Flächen sind fast schwarz (`--nacht`) mit feinem Millimeterraster und weichem Leuchten oben rechts. Jedes Thema hat eine eigene Skizze.
 - **Farben** aus dem Logo: Navy `#182c3c`, Ring-Grau `#eeeeee`, Weiß. Keine weiteren Akzentfarben.
 - **Schriften:** Barlow Semi Condensed für Überschriften (an DIN angelehnt, passt zur Logo-Umschrift), Source Sans 3 für Fließtext. Beide liegen auf dem eigenen Server, es gehen keine Daten an Google.
 - Festgelegt in [`src/styles/global.css`](src/styles/global.css).
 
 - **Schriftfeld** (wie auf technischen Zeichnungen) ist das durchgehende Gestaltungsmerkmal: unten im Seitenkopf der Themenseiten (Bereich, Wettbewerb, Ansprechperson) und von „Mitmachen“ (nächstes Treffen), auf den Themenkarten und als Fußzeile. Baustein: `src/components/Schriftfeld.astro`. Die Angaben der Fußzeile stehen in `src/content/allgemein.yaml` → `fussFelder`.
-- Keine Labels in Großbuchstaben, keine Pfeile hinter Links. Einzige Animation ist das Flugprofil auf der Startseite.
+- Keine Labels in Großbuchstaben, keine Pfeile hinter Links.
+- **Bewegung gibt es an genau drei Stellen**, alle stehen still bei „Bewegung reduzieren“ und funktionieren ohne JavaScript als ruhiges Bild:
+  - **Flugprofil** im Kopf der Startseite (`src/components/Flugprofil.astro`): Ein leuchtender Punkt fliegt die Bahn in Schleife ab. Beschriftungen in `startseite.yaml` → `flugprofil`.
+  - **Explosionszeichnung** von Stella (`src/components/Raketenzeichnung.astro`): Baugruppen fahren beim Scrollen auseinander, ohne das Scrollen anzuhalten.
+  - Grundsatz (Jonas, 19.10.): Animationen laufen im Fluss der Seite mit; nichts heftet sich an oder hält vom Weiterscrollen ab.
+  - **3D-Modelle** von Stella und Doug im Kopf der Themenseiten (`src/components/Modell3D.astro`, Modelle in `src/lib/modelle3d.ts`). Welche Seite welches Modell zeigt, steht im Feld `modell3d` der Themendatei (`keins`, `stella`, `doug`). Die Modelle sind schematisch aus Grundformen gebaut. Sobald es CAD-Modelle gibt: in Fusion 360 vereinfacht als glTF (`.glb`) exportieren, nach `public/modelle/` legen und in `modelle3d.ts` mit dem GLTFLoader laden. Three.js wird nur auf diesen Seiten und erst beim Hinsehen geladen.
 
 ## Veröffentlichen (GitHub Pages)
 
