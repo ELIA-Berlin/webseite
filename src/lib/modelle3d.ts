@@ -207,7 +207,8 @@ export function zeigeModell(box: HTMLElement, name: ModellName, { bewegung, fert
 
   // Kamera so weit weg, dass das Modell ganz hineinpasst
   const kugel = new THREE.Box3().setFromObject(ziehen).getBoundingSphere(new THREE.Sphere());
-  const abstand = kugel.radius / Math.sin(THREE.MathUtils.degToRad(kamera.fov / 2)) * 0.98;
+  // etwas näher als die volle Kugel: die Modelle sind länglich und füllen die Kugel nicht aus
+  const abstand = kugel.radius / Math.sin(THREE.MathUtils.degToRad(kamera.fov / 2)) * 0.82;
   kamera.position.set(0, kugel.radius * 0.18, abstand);
   kamera.lookAt(kugel.center);
 

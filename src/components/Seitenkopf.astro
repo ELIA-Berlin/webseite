@@ -23,7 +23,7 @@ const rechts = bild || skizze || modell;
 const mitFeld = schriftfeld.some((f) => f.wert) || Astro.slots.has('feld');
 ---
 <section class:list={['seitenkopf', 'dunkel', 'raster', 'leuchten', { 'mit-feld': mitFeld }]}>
-  <div class:list={['huelle', 'seitenkopf__raster', { 'mit-bild': rechts }]}>
+  <div class:list={['huelle', 'seitenkopf__raster', { 'mit-bild': rechts, 'mit-modell': !bild && modell }]}>
     <div class="seitenkopf__text">
       {einordnung && <p class="einordnung">{einordnung}</p>}
       <h1>{titel}</h1>
@@ -54,6 +54,11 @@ const mitFeld = schriftfeld.some((f) => f.wert) || Astro.slots.has('feld');
   .seitenkopf.mit-feld { padding-bottom: 0; }
   .seitenkopf__raster { display: grid; gap: 2rem; align-items: end; }
   @media (min-width: 56rem) { .mit-bild { grid-template-columns: 1.3fr 1fr; gap: 3rem; } }
+  /* Mit 3D-Modell: Text und Modell rücken zusammen, das Modell bekommt mehr Platz */
+  @media (min-width: 56rem) {
+    .mit-modell { grid-template-columns: minmax(0, 32rem) minmax(0, 1fr); gap: 1rem 2rem; align-items: center; }
+    .mit-modell :global(.modell3d) { width: min(100%, 40rem); justify-self: start; margin-block: -2rem -1rem; }
+  }
   h1 { margin-bottom: 0; }
   .einordnung {
     font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem;

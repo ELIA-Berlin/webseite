@@ -77,12 +77,16 @@ const technikDa = Boolean(thema.technik.titel);
     )}
   </Abschnitt>
 
-  {technikDa && (
-    <Abschnitt titel={thema.technik.titel} leer={leer(thema.technik.text) && !thema.technik.bild && !zeichnung.anzeigen} platzhalter="Technik oder Vertiefung, z. B. eine Zeichnung">
+  {technikDa && zeichnung.anzeigen && (
+    <Raketenzeichnung titel={thema.technik.titel} b={zeichnung}>
       <Absaetze text={thema.technik.text} />
-      {zeichnung.anzeigen && (
-        <Raketenzeichnung b={zeichnung} />
-      )}
+      {thema.technik.bild && <img src={thema.technik.bild} alt={thema.technik.bildBeschreibung} loading="lazy" />}
+    </Raketenzeichnung>
+  )}
+
+  {technikDa && !zeichnung.anzeigen && (
+    <Abschnitt titel={thema.technik.titel} leer={leer(thema.technik.text) && !thema.technik.bild} platzhalter="Technik oder Vertiefung, z. B. eine Zeichnung">
+      <Absaetze text={thema.technik.text} />
       {thema.technik.bild && <img src={thema.technik.bild} alt={thema.technik.bildBeschreibung} loading="lazy" />}
     </Abschnitt>
   )}
