@@ -142,8 +142,9 @@ So sieht eine gute Skizze aus:
 - **Schriftfeld** (wie auf technischen Zeichnungen) ist das durchgehende Gestaltungsmerkmal: unten im Seitenkopf der Themenseiten (Bereich, Wettbewerb, Ansprechperson) und von „Mitmachen“ (nächstes Treffen), auf den Themenkarten und als Fußzeile. Baustein: `src/components/Schriftfeld.astro`. Die Angaben der Fußzeile stehen in `src/content/allgemein.yaml` → `fussFelder`.
 - Keine Labels in Großbuchstaben, keine Pfeile hinter Links.
 - **Bewegung gibt es an genau drei Stellen**, alle stehen still bei „Bewegung reduzieren“ und funktionieren ohne JavaScript als ruhiges Bild:
-  - **Flugszene** im Kopf der Startseite (`src/components/Flugszene.astro`): Beim Scrollen bleibt der Kopf stehen und die Rakete fliegt das Flugprofil ab. Beschriftungen in `startseite.yaml` → `flugprofil`.
-  - **Explosionszeichnung** von Stella (`src/components/Raketenzeichnung.astro`): Baugruppen fahren beim Scrollen auseinander.
+  - **Flugprofil** im Kopf der Startseite (`src/components/Flugprofil.astro`): Ein leuchtender Punkt fliegt die Bahn in Schleife ab. Beschriftungen in `startseite.yaml` → `flugprofil`.
+  - **Explosionszeichnung** von Stella (`src/components/Raketenzeichnung.astro`): Baugruppen fahren beim Scrollen auseinander, ohne das Scrollen anzuhalten.
+  - Grundsatz (Jonas, 19.10.): Animationen laufen im Fluss der Seite mit; nichts heftet sich an oder hält vom Weiterscrollen ab.
   - **3D-Modelle** von Stella und Doug im Kopf der Themenseiten (`src/components/Modell3D.astro`, Modelle in `src/lib/modelle3d.ts`). Welche Seite welches Modell zeigt, steht im Feld `modell3d` der Themendatei (`keins`, `stella`, `doug`). Die Modelle sind schematisch aus Grundformen gebaut. Sobald es CAD-Modelle gibt: in Fusion 360 vereinfacht als glTF (`.glb`) exportieren, nach `public/modelle/` legen und in `modelle3d.ts` mit dem GLTFLoader laden. Three.js wird nur auf diesen Seiten und erst beim Hinsehen geladen.
 
 ## Veröffentlichen (GitHub Pages)

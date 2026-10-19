@@ -1,0 +1,185 @@
+---
+/**
+ * Flugprofil einer Rakete für den Kopf der Startseite, gezeichnet wie auf einer technischen Zeichnung:
+ * Start, Brennschluss, Apogäum, Fallschirm, Landung.
+ *
+ * Ohne Animation (oder bei „Bewegung reduzieren“) steht das ganze Profil ruhig da.
+ * Mit Animation fliegt ein leuchtender Punkt die Bahn ab und zieht eine helle Spur,
+ * danach verblasst die Spur und der nächste Flug startet.
+ *
+ * Beschriftungen: src/content/startseite.yaml → flugprofil (Editor: Startseite → Flugprofil).
+ */
+interface Props {
+  b: { start: string; brennschluss: string; apogaeum: string; fallschirm: string; landung: string; beschreibung: string };
+}
+const { b } = Astro.props;
+
+// Die drei Flugabschnitte. Punkte: Start (90|500), Brennschluss (250|250), Apogäum (540|80),
+// Fallschirm (770|290), Landung (800|500).
+const brenn = 'M90 500 C 110 410, 160 330, 250 250';
+const gleit = 'M250 250 C 330 180, 430 90, 540 80';
+const sink = 'M540 80 C 640 72, 730 150, 770 290 L 800 500';
+---
+<svg class="profil" viewBox="0 0 900 560" role="img" aria-label={b.beschreibung} data-flugprofil>
+  <defs>
+    <filter id="profil-glanz" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="5" result="weich" />
+      <feMerge><feMergeNode in="weich" /><feMergeNode in="SourceGraphic" /></feMerge>
+    </filter>
+    <radialGradient id="profil-schein">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9" />
+      <stop offset="0.35" stop-color="#d6e8f7" stop-opacity="0.35" />
+      <stop offset="1" stop-color="#d6e8f7" stop-opacity="0" />
+    </radialGradient>
+    <mask id="profil-maske-sink" maskUnits="userSpaceOnUse" x="0" y="0" width="900" height="560">
+      <path class="maske" d={sink} pathLength="1" />
+    </mask>
+  </defs>
+
+  <!-- Boden -->
+  <line class="boden" x1="30" y1="500" x2="880" y2="500" />
+  <path class="boden-schraffur" d="M60 500 l-12 14 M100 500 l-12 14 M140 500 l-12 14 M760 500 l-12 14 M800 500 l-12 14 M840 500 l-12 14" />
+  <!-- Höhe des Apogäums als Maßlinie -->
+  <line class="mass" x1="540" y1="80" x2="540" y2="500" />
+  <path class="mass" d="M534 86 L540 80 L546 86 M534 494 L540 500 L546 494" />
+
+  <!-- geplante Bahn: ruhig und gestrichelt, immer sichtbar -->
+  <g class="plan">
+    <path d={brenn} /><path d={gleit} /><path d={sink} />
+  </g>
+
+  <!-- leuchtende Spur, wird beim Flug gezogen -->
+  <g class="spur" filter="url(#profil-glanz)">
+    <path class="spur-brenn" d={brenn} pathLength="1" />
+    <path class="spur-gleit" d={gleit} pathLength="1" />
+    <path class="spur-sink" d={sink} mask="url(#profil-maske-sink)" />
+  </g>
+
+  <!-- Messpunkte mit Beschriftung -->
+  <g class="punkt" data-bei="0"><circle cx="90" cy="500" r="4" /><text x="90" y="532" text-anchor="middle">{b.start}</text></g>
+  <g class="punkt" data-bei="1"><circle cx="250" cy="250" r="4" /><path d="M250 250 L 196 250" /><text x="188" y="255" text-anchor="end">{b.brennschluss}</text></g>
+  <g class="punkt" data-bei="2"><circle cx="540" cy="80" r="4" /><path d="M540 80 L 540 40" /><text x="540" y="30" text-anchor="middle">{b.apogaeum}</text></g>
+  <g class="punkt" data-bei="3"><circle cx="770" cy="290" r="4" /><path d="M770 290 L 720 290" /><text x="712" y="296" text-anchor="end">{b.fallschirm}</text></g>
+  <g class="punkt" data-bei="4"><circle cx="800" cy="500" r="4" /><text x="800" y="532" text-anchor="middle">{b.landung}</text></g>
+
+  <!-- die Rakete: leuchtender Punkt mit Schein -->
+  <g class="rakete" opacity="0">
+    <circle class="schein" r="26" fill="url(#profil-schein)" />
+    <circle class="kern" r="4.5" />
+  </g>
+</svg>
+
+<style>
+  .profil { width: 100%; max-width: 44rem; display: block; justify-self: end; overflow: visible; }
+  .boden { stroke: rgb(255 255 255 / 0.35); stroke-width: 1.2; }
+  .boden-schraffur { fill: none; stroke: rgb(255 255 255 / 0.2); stroke-width: 1; }
+  .mass { fill: none; stroke: rgb(255 255 255 / 0.18); stroke-width: 1; stroke-dasharray: 2 5; }
+  .plan path { fill: none; stroke: rgb(255 255 255 / 0.38); stroke-width: 1.3; stroke-dasharray: 6 6; }
+  .spur path { fill: none; stroke: #ffffff; stroke-linecap: round; }
+  .spur-brenn { stroke-width: 3; }
+  .spur-gleit { stroke-width: 2; }
+  .spur-sink { stroke-width: 1.6; stroke-dasharray: 7 6; }
+  .maske { fill: none; stroke: #ffffff; stroke-width: 14; }
+  .punkt circle { fill: var(--nacht); stroke: #ffffff; stroke-width: 1.5; transition: fill .4s, filter .4s; }
+  .punkt path { fill: none; stroke: rgb(255 255 255 / 0.45); stroke-width: 1; }
+  .punkt text { font-family: var(--schrift-titel); font-weight: 500; font-size: 22px; fill: rgb(255 255 255 / 0.82); transition: fill .4s; }
+  .punkt.erreicht circle { fill: #ffffff; filter: drop-shadow(0 0 6px rgb(210 230 248 / 0.9)); }
+  .punkt.erreicht text { fill: #ffffff; }
+  .kern { fill: #ffffff; }
+  @media (max-width: 40rem) { .punkt text { font-size: 32px; } }
+
+  /* Ruhezustand (ohne Skript oder bei reduzierter Bewegung): ganze Bahn hell, Rakete am Boden */
+  .spur { opacity: 0.85; }
+  .maske { stroke-dasharray: 1 0; }
+  [data-fliegt] .spur { opacity: 1; }
+</style>
+
+<script>
+  // Ein Flug: Brennphase schnell, Gleitflug bis zum Apogäum langsamer werdend,
+  // kurzes Stehen oben, dann ruhig am Fallschirm nach unten. Danach verblasst die Spur.
+  const ablaufe = document.querySelectorAll<SVGSVGElement>('[data-flugprofil]');
+  const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  ablaufe.forEach((svg) => {
+    if (ruhig.matches) return;
+    const q = <T extends Element>(s: string) => svg.querySelector<T>(s)!;
+    const brenn = q<SVGPathElement>('.spur-brenn');
+    const gleit = q<SVGPathElement>('.spur-gleit');
+    const sink = q<SVGPathElement>('.spur-sink');
+    const maske = q<SVGPathElement>('.maske');
+    const spur = q<SVGGElement>('.spur');
+    const rakete = q<SVGGElement>('.rakete');
+    const schein = q<SVGCircleElement>('.schein');
+    const punkte = [...svg.querySelectorAll<SVGGElement>('.punkt')];
+    const abschnitte = [brenn, gleit, sink].map((p) => ({ p, laenge: p.getTotalLength() }));
+
+    // Dauer der Phasen in Millisekunden
+    const T = { warten: 600, brenn: 1300, gleit: 1900, oben: 500, sink: 3400, ruhe: 2200, verblassen: 900 };
+    const gesamt = T.warten + T.brenn + T.gleit + T.oben + T.sink + T.ruhe + T.verblassen;
+
+    const setzeAnteil = (el: SVGPathElement, anteil: number) => {
+      el.style.strokeDasharray = '1 1';
+      el.style.strokeDashoffset = String(1 - anteil);
+    };
+    const anteilSink = (anteil: number) => {
+      maske.style.strokeDasharray = '1 1';
+      maske.style.strokeDashoffset = String(1 - anteil);
+    };
+    const setzeRakete = (i: number, anteil: number, gross = 1) => {
+      const { p, laenge } = abschnitte[i];
+      const pt = p.getPointAtLength(laenge * anteil);
+      rakete.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+      schein.setAttribute('r', String(26 * gross));
+    };
+    const markiere = (bis: number) => punkte.forEach((pk, i) => pk.classList.toggle('erreicht', i <= bis));
+
+    const beschleunigen = (t: number) => t * t;
+    const abbremsen = (t: number) => 1 - (1 - t) * (1 - t);
+
+    svg.setAttribute('data-fliegt', '');
+    let start = performance.now();
+
+    function bild(jetzt: number) {
+      let t = (jetzt - start) % gesamt;
+      spur.style.opacity = '1';
+      rakete.setAttribute('opacity', '1');
+
+      if (t < T.warten) {
+        setzeAnteil(brenn, 0); setzeAnteil(gleit, 0); anteilSink(0);
+        setzeRakete(0, 0, 0.6); markiere(0);
+      } else if ((t -= T.warten) < T.brenn) {
+        const a = beschleunigen(t / T.brenn);
+        setzeAnteil(brenn, a); setzeAnteil(gleit, 0); anteilSink(0);
+        setzeRakete(0, a, 1.5); markiere(0);
+      } else if ((t -= T.brenn) < T.gleit) {
+        const a = abbremsen(t / T.gleit);
+        setzeAnteil(brenn, 1); setzeAnteil(gleit, a); anteilSink(0);
+        setzeRakete(1, a, 1); markiere(1);
+      } else if ((t -= T.gleit) < T.oben) {
+        setzeAnteil(gleit, 1); anteilSink(0);
+        setzeRakete(2, 0, 0.8); markiere(2);
+      } else if ((t -= T.oben) < T.sink) {
+        const a = t / T.sink;
+        setzeAnteil(brenn, 1); setzeAnteil(gleit, 1); anteilSink(a);
+        setzeRakete(2, a, 0.8); markiere(a > 0.62 ? 3 : 2);
+      } else if ((t -= T.sink) < T.ruhe) {
+        anteilSink(1); setzeRakete(2, 1, 0.7); markiere(4);
+      } else {
+        t -= T.ruhe;
+        const rest = 1 - t / T.verblassen;
+        spur.style.opacity = String(rest);
+        rakete.setAttribute('opacity', String(rest));
+        if (rest < 0.5) markiere(-1);
+      }
+      if (laeuft) rahmen = requestAnimationFrame(bild);
+    }
+
+    // Erst starten, wenn die Zeichnung zu sehen ist; außerhalb des Bildschirms pausieren
+    let laeuft = false;
+    let rahmen = 0;
+    new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !laeuft) { laeuft = true; start = performance.now(); rahmen = requestAnimationFrame(bild); }
+      if (!e.isIntersecting && laeuft) { laeuft = false; cancelAnimationFrame(rahmen); }
+    }).observe(svg);
+  });
+</script>
