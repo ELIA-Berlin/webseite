@@ -1,0 +1,77 @@
+---
+/**
+ * 3D-Modell (Stella oder Doug) im Kopf einer Themenseite.
+ * Bis das Modell geladen ist – und wenn der Browser kein 3D kann – steht die Skizze des Themas da.
+ * Three.js wird erst geladen, wenn das Modell in Sichtweite kommt, und nur auf diesen Seiten.
+ *
+ * Welche Seite welches Modell zeigt: Feld „3D-Modell“ beim Thema (Editor: Themen).
+ */
+interface Props {
+  modell: 'stella' | 'doug';
+  skizze?: string | null;
+  beschreibung: string;
+}
+const { modell, skizze, beschreibung } = Astro.props;
+---
+<div class="modell3d" data-modell={modell} role="img" aria-label={beschreibung}>
+  {skizze && <img class="modell3d__ersatz" src={skizze} alt="" />}
+  <p class="modell3d__hinweis" aria-hidden="true">Zum Drehen ziehen</p>
+</div>
+
+<style>
+  .modell3d {
+    position: relative; width: min(100%, 30rem); aspect-ratio: 1; max-width: 100%;
+    justify-self: center; align-self: center; touch-action: pan-y;
+  }
+  .modell3d__ersatz {
+    position: absolute; inset: 12%; width: 76%; height: 76%; object-fit: contain;
+    filter: brightness(0) invert(1) drop-shadow(0 0 6px rgb(200 225 245 / 0.55)); opacity: 0.92;
+    transition: opacity .6s;
+  }
+  .modell3d.bereit .modell3d__ersatz { opacity: 0; }
+  .modell3d :global(.modell3d__leinwand) {
+    position: absolute; inset: 0; width: 100%; height: 100%; cursor: grab;
+    filter: drop-shadow(0 0 5px rgb(200 225 245 / 0.45));
+    opacity: 0; transition: opacity .8s;
+  }
+  .modell3d.bereit :global(.modell3d__leinwand) { opacity: 1; }
+  .modell3d.zieht :global(.modell3d__leinwand) { cursor: grabbing; }
+  .modell3d__hinweis {
+    position: absolute; left: 0; right: 0; bottom: 0; margin: 0; text-align: center;
+    font-family: var(--schrift-titel); font-size: 0.9rem; color: rgb(255 255 255 / 0.5);
+    opacity: 0; transition: opacity .6s;
+  }
+  .modell3d.bereit .modell3d__hinweis { opacity: 1; }
+  @media (hover: none) { .modell3d__hinweis { display: none; } }
+</style>
+
+<script>
+  const ruhig = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const kann3D = () => {
+    try {
+      const c = document.createElement('canvas');
+      return Boolean(c.getContext('webgl2') || c.getContext('webgl'));
+    } catch { return false; }
+  };
+
+  document.querySelectorAll<HTMLElement>('[data-modell]').forEach((box) => {
+    if (!kann3D()) return;
+    const starten = async () => {
+      try {
+        const { zeigeModell } = await import('../lib/modelle3d');
+        zeigeModell(box, box.dataset.modell as 'stella' | 'doug', {
+          bewegung: !ruhig,
+          fertig: () => requestAnimationFrame(() => box.classList.add('bereit')),
+        });
+      } catch (fehler) {
+        // Skizze bleibt stehen
+        console.warn('3D-Modell konnte nicht geladen werden', fehler);
+      }
+    };
+    const beobachter = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { beobachter.disconnect(); starten(); }
+    }, { rootMargin: '200px' });
+    beobachter.observe(box);
+  });
+</script>

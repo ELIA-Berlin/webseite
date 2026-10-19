@@ -63,6 +63,16 @@ export default config({
           directory: 'public/grafiken/themen',
           publicPath: '/grafiken/themen/',
         }),
+        modell3d: fields.select({
+          label: '3D-Modell im Seitenkopf',
+          description: 'Drehbares Modell statt der Skizze. Ein Foto im Feld „Bild im Seitenkopf“ hat Vorrang.',
+          options: [
+            { label: 'Keins (Skizze zeigen)', value: 'keins' },
+            { label: 'Stella (Rakete)', value: 'stella' },
+            { label: 'Doug (Rover)', value: 'doug' },
+          ],
+          defaultValue: 'keins',
+        }),
         teaser: fields.text({
           label: 'Text für die Themenübersicht',
           description: 'Zwei bis drei Sätze, etwas ausführlicher als auf der Startseite.',

@@ -3,9 +3,10 @@
  * Dunkler Kopfbereich einer Unterseite, gestaltet wie der obere Teil eines Zeichnungsblatts:
  * kleine Zeile, Überschrift, Einleitung, rechts optional ein Foto oder eine Skizze,
  * unten optional ein Schriftfeld mit Angaben zur Seite (z. B. Bereich, Wettbewerb).
- * Ein Foto (bild) hat Vorrang; sonst wird die Skizze des Themas weiß auf dem Raster gezeigt.
+ * Ein Foto (bild) hat Vorrang, dann ein 3D-Modell (modell); sonst wird die Skizze des Themas weiß auf dem Raster gezeigt.
  */
 import Schriftfeld, { type Feld } from './Schriftfeld.astro';
+import Modell3D from './Modell3D.astro';
 interface Props {
   titel: string;
   einordnung?: string | null;
@@ -13,10 +14,12 @@ interface Props {
   bild?: string | null;
   bildBeschreibung?: string | null;
   skizze?: string | null;
+  /** 3D-Modell statt der Skizze (Skizze bleibt als Ersatz) */
+  modell?: 'stella' | 'doug' | null;
   schriftfeld?: Feld[];
 }
-const { titel, einordnung, einleitung, bild, bildBeschreibung, skizze, schriftfeld = [] } = Astro.props;
-const rechts = bild || skizze;
+const { titel, einordnung, einleitung, bild, bildBeschreibung, skizze, modell, schriftfeld = [] } = Astro.props;
+const rechts = bild || skizze || modell;
 const mitFeld = schriftfeld.some((f) => f.wert) || Astro.slots.has('feld');
 ---
 <section class:list={['seitenkopf', 'dunkel', 'raster', 'leuchten', { 'mit-feld': mitFeld }]}>
@@ -29,7 +32,9 @@ const mitFeld = schriftfeld.some((f) => f.wert) || Astro.slots.has('feld');
     </div>
     {bild
       ? <img class="foto" src={bild} alt={bildBeschreibung ?? ''} />
-      : skizze && <img class="skizze" src={skizze} alt="" />}
+      : modell
+        ? <Modell3D modell={modell} skizze={skizze} beschreibung={`3D-Modell: ${titel}, schematisch`} />
+        : skizze && <img class="skizze" src={skizze} alt="" />}
   </div>
   {mitFeld && (
     <div class="huelle seitenkopf__feld">

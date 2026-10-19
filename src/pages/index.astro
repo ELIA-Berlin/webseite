@@ -5,7 +5,7 @@
  * Der Missionslog kommt aus „Über uns“ → Rückblick, die Themen aus der Sammlung „Themen“.
  */
 import Basis from '../layouts/Basis.astro';
-import Flugprofil from '../components/Flugprofil.astro';
+import Flugszene from '../components/Flugszene.astro';
 import ThemenBlaetter from '../components/ThemenBlaetter.astro';
 import Missionslog from '../components/Missionslog.astro';
 import { absaetze, allgemein, alleThemen, reader } from '../lib/inhalte';
@@ -17,20 +17,7 @@ const themen = await alleThemen();
 const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
 ---
 <Basis>
-  <section class="hero dunkel raster leuchten">
-    <div class="huelle hero__raster">
-      <div class="hero__text">
-        {start.unterzeile && <p class="unterzeile">{start.unterzeile}</p>}
-        <h1>{start.titel}</h1>
-        <p class="einleitung">{start.einleitung}</p>
-        <p class="aktionen">
-          <a class="knopf" href="/mitmachen">{start.knopfMitmachen}</a>
-          <a class="knopf knopf--rahmen" href="/themen">{start.knopfThemen}</a>
-        </p>
-      </div>
-      <Flugprofil b={start.flugprofil} />
-    </div>
-  </section>
+  <Flugszene start={start} />
 
   <section class="wer">
     <div class="huelle zwei">
@@ -82,21 +69,6 @@ const [ersterAbsatz, ...weitereAbsaetze] = absaetze(start.werWirSindText);
 </Basis>
 
 <style>
-  /* Kopfbereich: Raster wie auf einer technischen Zeichnung, rechts die Rakete */
-  .hero { --raster-y: -73px; color: var(--weiss); overflow: hidden; }
-  .hero__raster { display: grid; gap: 2.5rem; padding-block: clamp(2.5rem, 7vw, 5rem) clamp(2.5rem, 6vw, 4.5rem); align-items: center; }
-  .hero__text { padding-bottom: 0; }
-  .unterzeile {
-    font-family: var(--schrift-titel); font-weight: 500; font-size: 1.15rem;
-    letter-spacing: 0.02em; color: rgb(255 255 255 / 0.62); margin-bottom: 1.4rem;
-  }
-  .einleitung { font-size: 1.25rem; max-width: 33rem; color: rgb(255 255 255 / 0.82); margin: 1.6rem 0 2.2rem; }
-  .aktionen { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
-
-  @media (min-width: 60rem) {
-    .hero__raster { grid-template-columns: 1fr 1.05fr; gap: 3rem; }
-  }
-
   /* Wer wir sind */
   .wer { padding: clamp(4rem, 9vw, 7rem) 0; }
   .zwei { display: grid; gap: 1.2rem 5rem; }
