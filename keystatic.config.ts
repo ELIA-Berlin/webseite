@@ -487,12 +487,52 @@ export default config({
 
     /* ---------- Partner & Sponsoren ---------- */
     partnerSeite: singleton({
-      label: 'Partner & Sponsoren',
+      label: 'Partner (Übersicht, Sponsoren, Unterstützen)',
       path: 'src/content/seiten/partner',
       format: 'yaml',
       schema: {
-        titel: fields.text({ label: 'Überschrift' }),
-        einleitung: fields.text({ label: 'Einleitung', multiline: true }),
+        titel: fields.text({ label: 'Übersicht /partner: Überschrift' }),
+        einleitung: fields.text({ label: 'Übersicht /partner: Einleitung', multiline: true }),
+        uebersichtSponsoren: fields.object(
+          {
+            titel: fields.text({ label: 'Titel' }),
+            text: fields.text({ label: 'Text', multiline: true }),
+            knopf: fields.text({ label: 'Button' }),
+          },
+          { label: 'Übersicht: Kasten „Sponsoren & Partner“' },
+        ),
+        uebersichtUnterstuetzen: fields.object(
+          {
+            titel: fields.text({ label: 'Titel' }),
+            text: fields.text({ label: 'Text', multiline: true }),
+            knopf: fields.text({ label: 'Button' }),
+          },
+          { label: 'Übersicht: Kasten „Unterstützen“' },
+        ),
+
+        sponsorenSeiteTitel: fields.text({ label: 'Seite Sponsoren & Partner: Überschrift' }),
+        sponsorenSeiteEinleitung: fields.text({ label: 'Seite Sponsoren & Partner: Einleitung', multiline: true }),
+        sponsorenAufrufTitel: fields.text({ label: 'Seite Sponsoren & Partner: Aufruf unten, Überschrift' }),
+        sponsorenAufrufText: fields.text({ label: 'Seite Sponsoren & Partner: Aufruf unten, Text', multiline: true }),
+        sponsorenAufrufKnopf: fields.text({ label: 'Seite Sponsoren & Partner: Aufruf unten, Button' }),
+
+        unterstuetzenTitel: fields.text({ label: 'Seite Unterstützen: Überschrift' }),
+        unterstuetzenEinleitung: fields.text({ label: 'Seite Unterstützen: Einleitung', multiline: true }),
+        wegeTitel: fields.text({ label: 'Seite Unterstützen: Überschrift „Wege“' }),
+        wege: fields.array(
+          fields.object({
+            titel: fields.text({ label: 'Titel', description: 'z. B. Material und Bauteile' }),
+            text: fields.text({ label: 'Beschreibung', multiline: true }),
+          }),
+          {
+            label: 'Seite Unterstützen: Wege, uns zu unterstützen',
+            itemLabel: (w) => w.fields.titel.value || 'Neuer Weg',
+          },
+        ),
+        partnerEmail: fields.text({
+          label: 'E-Mail für Sponsoring-Anfragen (optional)',
+          description: 'Leer lassen = allgemeine Kontakt-E-Mail.',
+        }),
         sponsorenTitel: fields.text({ label: 'Sponsoren: Überschrift' }),
         institutionenTitel: fields.text({ label: 'Institutionelle Partner: Überschrift' }),
         warumTitel: fields.text({ label: 'Warum unterstützen: Überschrift' }),
@@ -574,6 +614,18 @@ export default config({
           fields.object({
             text: fields.text({ label: 'Beschriftung' }),
             link: fields.text({ label: 'Adresse', description: 'z. B. /themen' }),
+            unterpunkte: fields.array(
+              fields.object({
+                text: fields.text({ label: 'Beschriftung' }),
+                link: fields.text({ label: 'Adresse', description: 'z. B. /partner/sponsoren' }),
+                zeile: fields.text({ label: 'Kleine Zeile darunter (optional)' }),
+              }),
+              {
+                label: 'Untermenü (optional)',
+                description: 'Erscheint beim Darüberfahren. Bei „Themen“ kommen die Einträge automatisch aus der Themen-Sammlung.',
+                itemLabel: (u) => u.fields.text.value || 'Neuer Unterpunkt',
+              },
+            ),
           }),
           {
             label: 'Menü',

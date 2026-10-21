@@ -1,7 +1,37 @@
-titel: Partner & Sponsoren
+titel: Partner
+uebersichtSponsoren:
+  titel: Sponsoren & Partner
+  text: Unternehmen und Institutionen, die ELIA möglich machen.
+  knopf: Zu den Sponsoren & Partnern
+uebersichtUnterstuetzen:
+  titel: Unterstützen
+  text: Mit Geld, Material oder Wissen bringen Sie studentische Raumfahrt in Berlin voran.
+  knopf: So können Sie uns unterstützen
+sponsorenSeiteTitel: Sponsoren & Partner
+sponsorenAufrufTitel: Ihr Logo fehlt noch.
+sponsorenAufrufText: >-
+  Wir freuen uns über weitere Unternehmen und Institutionen, die studentische
+  Raumfahrt an der HTW Berlin unterstützen.
+sponsorenAufrufKnopf: So können Sie uns unterstützen
+unterstuetzenTitel: Unterstützen
+wegeTitel: So können Sie helfen
+wege:
+  - titel: Finanzielles Sponsoring
+    text: >-
+      Damit finanzieren wir Bauteile, Werkzeug und die Teilnahme an
+      Wettbewerben wie der European Rover Challenge und der European Rocketry
+      Challenge.
+  - titel: Material und Bauteile
+    text: >-
+      Elektronik, Werkstoffe oder Fertigungszeit an Ihren Maschinen bringen
+      unsere Projekte direkt voran.
+  - titel: Wissen und Kontakte
+    text: >-
+      Mentoring, Workshops oder ein Blick in Ihr Unternehmen helfen
+      Studierenden, Raumfahrt in der Praxis kennenzulernen.
 sponsorenTitel: Sponsoren
 institutionenTitel: Institutionelle Partner
-warumTitel: Warum uns unterstützen
+warumTitel: Was Sie davon haben
 mappeTitel: Sponsoring
 mappeKnopf: Sponsoringmappe herunterladen
 kontaktKnopf: Kontakt aufnehmen

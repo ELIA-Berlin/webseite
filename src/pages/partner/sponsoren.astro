@@ -1,0 +1,107 @@
+---
+/**
+ * Sponsoren & Partner: Logos der Sponsoren (nach Stufen) und institutionelle Partner.
+ * Logos: Sammlung „Partner & Sponsoren“, Texte: src/content/seiten/partner.yaml
+ */
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import Abschnitt from '../../components/Abschnitt.astro';
+import { reader, sichererLink } from '../../lib/inhalte';
+
+const seite = await reader.singletons.partnerSeite.readOrThrow();
+const alle = (await reader.collections.partner.all()).sort((a, b) => (a.entry.reihenfolge ?? 99) - (b.entry.reihenfolge ?? 99));
+const sponsoren = alle.filter((p) => p.entry.art === 'sponsor');
+const institutionen = alle.filter((p) => p.entry.art === 'institution');
+
+// Sponsoren nach Stufe gruppieren (Reihenfolge wie im Editor)
+const stufen = new Map<string, typeof sponsoren>();
+for (const s of sponsoren) {
+  const stufe = s.entry.stufe || '';
+  stufen.set(stufe, [...(stufen.get(stufe) ?? []), s]);
+}
+---
+<Basis titel={seite.sponsorenSeiteTitel || 'Sponsoren & Partner'}>
+  <Seitenkopf
+    titel={seite.sponsorenSeiteTitel || 'Sponsoren & Partner'}
+    einleitung={seite.sponsorenSeiteEinleitung}
+    schriftfeld={[
+      { name: seite.sponsorenTitel, wert: sponsoren.length > 0 ? String(sponsoren.length) : null },
+      { name: seite.institutionenTitel, wert: institutionen.length > 0 ? String(institutionen.length) : null },
+    ]}
+  />
+
+  <Abschnitt titel={seite.sponsorenTitel} leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
+    {[...stufen].map(([stufe, liste]) => (
+      <div class="stufe">
+        {stufe && <h3>{stufe}</h3>}
+        <ul class="logos">
+          {liste.map(({ entry }) => (
+            <li>
+              <a href={sichererLink(entry.link)} title={entry.name}>
+                {entry.logo ? <img src={entry.logo} alt={entry.name} loading="lazy" /> : <span>{entry.name}</span>}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </Abschnitt>
+
+  <Abschnitt titel={seite.institutionenTitel} leer={institutionen.length === 0} platzhalter="HTW Berlin, DGLR, internationale Kooperationen">
+    <ul class="institutionen">
+      {institutionen.map(({ entry }) => (
+        <li>
+          {entry.logo && <img src={entry.logo} alt="" loading="lazy" />}
+          <div>
+            <h3>{sichererLink(entry.link) ? <a href={sichererLink(entry.link)}>{entry.name}</a> : entry.name}</h3>
+            {entry.text && <p>{entry.text}</p>}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </Abschnitt>
+
+  {seite.sponsorenAufrufTitel && (
+    <section class="aufruf-band">
+      <div class="huelle">
+        <div class="aufruf">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="10" y="10" width="44" height="44" /><path d="M32 22 V42 M22 32 H42" /></svg>
+          <div>
+            <h2>{seite.sponsorenAufrufTitel}</h2>
+            {seite.sponsorenAufrufText && <p>{seite.sponsorenAufrufText}</p>}
+          </div>
+          <a class="knopf" href="/partner/unterstuetzen">{seite.sponsorenAufrufKnopf}</a>
+        </div>
+      </div>
+    </section>
+  )}
+</Basis>
+
+<style>
+  .stufe + .stufe { margin-top: 2rem; }
+  .stufe h3 { font-size: 1.2rem; color: var(--grau); }
+  .logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr)); gap: 1rem; }
+  .logos a { display: grid; place-items: center; height: 7rem; padding: 1.2rem; border: 1.5px solid var(--navy); text-decoration: none; background: var(--weiss); }
+  .logos a:hover { background: var(--ring); }
+  .logos img { max-height: 100%; width: auto; object-fit: contain; }
+  .logos span { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.2rem; text-align: center; }
+  .institutionen { list-style: none; margin: 0; padding: 0; }
+  .institutionen li { display: flex; gap: 1.2rem; align-items: flex-start; }
+  .institutionen li + li { border-top: 1px solid var(--linie); padding-top: 1.2rem; margin-top: 1.2rem; }
+  .institutionen img { width: 5rem; height: auto; }
+  .institutionen h3 { margin-bottom: 0.3rem; }
+  .institutionen p { margin: 0; color: var(--grau); }
+
+  /* Aufruf im Stil von „Dein Bauteil fehlt noch“: gestrichelter Platz für ein weiteres Logo */
+  .aufruf-band { padding: clamp(3rem, 7vw, 5rem) 0 clamp(4rem, 9vw, 6rem); }
+  .aufruf {
+    display: grid; gap: 1.2rem 2rem; align-items: center;
+    padding: clamp(1.4rem, 3vw, 2rem); border: 1.5px dashed var(--navy);
+  }
+  @media (min-width: 48rem) { .aufruf { grid-template-columns: auto 1fr auto; } }
+  .aufruf svg { width: 3.5rem; height: 3.5rem; fill: none; stroke: var(--navy); stroke-width: 1.5; }
+  .aufruf svg rect { stroke-dasharray: 4 3; }
+  .aufruf h2 { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); margin: 0 0 0.3rem; }
+  .aufruf p { margin: 0; color: var(--grau); max-width: 34rem; }
+  .aufruf .knopf { justify-self: start; }
+</style>

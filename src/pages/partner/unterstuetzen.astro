@@ -1,0 +1,50 @@
+---
+/**
+ * Unterstützen: Wege, ELIA zu unterstützen, was Sponsoren davon haben, Sponsoringmappe und Kontakt.
+ * Texte: src/content/seiten/partner.yaml (Editor: Seiten → Partner)
+ */
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import Abschnitt from '../../components/Abschnitt.astro';
+import Absaetze from '../../components/Absaetze.astro';
+import { absaetze, allgemein, reader, sichererLink } from '../../lib/inhalte';
+
+const seite = await reader.singletons.partnerSeite.readOrThrow();
+const texte = await allgemein();
+const email = seite.partnerEmail || texte.kontaktEmail;
+const mailto = `mailto:${email}?subject=${encodeURIComponent(seite.mappeTitel || 'Sponsoring')}`;
+---
+<Basis titel={seite.unterstuetzenTitel || 'Unterstützen'}>
+  <Seitenkopf titel={seite.unterstuetzenTitel || 'Unterstützen'} einleitung={seite.unterstuetzenEinleitung} />
+
+  <Abschnitt titel={seite.wegeTitel} leer={seite.wege.length === 0} platzhalter="Wege, uns zu unterstützen">
+    <ul class="wege">
+      {seite.wege.map((w) => (
+        <li>
+          <h3>{w.titel}</h3>
+          {w.text && <p>{w.text}</p>}
+        </li>
+      ))}
+    </ul>
+  </Abschnitt>
+
+  <Abschnitt titel={seite.warumTitel} leer={absaetze(seite.warumText).length === 0} platzhalter="was Unterstützer davon haben, z. B. Logo auf Rover und Rakete, Sichtbarkeit bei Messen">
+    <Absaetze text={seite.warumText} />
+  </Abschnitt>
+
+  <Abschnitt titel={seite.mappeTitel} grau id="kontakt">
+    {seite.mappeText && <p>{seite.mappeText}</p>}
+    <p class="knoepfe">
+      {sichererLink(seite.mappe) && <a class="knopf" href={sichererLink(seite.mappe)} download>{seite.mappeKnopf}</a>}
+      <a class:list={['knopf', { 'knopf--rahmen': sichererLink(seite.mappe) }]} href={mailto}>{seite.kontaktKnopf}</a>
+    </p>
+  </Abschnitt>
+</Basis>
+
+<style>
+  .wege { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--navy); }
+  .wege li { padding: 1.3rem 0 1.4rem; border-bottom: 1px solid var(--linie); }
+  .wege h3 { margin: 0 0 0.35rem; }
+  .wege p { margin: 0; color: var(--grau); }
+  .knoepfe { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 0; }
+</style>

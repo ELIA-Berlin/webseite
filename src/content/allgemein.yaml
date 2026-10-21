@@ -7,6 +7,13 @@ navigation:
     link: /mitmachen
   - text: Partner
     link: /partner
+    unterpunkte:
+      - text: Sponsoren & Partner
+        link: /partner/sponsoren
+        zeile: Wer uns unterstützt
+      - text: Unterstützen
+        link: /partner/unterstuetzen
+        zeile: Sponsoring, Material, Wissen
   - text: Über uns
     link: /ueber-uns
 menueKnopf: Menü

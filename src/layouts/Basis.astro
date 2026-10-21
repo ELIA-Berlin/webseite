@@ -20,8 +20,15 @@ const seitentitel = titel ? `${titel} | ELIA` : 'ELIA – Studentische Raumfahrt
 // (Editor: „Menü, Fußzeile & Beschriftungen“). Ist das Menü leer, wird keins angezeigt.
 const texte = await allgemein();
 const navigation = texte.navigation;
-// Unter dem Menüpunkt „/themen“ erscheinen automatisch alle Themen als Untermenü.
+// Untermenüs: unter „/themen“ automatisch alle Themen, sonst die Unterpunkte aus allgemein.yaml.
 const themen = await alleThemen();
+interface Unterpunkt { href: string; titel: string; zeile?: string | null; skizze?: string | null }
+const unterpunkteVon = (punkt: (typeof navigation)[number]): Unterpunkt[] =>
+  punkt.link === '/themen'
+    ? themen.map(({ slug, entry }) => ({ href: `/themen/${slug}`, titel: entry.titel, zeile: entry.einordnung, skizze: entry.skizze }))
+    : (punkt.unterpunkte ?? [])
+        .filter((u) => u.text && sichererLink(u.link))
+        .map((u) => ({ href: sichererLink(u.link)!, titel: u.text, zeile: u.zeile }));
 const pfad = Astro.url.pathname.replace(/\/$/, '');
 const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
 ---
@@ -60,32 +67,36 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
           <details class="menue">
             <summary>{texte.menueKnopf}</summary>
             <ul>
-              {navigation.map((punkt) => punkt.link === '/themen' && themen.length > 0 ? (
-                <li class="mit-unter">
-                  <span class="unter__zeile">
-                    <a href={sichererLink(punkt.link)} aria-current={pfad === punkt.link ? 'page' : undefined} class:list={{ teil: pfad.startsWith(`${punkt.link}/`) }}>{punkt.text}</a>
-                    <button class="unter__knopf" type="button" aria-expanded="false" aria-controls="untermenue-themen">
-                      <span class="sr">{texte.menueUnterKnopf || 'Untermenü'}: {punkt.text}</span>
-                      <svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 L6 6.5 L11 1.5" /></svg>
-                    </button>
-                  </span>
-                  <ul class="unter" id="untermenue-themen">
-                    {themen.map(({ slug, entry }) => (
-                      <li>
-                        <a href={`/themen/${slug}`} aria-current={pfad === `/themen/${slug}` ? 'page' : undefined}>
-                          <span class="unter__skizze">{entry.skizze && <img src={entry.skizze} alt="" width="48" height="32" />}</span>
-                          <span class="unter__text">
-                            <span class="unter__titel">{entry.titel}</span>
-                            {entry.einordnung && <span class="unter__einordnung">{entry.einordnung}</span>}
-                          </span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ) : (
-                <li><a href={sichererLink(punkt.link)} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
-              ))}
+              {navigation.map((punkt, nr) => {
+                const unter = unterpunkteVon(punkt);
+                const id = `untermenue-${nr}`;
+                return unter.length > 0 ? (
+                  <li class="mit-unter">
+                    <span class="unter__zeile">
+                      <a href={sichererLink(punkt.link)} aria-current={pfad === punkt.link ? 'page' : undefined} class:list={{ teil: pfad.startsWith(`${punkt.link}/`) }}>{punkt.text}</a>
+                      <button class="unter__knopf" type="button" aria-expanded="false" aria-controls={id}>
+                        <span class="sr">{texte.menueUnterKnopf || 'Untermenü'}: {punkt.text}</span>
+                        <svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5 L6 6.5 L11 1.5" /></svg>
+                      </button>
+                    </span>
+                    <ul class="unter" id={id}>
+                      {unter.map((u) => (
+                        <li>
+                          <a href={u.href} aria-current={pfad === u.href ? 'page' : undefined}>
+                            {u.skizze !== undefined && <span class="unter__skizze">{u.skizze && <img src={u.skizze} alt="" width="48" height="32" />}</span>}
+                            <span class="unter__text">
+                              <span class="unter__titel">{u.titel}</span>
+                              {u.zeile && <span class="unter__einordnung">{u.zeile}</span>}
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </li>
+                ) : (
+                  <li><a href={sichererLink(punkt.link)} aria-current={aktiv(punkt.link) ? 'page' : undefined}>{punkt.text}</a></li>
+                );
+              })}
             </ul>
           </details>
         </nav>

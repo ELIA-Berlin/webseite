@@ -1,0 +1,70 @@
+---
+/**
+ * Partner: Übersicht mit zwei Wegen, „Sponsoren & Partner“ und „Unterstützen“.
+ * Texte: src/content/seiten/partner.yaml (Editor: Seiten → Partner)
+ */
+import Basis from '../../layouts/Basis.astro';
+import Seitenkopf from '../../components/Seitenkopf.astro';
+import Schriftfeld from '../../components/Schriftfeld.astro';
+import { reader } from '../../lib/inhalte';
+
+const seite = await reader.singletons.partnerSeite.readOrThrow();
+const alle = await reader.collections.partner.all();
+const sponsoren = alle.filter((p) => p.entry.art === 'sponsor').length;
+const institutionen = alle.filter((p) => p.entry.art === 'institution').length;
+const wege = [
+  {
+    href: '/partner/sponsoren',
+    ...seite.uebersichtSponsoren,
+    felder: [
+      { name: seite.sponsorenTitel, wert: sponsoren > 0 ? String(sponsoren) : null },
+      { name: seite.institutionenTitel, wert: institutionen > 0 ? String(institutionen) : null },
+    ],
+  },
+  {
+    href: '/partner/unterstuetzen',
+    ...seite.uebersichtUnterstuetzen,
+    felder: [] as { name: string; wert: string | null }[],
+  },
+];
+---
+<Basis titel={seite.titel}>
+  <Seitenkopf titel={seite.titel} einleitung={seite.einleitung} />
+
+  <section class="wege">
+    <div class="huelle">
+      <ul>
+        {wege.map((w) => (
+          <li>
+            <a class="blatt" href={w.href}>
+              <span class="text">
+                <h2>{w.titel}</h2>
+                {w.text && <p>{w.text}</p>}
+              </span>
+              <Schriftfeld klein class="feld" felder={w.felder} />
+              <span class="knopf">{w.knopf}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</Basis>
+
+<style>
+  .wege { padding: clamp(3rem, 7vw, 5rem) 0 clamp(4rem, 9vw, 6rem); }
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.5rem; }
+  @media (min-width: 52rem) { ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .blatt {
+    display: flex; flex-direction: column; height: 100%;
+    border: 1.5px solid var(--navy); text-decoration: none; background: var(--weiss);
+  }
+  .text { display: block; padding: clamp(1.4rem, 3vw, 2rem); flex: 1; }
+  h2 { font-size: clamp(2rem, 1.5rem + 1.8vw, 2.8rem); margin: 0 0 0.6rem; }
+  p { margin: 0; color: var(--grau); max-width: 30rem; }
+  .blatt :global(.feld) { border-left: 0; border-top-width: 1px; }
+  .blatt :global(.feld > div:last-child) { border-right: 0; }
+  .knopf { align-self: flex-start; margin: 1.2rem clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem); }
+  .blatt:hover h2 { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 0.1em; }
+  .blatt:hover .knopf { background: var(--navy-tief); }
+</style>

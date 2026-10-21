@@ -16,7 +16,9 @@ Startseite                /
 ├── News                  /news  (Filter: /news?thema=rover)
 │   └── Beitrag           /news/<adresse>
 ├── Mitmachen             /mitmachen
-├── Partner & Sponsoren   /partner
+├── Partner             /partner (Übersicht)
+│   ├── Sponsoren & Partner /partner/sponsoren
+│   └── Unterstützen      /partner/unterstuetzen
 ├── Über uns              /ueber-uns
 └── Impressum, Datenschutz
 ```
@@ -195,3 +197,11 @@ public/grafiken/themen/    Skizzen der vier Themen
 - **Keine privaten E-Mail-Adressen in Commits.** Jeder Commit zeigt öffentlich Name und E-Mail des Autors. Am besten auf GitHub unter *Settings → Emails* „Keep my email addresses private“ aktivieren und lokal die angezeigte `…@users.noreply.github.com`-Adresse verwenden (`git config user.email …`).
 - **Keine personenbezogenen Daten ohne Einverständnis** (Fotos, private Kontaktdaten). Für Ansprechpersonen die Vereinsadressen `…@elia-space.de` nutzen.
 - **Externe Inhalte** (Videos, Karten, fremde Bilder) werden von der Content-Security-Policy in `src/layouts/Basis.astro` blockiert. Wer so etwas einbaut, muss die Policy erweitern und die Datenschutzerklärung ergänzen.
+
+## Menü und Untermenüs
+
+- Menüpunkte stehen in `src/content/allgemein.yaml` → `navigation` (Editor: Menü & Beschriftungen).
+- Jeder Menüpunkt kann `unterpunkte` haben (Beschriftung, Adresse, kleine Zeile). Sie erscheinen beim Darüberfahren als Tafel, auf dem Handy eingerückt.
+- Unter „Themen“ (`/themen`) kommen die Unterpunkte automatisch aus der Themen-Sammlung.
+- Partner: Texte für Übersicht, „Sponsoren & Partner“ und „Unterstützen“ in `src/content/seiten/partner.yaml`, Logos in der Sammlung „Partner & Sponsoren“.
+
