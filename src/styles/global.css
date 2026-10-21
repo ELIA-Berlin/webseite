@@ -34,9 +34,14 @@
   --raster-fein: rgb(255 255 255 / 0.03);
   --raster-grob: rgb(255 255 255 / 0.06);
   --rand: clamp(1.25rem, 4vw, 3rem);
+  /* Höhe der festen Kopfzeile (71 px + 1 px Linie) */
+  --kopf-hoehe: 72px;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+
+/* Sprungziele (z. B. #kontakt) nicht unter der festen Kopfzeile verstecken */
+html { scroll-padding-top: calc(var(--kopf-hoehe) + 1rem); }
 
 [hidden] { display: none !important; }
 

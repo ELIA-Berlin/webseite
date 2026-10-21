@@ -135,7 +135,8 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
 </html>
 
 <style>
-  .kopf { color: var(--weiss); border-bottom: 1px solid rgb(255 255 255 / 0.14); position: relative; z-index: 5; }
+  /* Kopfzeile bleibt beim Scrollen oben stehen */
+  .kopf { color: var(--weiss); border-bottom: 1px solid rgb(255 255 255 / 0.14); position: sticky; top: 0; z-index: 30; }
   /* genau 72 px hoch (3 Rasterkästchen), damit das Raster im Seitenkopf darunter weiterläuft */
   .kopf__zeile { display: flex; align-items: center; justify-content: space-between; height: 71px; }
   .marke {
@@ -156,6 +157,7 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
     padding: 0.5rem 0;
     position: absolute; left: 0; right: 0; top: 100%;
     background: var(--nacht); border-bottom: 1px solid rgb(255 255 255 / 0.14);
+    max-height: calc(100dvh - var(--kopf-hoehe)); overflow-y: auto; overscroll-behavior: contain;
   }
   .menue > ul > li > a, .unter__zeile > a {
     display: block; padding: 0.75rem var(--rand);
@@ -177,7 +179,7 @@ const aktiv = (link: string) => pfad === link || pfad.startsWith(`${link}/`);
 
   @media (min-width: 52rem) {
     .menue summary { display: none; }
-    .menue > ul { position: static; display: flex; align-items: center; gap: 2rem; padding: 0; border: 0; background: none; }
+    .menue > ul { position: static; display: flex; align-items: center; gap: 2rem; padding: 0; border: 0; background: none; max-height: none; overflow: visible; }
     .menue > ul > li > a, .unter__zeile > a { padding: 0.3rem 0; font-size: 1.05rem; opacity: 0.85; }
     .menue > ul > li > a:hover, .unter__zeile > a:hover { opacity: 1; text-decoration: underline; }
     .menue > ul > li > a[aria-current='page'], .unter__zeile > a[aria-current='page'], .unter__zeile > a.teil {
