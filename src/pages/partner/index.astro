@@ -9,17 +9,11 @@ import Schriftfeld from '../../components/Schriftfeld.astro';
 import { reader } from '../../lib/inhalte';
 
 const seite = await reader.singletons.partnerSeite.readOrThrow();
-const alle = await reader.collections.partner.all();
-const sponsoren = alle.filter((p) => p.entry.art === 'sponsor').length;
-const institutionen = alle.filter((p) => p.entry.art === 'institution').length;
 const wege = [
   {
     href: '/partner/sponsoren',
     ...seite.uebersichtSponsoren,
-    felder: [
-      { name: seite.sponsorenTitel, wert: sponsoren > 0 ? String(sponsoren) : null },
-      { name: seite.institutionenTitel, wert: institutionen > 0 ? String(institutionen) : null },
-    ],
+    felder: [] as { name: string; wert: string | null }[],
   },
   {
     href: '/partner/unterstuetzen',

@@ -24,10 +24,6 @@ for (const s of sponsoren) {
   <Seitenkopf
     titel={seite.sponsorenSeiteTitel || 'Sponsoren & Partner'}
     einleitung={seite.sponsorenSeiteEinleitung}
-    schriftfeld={[
-      { name: seite.sponsorenTitel, wert: sponsoren.length > 0 ? String(sponsoren.length) : null },
-      { name: seite.institutionenTitel, wert: institutionen.length > 0 ? String(institutionen.length) : null },
-    ]}
   />
 
   <Abschnitt titel={seite.sponsorenTitel} leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
