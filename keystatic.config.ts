@@ -533,7 +533,6 @@ export default config({
           label: 'E-Mail für Sponsoring-Anfragen (optional)',
           description: 'Leer lassen = allgemeine Kontakt-E-Mail.',
         }),
-        institutionenTitel: fields.text({ label: 'Institutionelle Partner: Überschrift' }),
         warumTitel: fields.text({ label: 'Warum unterstützen: Überschrift' }),
         warumText: absatzText('Warum unterstützen: Text'),
         mappeTitel: fields.text({ label: 'Sponsoring: Überschrift' }),

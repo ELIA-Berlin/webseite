@@ -22,6 +22,11 @@ for (const s of sponsoren) {
   const stufe = s.entry.stufe || '';
   stufen.set(stufe, [...(stufen.get(stufe) ?? []), s]);
 }
+// Hochschulen und Institutionen stehen als erste Zeile, durch eine Linie von den Unternehmen getrennt.
+const gruppen = [
+  ...(institutionen.length ? [{ liste: institutionen, rang: 0, trenner: sponsoren.length > 0 }] : []),
+  ...[...stufen.values()].map((liste, rang) => ({ liste, rang: Math.min(rang, 3), trenner: false })),
+];
 ---
 <Basis titel={seite.sponsorenSeiteTitel || 'Sponsoren & Partner'}>
   <Seitenkopf
@@ -29,9 +34,9 @@ for (const s of sponsoren) {
     einleitung={seite.sponsorenSeiteEinleitung}
   />
 
-  <Abschnitt volleBreite leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
-    {[...stufen].map(([stufe, liste], rang) => (
-      <div class="stufe" data-rang={Math.min(rang, 3)}>
+  <Abschnitt volleBreite leer={gruppen.length === 0} platzhalter="Logos der Hochschulen, Partner und Sponsoren, ggf. nach Stufen">
+    {gruppen.map(({ liste, rang, trenner }) => (
+      <div class:list={['stufe', { trenner }]} data-rang={rang}>
         <ul class="logos">
           {liste.map(({ entry }) => {
             const Tag = sichererLink(entry.link) ? 'a' : 'div';
@@ -54,20 +59,6 @@ for (const s of sponsoren) {
     ))}
   </Abschnitt>
 
-  <Abschnitt titel={seite.institutionenTitel} leer={institutionen.length === 0} platzhalter="HTW Berlin, DGLR, internationale Kooperationen">
-    <ul class="institutionen">
-      {institutionen.map(({ entry }) => (
-        <li>
-          {entry.logo && <img src={entry.logo} alt="" loading="lazy" />}
-          <div>
-            <h3>{sichererLink(entry.link) ? <a href={sichererLink(entry.link)} {...neuerTab(entry.link)}>{entry.name}</a> : entry.name}</h3>
-            {entry.text && <p>{entry.text}</p>}
-          </div>
-        </li>
-      ))}
-    </ul>
-  </Abschnitt>
-
   {seite.sponsorenAufrufTitel && (
     <section class="aufruf-band">
       <div class="huelle">
@@ -86,6 +77,7 @@ for (const s of sponsoren) {
 
 <style>
   .stufe + .stufe { margin-top: 2rem; }
+  .stufe.trenner { padding-bottom: 2rem; border-bottom: 1px solid var(--linie); }
   /* Jede Stufe eine Zeile; je weiter unten, desto kleiner die Kacheln */
   .stufe { --kachel: 13rem; --logo-hoehe: 8rem; --logo-rand: 1.4rem; --name: 1.15rem; --text: 0.95rem; }
   .stufe[data-rang="1"] { --kachel: 11rem; --logo-hoehe: 6.5rem; --logo-rand: 1.2rem; --name: 1.05rem; --text: 0.9rem; }
@@ -102,12 +94,6 @@ for (const s of sponsoren) {
   .sponsor__beschreibung { color: var(--grau); font-size: var(--text); line-height: 1.45; }
   a.sponsor:hover .sponsor__logo { background: var(--ring); }
   a.sponsor:hover .sponsor__name { text-decoration: underline; text-underline-offset: 0.15em; }
-  .institutionen { list-style: none; margin: 0; padding: 0; }
-  .institutionen li { display: flex; gap: 1.2rem; align-items: flex-start; }
-  .institutionen li + li { border-top: 1px solid var(--linie); padding-top: 1.2rem; margin-top: 1.2rem; }
-  .institutionen img { width: 5rem; height: auto; }
-  .institutionen h3 { margin-bottom: 0.3rem; }
-  .institutionen p { margin: 0; color: var(--grau); }
 
   /* Aufruf im Stil von „Dein Bauteil fehlt noch“: gestrichelter Platz für ein weiteres Logo */
   .aufruf-band { padding: clamp(3rem, 7vw, 5rem) 0 clamp(4rem, 9vw, 6rem); }
