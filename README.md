@@ -205,3 +205,10 @@ public/grafiken/themen/    Skizzen der vier Themen
 - Unter „Themen“ (`/themen`) kommen die Unterpunkte automatisch aus der Themen-Sammlung.
 - Partner: Texte für Übersicht, „Sponsoren & Partner“ und „Unterstützen“ in `src/content/seiten/partner.yaml`, Logos in der Sammlung „Partner & Sponsoren“.
 
+## Partner und Sponsoren direkt auf GitHub eintragen
+
+1. **Logo hochladen:** Ordner [`public/bilder/partner/`](public/bilder/partner/) öffnen → **Add file → Upload files** → Logo hineinziehen → **Commit changes**. Am besten SVG oder PNG mit transparentem Hintergrund, Dateiname klein und ohne Leerzeichen (z. B. `cashwerk.svg`).
+2. **Eintrag anlegen:** Ordner [`src/content/partner/`](src/content/partner/) öffnen → **Add file → Create new file** → Name z. B. `cashwerk.yaml` → Vorlage aus [`LIESMICH.md`](src/content/partner/LIESMICH.md) einfügen und anpassen → **Commit changes**.
+
+Nach ein bis zwei Minuten steht der Eintrag auf `/partner/sponsoren`. Sponsoren erscheinen als Kachel mit Logo, Name und Kurztext; institutionelle Partner (`art: institution`) als Liste darunter.
+
