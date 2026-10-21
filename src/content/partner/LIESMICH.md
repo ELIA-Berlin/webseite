@@ -16,6 +16,6 @@ text: Ein Satz, wie uns der Partner unterstützt.
 
 - `art`: `sponsor` (Logo-Raster) oder `institution` (z. B. HTW Berlin, DGLR)
 - `reihenfolge`: kleinere Zahl steht weiter vorne
-- `stufe` (optional, nur Sponsoren): z. B. `Gold`; gleiche Stufen stehen zusammen
+- `stufe` (optional, nur Sponsoren): z. B. `Gold`; wird nicht angezeigt. Jede Stufe ist eine eigene Zeile, die Zeilen werden nach unten kleiner (Reihenfolge nach `reihenfolge`). Gleiche Schreibweise für gleiche Stufen verwenden.
 - `logo`: Pfad ab `/bilder/...`, genau wie der Dateiname im Ordner (Groß-/Kleinschreibung beachten)
 - `text` und `link` sind optional

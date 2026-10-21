@@ -15,7 +15,8 @@ const institutionen = alle.filter((p) => p.entry.art === 'institution');
 
 // Externe Links öffnen in einem neuen Tab, damit man auf unserer Seite bleibt.
 const neuerTab = (link?: string) => /^https?:\/\//i.test(sichererLink(link) ?? '') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
-// Sponsoren nach Stufe gruppieren (Reihenfolge wie im Editor)
+// Sponsoren nach Stufe gruppieren: jede Stufe eine eigene Zeile, die Zeilen werden nach unten kleiner.
+// Der Name der Stufe wird nicht angezeigt; die Reihenfolge ergibt sich aus „reihenfolge“.
 const stufen = new Map<string, typeof sponsoren>();
 for (const s of sponsoren) {
   const stufe = s.entry.stufe || '';
@@ -29,9 +30,8 @@ for (const s of sponsoren) {
   />
 
   <Abschnitt titel={seite.sponsorenTitel} leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
-    {[...stufen].map(([stufe, liste]) => (
-      <div class="stufe">
-        {stufe && <h3>{stufe}</h3>}
+    {[...stufen].map(([stufe, liste], rang) => (
+      <div class="stufe" data-rang={Math.min(rang, 3)}>
         <ul class="logos">
           {liste.map(({ entry }) => {
             const Tag = sichererLink(entry.link) ? 'a' : 'div';
@@ -86,16 +86,20 @@ for (const s of sponsoren) {
 
 <style>
   .stufe + .stufe { margin-top: 2rem; }
-  .stufe h3 { font-size: 1.2rem; color: var(--grau); }
-  .logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13rem), 1fr)); gap: 1rem; }
+  /* Jede Stufe eine Zeile; je weiter unten, desto kleiner die Kacheln */
+  .stufe { --kachel: 13rem; --logo-hoehe: 8rem; --logo-rand: 1.4rem; --name: 1.15rem; --text: 0.95rem; }
+  .stufe[data-rang="1"] { --kachel: 11rem; --logo-hoehe: 6.5rem; --logo-rand: 1.2rem; --name: 1.05rem; --text: 0.9rem; }
+  .stufe[data-rang="2"] { --kachel: 9.5rem; --logo-hoehe: 5rem; --logo-rand: 1rem; --name: 0.98rem; --text: 0.85rem; }
+  .stufe[data-rang="3"] { --kachel: 8rem; --logo-hoehe: 4rem; --logo-rand: 0.8rem; --name: 0.92rem; --text: 0.8rem; }
+  .logos { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--kachel)), 1fr)); gap: 1rem; }
   /* Jede Kachel wie ein kleines Blatt: Logo oben, darunter Name und Kurztext */
   .sponsor { display: flex; flex-direction: column; height: 100%; border: 1.5px solid var(--navy); text-decoration: none; background: var(--weiss); }
-  .sponsor__logo { display: grid; place-items: center; height: 8rem; padding: 1.4rem; border-bottom: 1px solid var(--navy); }
+  .sponsor__logo { display: grid; place-items: center; height: var(--logo-hoehe); padding: var(--logo-rand); border-bottom: 1px solid var(--navy); }
   .sponsor__logo img { max-height: 100%; max-width: 100%; width: auto; height: auto; object-fit: contain; }
   .sponsor__ersatz { font-family: var(--schrift-titel); font-weight: 700; font-size: 1.5rem; text-align: center; }
   .sponsor__text { display: grid; gap: 0.2rem; padding: 0.7rem 0.9rem 0.9rem; }
-  .sponsor__name { font-family: var(--schrift-titel); font-weight: 600; font-size: 1.15rem; }
-  .sponsor__beschreibung { color: var(--grau); font-size: 0.95rem; line-height: 1.45; }
+  .sponsor__name { font-family: var(--schrift-titel); font-weight: 600; font-size: var(--name); }
+  .sponsor__beschreibung { color: var(--grau); font-size: var(--text); line-height: 1.45; }
   a.sponsor:hover .sponsor__logo { background: var(--ring); }
   a.sponsor:hover .sponsor__name { text-decoration: underline; text-underline-offset: 0.15em; }
   .institutionen { list-style: none; margin: 0; padding: 0; }

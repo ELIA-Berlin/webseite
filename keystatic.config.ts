@@ -331,7 +331,7 @@ export default config({
           ],
           defaultValue: 'sponsor',
         }),
-        stufe: fields.text({ label: 'Stufe (optional)', description: 'Nur für Sponsoren, z. B. Gold. Gleiche Stufen werden zusammen angezeigt.' }),
+        stufe: fields.text({ label: 'Stufe (optional)', description: 'Nur für Sponsoren, z. B. Gold, Silber, Bronze. Wird nicht angezeigt: gleiche Stufen stehen in einer Zeile, die Zeilen werden nach unten kleiner (Reihenfolge nach „Reihenfolge“).' }),
         reihenfolge: fields.integer({ label: 'Reihenfolge', defaultValue: 1 }),
         logo: bild('Logo', 'partner'),
         link: fields.url({ label: 'Webseite' }),
