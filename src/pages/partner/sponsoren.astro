@@ -13,6 +13,8 @@ const alle = (await reader.collections.partner.all()).sort((a, b) => (a.entry.re
 const sponsoren = alle.filter((p) => p.entry.art === 'sponsor');
 const institutionen = alle.filter((p) => p.entry.art === 'institution');
 
+// Externe Links öffnen in einem neuen Tab, damit man auf unserer Seite bleibt.
+const neuerTab = (link?: string) => /^https?:\/\//i.test(sichererLink(link) ?? '') ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 // Sponsoren nach Stufe gruppieren (Reihenfolge wie im Editor)
 const stufen = new Map<string, typeof sponsoren>();
 for (const s of sponsoren) {
@@ -35,7 +37,7 @@ for (const s of sponsoren) {
             const Tag = sichererLink(entry.link) ? 'a' : 'div';
             return (
               <li>
-                <Tag class="sponsor" href={sichererLink(entry.link)}>
+                <Tag class="sponsor" href={sichererLink(entry.link)} {...neuerTab(entry.link)}>
                   <span class="sponsor__logo">
                     {entry.logo ? <img src={entry.logo} alt="" loading="lazy" /> : <span class="sponsor__ersatz">{entry.name}</span>}
                   </span>
@@ -58,7 +60,7 @@ for (const s of sponsoren) {
         <li>
           {entry.logo && <img src={entry.logo} alt="" loading="lazy" />}
           <div>
-            <h3>{sichererLink(entry.link) ? <a href={sichererLink(entry.link)}>{entry.name}</a> : entry.name}</h3>
+            <h3>{sichererLink(entry.link) ? <a href={sichererLink(entry.link)} {...neuerTab(entry.link)}>{entry.name}</a> : entry.name}</h3>
             {entry.text && <p>{entry.text}</p>}
           </div>
         </li>
