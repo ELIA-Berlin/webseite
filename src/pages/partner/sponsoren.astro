@@ -29,7 +29,7 @@ for (const s of sponsoren) {
     einleitung={seite.sponsorenSeiteEinleitung}
   />
 
-  <Abschnitt titel={seite.sponsorenTitel} leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
+  <Abschnitt volleBreite leer={sponsoren.length === 0} platzhalter="Logos der Sponsoren, ggf. nach Stufen">
     {[...stufen].map(([stufe, liste], rang) => (
       <div class="stufe" data-rang={Math.min(rang, 3)}>
         <ul class="logos">
