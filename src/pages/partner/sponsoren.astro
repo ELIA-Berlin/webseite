@@ -42,7 +42,7 @@ const gruppen = [
             const Tag = sichererLink(entry.link) ? 'a' : 'div';
             return (
               <li>
-                <Tag class="sponsor" href={sichererLink(entry.link)} {...neuerTab(entry.link)}>
+                <Tag class="sponsor" href={sichererLink(entry.link)} {...neuerTab(entry.link ?? undefined)}>
                   <span class="sponsor__logo">
                     {entry.logo ? <img src={entry.logo} alt="" loading="lazy" /> : <span class="sponsor__ersatz">{entry.name}</span>}
                   </span>
