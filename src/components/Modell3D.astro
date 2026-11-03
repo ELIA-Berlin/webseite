@@ -23,6 +23,7 @@ const { modell, skizze, beschreibung } = Astro.props;
     position: relative; width: min(100%, 30rem); aspect-ratio: 1; max-width: 100%;
     justify-self: center; align-self: center; touch-action: pan-y;
   }
+  .modell3d[data-modell='drohne'] { aspect-ratio: 16 / 10; }
   .modell3d__ersatz {
     position: absolute; inset: 12%; width: 76%; height: 76%; object-fit: contain;
     filter: brightness(0) invert(1) drop-shadow(0 0 6px rgb(200 225 245 / 0.55)); opacity: 0.92;

@@ -222,7 +222,7 @@ function baueDrohne() {
   const halter = new THREE.Group();
   halter.add(k.gruppe);
   const drehe = (dt: number) => propeller.forEach((p) => { p.rotation.y += dt * 9 * p.userData.richtung; });
-  return { baukasten: k, halter, neigung: new THREE.Euler(0.5, 0, 0), drehe, abstandFaktor: 1.02 };
+  return { baukasten: k, halter, neigung: new THREE.Euler(0.5, 0, 0), drehe, abstandFaktor: 0.8 };
 }
 
 /* ---------- Anzeige ---------- */
