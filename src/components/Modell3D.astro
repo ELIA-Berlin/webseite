@@ -20,7 +20,7 @@ const { modell, skizze, beschreibung } = Astro.props;
 
 <style>
   .modell3d {
-    position: relative; width: min(100%, 30rem); aspect-ratio: 1; max-width: 100%;
+    position: relative; width: min(100%, 22rem); aspect-ratio: 1; max-width: 100%;
     justify-self: center; align-self: center; touch-action: pan-y;
   }
   .modell3d[data-modell='drohne'] { aspect-ratio: 16 / 10; }
@@ -38,7 +38,7 @@ const { modell, skizze, beschreibung } = Astro.props;
   .modell3d.bereit :global(.modell3d__leinwand) { opacity: 1; }
   .modell3d.zieht :global(.modell3d__leinwand) { cursor: grabbing; }
   .modell3d__hinweis {
-    position: absolute; left: 0; right: 0; bottom: 0; margin: 0; text-align: center;
+    position: absolute; left: 0; right: 0; bottom: -1.6rem; margin: 0; text-align: center;
     font-family: var(--schrift-titel); font-size: 0.9rem; color: rgb(255 255 255 / 0.5);
     opacity: 0; transition: opacity .6s;
   }

@@ -57,9 +57,10 @@ const mitFeld = schriftfeld.some((f) => f.wert) || Astro.slots.has('feld');
   /* Mit 3D-Modell: Text und Modell rücken zusammen, das Modell bekommt mehr Platz */
   @media (min-width: 56rem) {
     .mit-modell { grid-template-columns: minmax(0, 32rem) minmax(0, 1fr); gap: 1rem 2rem; align-items: center; }
-    .mit-modell :global(.modell3d) { width: min(100%, 40rem); justify-self: start; margin-block: -2rem -1rem; }
-    /* Die Drohne ist flach und breit: Querformat, damit der Kopf nicht den ganzen Bildschirm füllt */
-    .mit-modell :global(.modell3d[data-modell='drohne']) { aspect-ratio: 16 / 10; width: min(100%, 36rem); margin-block: -1rem 0; }
+    /* Modelle bewusst klein halten, damit der Kopf nicht den ganzen Bildschirm füllt */
+    .mit-modell :global(.modell3d) { width: min(100%, 24rem); justify-self: center; margin-block: -1rem 0; }
+    /* Die Drohne ist flach und breit: Querformat */
+    .mit-modell :global(.modell3d[data-modell='drohne']) { width: min(100%, 36rem); }
   }
   h1 { margin-bottom: 0; }
   .einordnung {
