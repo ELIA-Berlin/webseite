@@ -7,7 +7,7 @@
  * Welche Seite welches Modell zeigt: Feld „3D-Modell“ beim Thema (Editor: Themen).
  */
 interface Props {
-  modell: 'stella' | 'doug';
+  modell: 'stella' | 'doug' | 'drohne';
   skizze?: string | null;
   beschreibung: string;
 }
@@ -60,7 +60,7 @@ const { modell, skizze, beschreibung } = Astro.props;
     const starten = async () => {
       try {
         const { zeigeModell } = await import('../lib/modelle3d');
-        zeigeModell(box, box.dataset.modell as 'stella' | 'doug', {
+        zeigeModell(box, box.dataset.modell as 'stella' | 'doug' | 'drohne', {
           bewegung: !ruhig,
           fertig: () => requestAnimationFrame(() => box.classList.add('bereit')),
         });

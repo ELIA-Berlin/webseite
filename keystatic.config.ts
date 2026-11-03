@@ -70,6 +70,7 @@ export default config({
             { label: 'Keins (Skizze zeigen)', value: 'keins' },
             { label: 'Stella (Rakete)', value: 'stella' },
             { label: 'Doug (Rover)', value: 'doug' },
+            { label: 'Drohne (UAV, Beispielmodell)', value: 'drohne' },
           ],
           defaultValue: 'keins',
         }),

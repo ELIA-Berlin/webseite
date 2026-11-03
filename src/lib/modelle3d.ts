@@ -1,5 +1,5 @@
 /**
- * Schematische 3D-Modelle von Stella (Rakete) und Doug (Rover) für die Köpfe der Themenseiten.
+ * Schematische 3D-Modelle von Stella (Rakete), Doug (Rover) und der Drohne (UAV) für die Köpfe der Themenseiten.
  *
  * Die Modelle sind aus einfachen Grundformen zusammengesetzt und im Stil der Seite dargestellt:
  * dunkler Körper mit hellem Randlicht und leuchtenden Kanten, wie eine Konstruktionszeichnung in 3D.
@@ -10,7 +10,7 @@
  */
 import * as THREE from 'three';
 
-export type ModellName = 'stella' | 'doug';
+export type ModellName = 'stella' | 'doug' | 'drohne';
 
 /* ---------- Darstellung: Körper mit Randlicht, dazu Kantenlinien ---------- */
 
@@ -177,6 +177,54 @@ function baueDoug() {
   return { baukasten: k, halter, neigung: new THREE.Euler(0.42, 0, 0) };
 }
 
+/* ---------- Drohne (Quadrocopter, erster Entwurf ca. 50 cm) ---------- */
+
+function baueDrohne() {
+  const k = new Baukasten();
+  const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
+
+  // Rumpf mit flacher Haube
+  k.teil(new THREE.BoxGeometry(0.62, 0.16, 0.5), [0, 0.62, 0]);
+  const haube = new THREE.SphereGeometry(0.24, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+  haube.scale(1.15, 0.5, 0.95);
+  k.teil(haube, [0, 0.7, 0], [0, 0, 0], 40);
+
+  // Vier Arme in X-Form mit Motoren, Propellern und Schutzringen
+  const propeller: THREE.Object3D[] = [];
+  const armL = 0.92;
+  [45, 135, 225, 315].forEach((grad, i) => {
+    const w = THREE.MathUtils.degToRad(grad);
+    const ende = v(Math.cos(w) * armL, 0.62, Math.sin(w) * armL);
+    k.balken(v(Math.cos(w) * 0.22, 0.62, Math.sin(w) * 0.22), ende, 0.06);
+    k.teil(new THREE.CylinderGeometry(0.075, 0.085, 0.14, 24), [ende.x, 0.72, ende.z], [0, 0, 0], 30);
+    // Propeller: zwei schmale Blätter, drehen sich abwechselnd links und rechts herum
+    const blatt = new THREE.BoxGeometry(0.54, 0.012, 0.065);
+    const prop = k.teil(blatt, [ende.x, 0.8, ende.z], [0, i * 0.7, 0], 20);
+    prop.userData.richtung = i % 2 === 0 ? 1 : -1;
+    propeller.push(prop);
+    // Schutzring
+    k.teil(new THREE.TorusGeometry(0.31, 0.012, 8, 48), [ende.x, 0.8, ende.z], [Math.PI / 2, 0, 0], 60);
+  });
+
+  // Kufen
+  [-1, 1].forEach((seite) => {
+    const z = seite * 0.26;
+    k.balken(v(-0.18, 0.54, z), v(-0.24, 0.12, z * 1.5), 0.035);
+    k.balken(v(0.18, 0.54, z), v(0.24, 0.12, z * 1.5), 0.035);
+    k.balken(v(-0.42, 0.1, z * 1.5), v(0.42, 0.1, z * 1.5), 0.04);
+  });
+
+  // Kamera unter dem Rumpf
+  k.teil(new THREE.BoxGeometry(0.14, 0.12, 0.14), [0.18, 0.46, 0]);
+  k.teil(new THREE.CylinderGeometry(0.04, 0.04, 0.06, 16), [0.27, 0.46, 0], [0, 0, Math.PI / 2], 30);
+
+  k.gruppe.position.set(0, -0.5, 0);
+  const halter = new THREE.Group();
+  halter.add(k.gruppe);
+  const drehe = (dt: number) => propeller.forEach((p) => { p.rotation.y += dt * 9 * p.userData.richtung; });
+  return { baukasten: k, halter, neigung: new THREE.Euler(0.5, 0, 0), drehe, abstandFaktor: 1.02 };
+}
+
 /* ---------- Anzeige ---------- */
 
 interface Optionen {
@@ -195,7 +243,8 @@ export function zeigeModell(box: HTMLElement, name: ModellName, { bewegung, fert
 
   const szene = new THREE.Scene();
   const kamera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
-  const modell = name === 'stella' ? baueStella() : baueDoug();
+  const modell: { baukasten: Baukasten; halter: THREE.Group; neigung: THREE.Euler; drehe?: (dt: number) => void; abstandFaktor?: number } =
+    name === 'stella' ? baueStella() : name === 'drohne' ? baueDrohne() : baueDoug();
 
   // Aufbau: aussen = Ziehen mit der Maus, innen = Neigung, ganz innen = Eigendrehung
   const ziehen = new THREE.Group();
@@ -208,7 +257,7 @@ export function zeigeModell(box: HTMLElement, name: ModellName, { bewegung, fert
   // Kamera so weit weg, dass das Modell ganz hineinpasst
   const kugel = new THREE.Box3().setFromObject(ziehen).getBoundingSphere(new THREE.Sphere());
   // etwas näher als die volle Kugel: die Modelle sind länglich und füllen die Kugel nicht aus
-  const abstand = kugel.radius / Math.sin(THREE.MathUtils.degToRad(kamera.fov / 2)) * 0.82;
+  const abstand = kugel.radius / Math.sin(THREE.MathUtils.degToRad(kamera.fov / 2)) * (modell.abstandFaktor ?? 0.82);
   kamera.position.set(0, kugel.radius * 0.18, abstand);
   kamera.lookAt(kugel.center);
 
@@ -253,6 +302,7 @@ export function zeigeModell(box: HTMLElement, name: ModellName, { bewegung, fert
     letzte = t;
     einblenden = Math.min(1, einblenden + dt / 1.2);
     eigen += dt * 0.35;
+    modell.drehe?.(dt);
     // nach dem Loslassen langsam zurück in die Grundlage kippen
     if (!zieht && t - ruhtSeit > 1500) nick *= 0.97;
     zeichne();

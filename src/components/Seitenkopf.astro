@@ -15,7 +15,7 @@ interface Props {
   bildBeschreibung?: string | null;
   skizze?: string | null;
   /** 3D-Modell statt der Skizze (Skizze bleibt als Ersatz) */
-  modell?: 'stella' | 'doug' | null;
+  modell?: 'stella' | 'doug' | 'drohne' | null;
   schriftfeld?: Feld[];
 }
 const { titel, einordnung, einleitung, bild, bildBeschreibung, skizze, modell, schriftfeld = [] } = Astro.props;

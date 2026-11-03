@@ -3,3 +3,29 @@ reihenfolge: 5
 einordnung: Luftfahrt
 kurztext: Unbemannte Luftfahrzeuge entwickeln, bauen und fliegen.
 skizze: /grafiken/themen/uav-drohne.svg
+modell3d: drohne
+teaser: >-
+  Seit Oktober 2026 entwickeln wir eine eigene Drohne. Der erste Entwurf wird
+  rund 50 cm groß und bis zu 2 kg schwer. Später soll eine kleinere Version
+  den Rover bei der European Rover Challenge autonom unterstützen.
+einzeiler: Seit Oktober 2026 entwickeln wir eine eigene Drohne.
+worumEsGeht: |-
+  Seit Oktober 2026 entwickelt ELIA eine eigene Drohne.
+
+  Im ersten Durchlauf bauen wir ein Fluggerät mit rund 50 cm Größe und bis zu 2 kg Gewicht. Daran lernen wir Aufbau, Antrieb, Steuerung und Flugerprobung.
+
+  Das langfristige Ziel ist eine miniaturisierte Version, die bei der European Rover Challenge zusammen mit unserem Rover Doug eingesetzt wird und ihn autonom unterstützt.
+stand: Die Entwicklung hat im Oktober 2026 begonnen. Der erste Entwurf entsteht gerade.
+meilensteine:
+  - zeitpunkt: Oktober 2026
+    text: Start der Entwicklung
+    erreicht: true
+  - zeitpunkt: Erster Durchlauf
+    text: Prototyp mit ca. 50 cm Größe und bis zu 2 kg Gewicht
+    erreicht: false
+  - zeitpunkt: Danach
+    text: Drohne miniaturisieren
+    erreicht: false
+  - zeitpunkt: Ziel
+    text: Den Rover bei der European Rover Challenge autonom unterstützen
+    erreicht: false
