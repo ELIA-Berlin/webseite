@@ -36,7 +36,7 @@ Alle Texte stehen als Dateien in [`src/content/`](src/content/), nichts davon st
 | `startseite.yaml` | Seiten → Startseite | Texte der Startseite |
 | `seiten/themen.yaml`, `seiten/news.yaml`, `seiten/mitmachen.yaml`, `seiten/partner.yaml`, `seiten/ueber-uns.yaml` | Seiten → … | Texte der jeweiligen Seite |
 | `themen/` | Inhalte → Themen | eine Datei pro Thema; erscheint auf Startseite, Themenübersicht und als eigene Seite |
-| `news/` | Inhalte → News | eine Datei pro Beitrag |
+| `news/` | Inhalte → News | eine Datei pro Beitrag, feste Vorlage (Medium, Überschrift, Untertitel, Text, Abbinder); Anleitung: [`docs/news-anleitung.md`](docs/news-anleitung.md) |
 | `positionen/` | Inhalte → Positionen & Bereiche | eine Datei pro Bereich oder Position; Häkchen „Anzeigen“ blendet ein/aus, „Großer Bedarf“ stellt nach oben |
 | `termine/` | Inhalte → Termine (Events & Ausfälle) | Events, einzelne Treffen außerhalb des Rhythmus, Ausfälle (Häkchen „fällt aus“) |
 | `personen/` | Inhalte → Personen | Ansprechpersonen und Vorstand (Fotos nur mit Einwilligung) |

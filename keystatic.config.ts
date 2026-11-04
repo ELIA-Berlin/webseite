@@ -197,34 +197,106 @@ export default config({
       },
     }),
 
-    /* ---------- News ---------- */
+    /* ---------- News: feste Vorlage (Pressemitteilung, aber lockerer, Wir-Perspektive) ---------- */
     news: collection({
       label: 'News',
       path: 'src/content/news/*',
       slugField: 'titel',
-      format: { contentField: 'inhalt' },
-      entryLayout: 'content',
+      format: 'yaml',
       columns: ['titel', 'datum'],
       schema: {
+        // 1. Medium
+        medium: fields.conditional(
+          fields.select({
+            label: '1. Medium',
+            description: 'Ein Bild oder ein Video, das bei YouTube liegt (wird nur verlinkt, nicht eingebettet).',
+            options: [
+              { label: 'Bild', value: 'bild' },
+              { label: 'Video (Link zu YouTube mit Vorschaubild)', value: 'video' },
+            ],
+            defaultValue: 'bild',
+          }),
+          {
+            bild: fields.object(
+              {
+                datei: fields.image({
+                  label: 'Bild',
+                  description: 'Querformat (z. B. 3:2), Metadaten/GPS vorher entfernen, nur eigene Bilder.',
+                  directory: 'public/bilder/news',
+                  publicPath: '/bilder/news/',
+                  validation: { isRequired: true },
+                }),
+                beschreibung: fields.text({
+                  label: 'Bildbeschreibung',
+                  description: 'Ein Satz: Was ist zu sehen? (für Screenreader, Pflicht)',
+                  validation: { length: { min: 5, max: 200 } },
+                }),
+              },
+              { label: 'Bild' },
+            ),
+            video: fields.object(
+              {
+                link: fields.text({
+                  label: 'YouTube-Link',
+                  description: 'Der Link aus der Adressleiste, z. B. https://www.youtube.com/watch?v=… oder https://youtu.be/…',
+                  validation: {
+                    pattern: {
+                      regex: /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{6,}\S*$/,
+                      message: 'Bitte einen vollständigen YouTube-Link einfügen (https://www.youtube.com/watch?v=… oder https://youtu.be/…).',
+                    },
+                  },
+                }),
+                vorschau: fields.image({
+                  label: 'Vorschaubild',
+                  description: 'Standbild aus dem Video, Querformat 16:9.',
+                  directory: 'public/bilder/news',
+                  publicPath: '/bilder/news/',
+                  validation: { isRequired: true },
+                }),
+                beschreibung: fields.text({
+                  label: 'Bildbeschreibung',
+                  description: 'Ein Satz: Worum geht es im Video? (Pflicht)',
+                  validation: { length: { min: 5, max: 200 } },
+                }),
+              },
+              { label: 'Video' },
+            ),
+          },
+        ),
+
+        // 2. Überschrift (+ Adresse der Seite, wird automatisch erzeugt)
         titel: fields.slug({
-          name: { label: 'Titel' },
-          slug: { label: 'Adresse', description: 'Teil der Adresse, z. B. eliaspace.de/news/<adresse>' },
+          name: {
+            label: '2. Überschrift',
+            description: 'Kurz und aussagekräftig, höchstens 90 Zeichen.',
+            validation: { length: { min: 5, max: 90 } },
+          },
+          slug: { label: 'Adresse', description: 'Wird aus der Überschrift erzeugt, nicht ändern. Beispiel: eliaspace.de/news/<adresse>' },
         }),
-        datum: fields.date({ label: 'Datum', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
+
+        // 3. Untertitel
+        untertitel: fields.text({
+          label: '3. Untertitel',
+          description: 'Ein Satz, der die Überschrift ergänzt (erscheint auch in der Übersicht), höchstens 200 Zeichen.',
+          validation: { length: { min: 10, max: 200 } },
+        }),
+
+        // 4. Text
+        text: fields.text({
+          label: '4. Text',
+          description: 'Höchstens 3500 Zeichen. Eine Leerzeile beginnt einen neuen Absatz. Nur Fließtext, keine Formatierung.',
+          multiline: true,
+          validation: { length: { min: 200, max: 3500 } },
+        }),
+
+        // Angaben, die nicht im Text stehen
+        datum: fields.date({ label: 'Datum der Veröffentlichung', defaultValue: { kind: 'today' }, validation: { isRequired: true } }),
         thema: fields.relationship({
-          label: 'Thema',
-          description: 'Optional. Der Beitrag erscheint dann auch auf der Themenseite.',
+          label: 'Thema (optional)',
+          description: 'Wenn gewählt, erscheint der Beitrag auch auf der Themenseite und im Filter.',
           collection: 'themen',
         }),
-        kurztext: fields.text({ label: 'Kurztext für die Übersicht', description: 'Ein bis zwei Sätze.', multiline: true }),
-        titelbild: bild('Titelbild', 'news'),
-        titelbildBeschreibung: fields.text({ label: 'Bildbeschreibung' }),
-        inhalt: fields.markdoc({
-          label: 'Text',
-          options: {
-            image: { directory: 'public/bilder/news', publicPath: '/bilder/news/' },
-          },
-        }),
+        // 5. Abbinder steht bei „Seiten → News (Übersicht)“ und erscheint automatisch unter jedem Beitrag.
       },
     }),
 
@@ -422,6 +494,13 @@ export default config({
         einleitung: fields.text({ label: 'Einleitung', multiline: true }),
         filterAlle: fields.text({ label: 'Filter: Beschriftung für „alle“' }),
         keineBeitraege: fields.text({ label: 'Hinweis, wenn es noch keine Beiträge gibt' }),
+        abbinderTitel: fields.text({ label: 'Abbinder: Überschrift', description: 'Steht automatisch unter jedem Beitrag.' }),
+        abbinder: fields.text({
+          label: 'Abbinder: Text',
+          description: 'Der gleichbleibende Schlusstext jeder Mitteilung („Über ELIA“). Eine Änderung gilt für alle Beiträge.',
+          multiline: true,
+        }),
+        videoKnopf: fields.text({ label: 'Beschriftung am Video', description: 'Hinweis, dass der Link zu YouTube führt.' }),
       },
     }),
 

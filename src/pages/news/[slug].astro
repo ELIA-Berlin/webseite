@@ -1,8 +1,12 @@
 ---
-/** Einzelner News-Beitrag. Inhalt: src/content/news/<beitrag>.mdoc */
-import Markdoc from '@markdoc/markdoc';
+/**
+ * Einzelner News-Beitrag nach fester Vorlage:
+ * Medium · Überschrift · Untertitel · Text (max. 3500 Zeichen) · Abbinder.
+ * Inhalt: src/content/news/<beitrag>.yaml. Gestaltung ist fix, nur die Inhalte ändern sich.
+ */
 import Basis from '../../layouts/Basis.astro';
-import { allgemein, alleNews, datumLang, reader } from '../../lib/inhalte';
+import Absaetze from '../../components/Absaetze.astro';
+import { alleNews, datumLang, newsMedium, reader } from '../../lib/inhalte';
 
 export async function getStaticPaths() {
   const news = await alleNews();
@@ -11,12 +15,11 @@ export async function getStaticPaths() {
 
 const { slug } = Astro.params;
 const beitrag = await reader.collections.news.readOrThrow(slug!);
-const texte = await allgemein();
+const seite = await reader.singletons.newsSeite.readOrThrow();
 const thema = beitrag.thema ? await reader.collections.themen.read(beitrag.thema) : null;
-const { node } = await beitrag.inhalt();
-const html = Markdoc.renderers.html(Markdoc.transform(node));
+const medium = newsMedium(beitrag);
 ---
-<Basis titel={beitrag.titel} beschreibung={beitrag.kurztext || undefined}>
+<Basis titel={beitrag.titel} beschreibung={beitrag.untertitel}>
   <article>
     <header class="kopf dunkel">
       <div class="huelle schmal">
@@ -25,13 +28,29 @@ const html = Markdoc.renderers.html(Markdoc.transform(node));
           {thema && <a href={`/themen/${beitrag.thema}`}>{thema.titel}</a>}
         </p>
         <h1>{beitrag.titel}</h1>
+        <p class="untertitel">{beitrag.untertitel}</p>
       </div>
     </header>
 
     <div class="huelle schmal text">
-      {beitrag.titelbild && <img class="titelbild" src={beitrag.titelbild} alt={beitrag.titelbildBeschreibung} />}
-      <Fragment set:html={html} />
-      <p class="zurueck"><a href="/news">{texte.zurueckNews}</a></p>
+      {medium.art === 'video' && medium.link
+        ? (
+          <a class="medium video" href={medium.link} target="_blank" rel="noopener noreferrer">
+            <img src={medium.src} alt={medium.alt} />
+            <span class="abspielen" aria-hidden="true"></span>
+            <span class="video-hinweis">{seite.videoKnopf}</span>
+          </a>
+        )
+        : <figure class="medium"><img src={medium.src} alt={medium.alt} /></figure>}
+
+      <div class="beitragstext"><Absaetze text={beitrag.text} /></div>
+
+      <aside class="abbinder" aria-labelledby="abbinder-titel">
+        <h2 id="abbinder-titel">{seite.abbinderTitel}</h2>
+        <Absaetze text={seite.abbinder} />
+      </aside>
+
+      <p class="zurueck"><a href="/news">← Alle News</a></p>
     </div>
   </article>
 </Basis>
@@ -40,10 +59,26 @@ const html = Markdoc.renderers.html(Markdoc.transform(node));
   .schmal { max-width: 46rem; }
   .kopf { background: var(--nacht); color: var(--weiss); padding: clamp(2.5rem, 7vw, 4rem) 0 clamp(2rem, 5vw, 3rem); }
   .kopf h1 { font-size: clamp(2.2rem, 1.5rem + 3vw, 3.4rem); margin: 0; }
+  .untertitel { font-style: italic; font-size: clamp(1.15rem, 1rem + 0.6vw, 1.4rem); color: rgb(255 255 255 / 0.85); margin: 0.8rem 0 0; }
   .meta { display: flex; gap: 1rem; color: rgb(255 255 255 / 0.7); font-size: 1rem; }
   .text { padding: clamp(2rem, 5vw, 3rem) 0 clamp(3.5rem, 8vw, 5rem); }
-  .titelbild { margin-bottom: 2rem; }
-  .text :global(h2) { font-size: 1.7rem; margin: 2rem 0 0.6rem; }
-  .text :global(img) { margin: 1.5rem 0; }
+  .medium { display: block; position: relative; margin: 0 0 2rem; text-decoration: none; }
+  .medium img { display: block; width: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
+  .video img { aspect-ratio: 16 / 9; }
+  .abspielen {
+    position: absolute; left: 50%; top: calc(50% - 1rem); width: 4.5rem; height: 4.5rem; translate: -50% -50%;
+    border-radius: 50%; background: rgb(8 19 28 / 0.78); box-shadow: inset 0 0 0 2px var(--weiss);
+  }
+  .abspielen::after {
+    content: ''; position: absolute; left: 54%; top: 50%; translate: -50% -50%;
+    border-style: solid; border-width: 0.8rem 0 0.8rem 1.3rem; border-color: transparent transparent transparent var(--weiss);
+  }
+  .video:hover .abspielen, .video:focus-visible .abspielen { background: var(--navy); }
+  .video-hinweis { display: block; padding: 0.6rem 0.9rem; background: var(--navy); color: var(--weiss); font-size: 0.95rem; }
+  .beitragstext :global(p) { max-width: 46rem; }
+  .abbinder { margin-top: 2.5rem; padding: 1.2rem 1.4rem; border: 1.5px solid var(--navy); background: var(--ring-tief, #e3e7ea); }
+  .abbinder h2 { font-size: 1.2rem; margin: 0 0 0.5rem; }
+  .abbinder :global(p) { font-size: 1rem; margin: 0; }
+  .abbinder :global(p + p) { margin-top: 0.6rem; }
   .zurueck { margin-top: 2.5rem; font-family: var(--schrift-titel); font-weight: 600; }
 </style>

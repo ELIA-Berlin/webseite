@@ -1,27 +1,30 @@
 ---
-/** Liste von News-Beiträgen (Datum, Thema, Titel, Kurztext). */
-import { datumLang } from '../lib/inhalte';
+/** Liste von News-Beiträgen (Datum, Thema, Überschrift, Untertitel, Medium). */
+import { datumLang, newsMedium } from '../lib/inhalte';
 interface Eintrag {
   slug: string;
-  entry: { titel: string; datum: string | null; thema: string | null; kurztext: string; titelbild: string | null; titelbildBeschreibung: string };
+  entry: Parameters<typeof newsMedium>[0];
 }
 interface Props { eintraege: Eintrag[]; themenNamen: Record<string, string> }
 const { eintraege, themenNamen } = Astro.props;
 ---
 <ul class="news">
-  {eintraege.map(({ slug, entry }) => (
+  {eintraege.map(({ slug, entry }) => {
+    const medium = newsMedium(entry);
+    return (
     <li data-thema={entry.thema ?? ''}>
-      {entry.titelbild && <img src={entry.titelbild} alt={entry.titelbildBeschreibung} loading="lazy" />}
+      {medium.src && <img src={medium.src} alt={medium.alt} loading="lazy" />}
       <div>
         <p class="meta">
           {entry.datum && <time datetime={entry.datum}>{datumLang(entry.datum)}</time>}
           {entry.thema && themenNamen[entry.thema] && <span>{themenNamen[entry.thema]}</span>}
         </p>
         <h3><a href={`/news/${slug}`}>{entry.titel}</a></h3>
-        {entry.kurztext && <p>{entry.kurztext}</p>}
+        <p>{entry.untertitel}</p>
       </div>
     </li>
-  ))}
+    );
+  })}
 </ul>
 
 <style>

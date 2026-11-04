@@ -46,6 +46,18 @@ export async function alleNews() {
   return news.sort((a, b) => (b.entry.datum ?? '').localeCompare(a.entry.datum ?? ''));
 }
 
+/** Medium eines Beitrags (Bild oder verlinktes YouTube-Video) in einheitlicher Form */
+export function newsMedium(entry: Awaited<ReturnType<typeof alleNews>>[number]['entry']) {
+  const m = entry.medium;
+  if (m.discriminant === 'video') {
+    const link = sichererLink(m.value.link);
+    // nur YouTube-Adressen zulassen
+    const ok = link && /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)/.test(link) ? link : undefined;
+    return { art: 'video' as const, src: m.value.vorschau, alt: m.value.beschreibung, link: ok };
+  }
+  return { art: 'bild' as const, src: m.value.datei, alt: m.value.beschreibung, link: undefined };
+}
+
 export const datumLang = (iso: string) =>
   new Date(iso).toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
 
