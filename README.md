@@ -2,7 +2,7 @@
 
 Webseite von ELIA, der studentischen Raumfahrtinitiative an der HTW Berlin (Nachwuchsgruppe der DGLR).
 
-**Aktueller Stand:** Startseite, Impressum und Datenschutz sind fertig. Alle Unterseiten sind als Gerüst angelegt, ihre Inhalte werden nach und nach eingetragen. Der Online-Editor folgt.
+**Aktueller Stand:** Startseite, Impressum und Datenschutz sind fertig. Alle Unterseiten sind als Gerüst angelegt, ihre Inhalte werden nach und nach eingetragen. Ein Online-Editor für News liegt unter /admin/ (siehe Weg 3).
 
 ## Aufbau der Seite
 
@@ -81,14 +81,15 @@ Dann im Browser öffnen:
 
 Die Änderung landet in der passenden Datei unter `src/content/` und wird wie gewohnt mit Git committet und gepusht.
 
-### Weg 3: Online-Editor (folgt)
+### Weg 3: Online-Editor für News (Sveltia CMS)
 
-Die Seite liegt auf GitHub Pages. Das ist kostenlos, liefert aber nur fertige Dateien aus und hat keinen Server. Keystatic braucht für die Anmeldung über GitHub einen kleinen Server-Teil und läuft deshalb **online nicht direkt**. Möglichkeiten für später:
+Unter **https://eliaspace.de/admin/** läuft ein Browser-Editor nur für die **News** (Anleitung für Autoren: [`docs/news-anleitung.md`](docs/news-anleitung.md), Einrichtung für den Vorstand: [`docs/einrichtung-online-editor.md`](docs/einrichtung-online-editor.md)). Keystatic selbst läuft online weiterhin **nicht**.
 
-- **Sveltia CMS** (kostenlos, läuft komplett im Browser): Login über GitHub mit einem kleinen kostenlosen Anmelde-Dienst, z. B. als Cloudflare Worker. Die Felder aus `keystatic.config.ts` müssten dafür in die Sveltia-Konfiguration übertragen werden.
-- **Keystatic auf einem Hoster mit Server-Funktionen** (z. B. Cloudflare), dann aber Umzug des Hostings.
-
-Bis dahin ist der Editor absichtlich *nicht* Teil der Live-Seite (siehe `astro.config.mjs`): Im lokalen Modus hat er keine Anmeldung, mit ausgeliefert könnte ihn jeder öffnen. Wer ihn online einrichtet: Speicher auf `{ kind: 'github', repo: 'ELIA-Berlin/webseite' }` umstellen, Zugangsdaten nur als geheime Variablen beim Hoster hinterlegen (niemals ins Repo) und die Content-Security-Policy in `src/layouts/Basis.astro` um `https://api.github.com` und `https://avatars.githubusercontent.com` erweitern.
+- **Anmeldung:** mit einem persönlichen GitHub-Zugriffstoken (fine-grained, nur dieses Repo, nur „Contents: Read and write“). Wer kein Schreibrecht hat, kann nichts speichern. Die Seite `/admin/` zeigt öffentlich nur die Anmeldung. Es gibt keinen Server und keinen Dienst eines Dritten.
+- **Freigabe:** Beiträge werden in den Zweig `redaktion` gespeichert. Die Action „News zur Freigabe“ legt daraus automatisch einen Pull Request nach `main` an. Veröffentlicht wird erst nach dem Zusammenführen durch den Vorstand.
+- **Felder:** `public/admin/config.yml` (Editor) und `keystatic.config.ts` (lokal) beschreiben **dieselben** Felder der Sammlung „news“. Änderungen immer an beiden Stellen machen. Neues Thema: auch die Liste unter `thema` in `config.yml` ergänzen.
+- **Sicherheitsregeln:** Die Seite `/admin/` hat eigene Regeln (CSP) in `src/pages/admin/index.astro` (nur eigene Dateien plus `api.github.com`).
+- **Später möglich:** Wenn viele Personen schreiben sollen, kann eine Anmeldung per GitHub-Konto (OAuth über einen kleinen kostenlosen Cloudflare Worker, „sveltia-cms-auth“) die Token ersetzen.
 
 ### Welches Feld steht wo? (Startseite)
 

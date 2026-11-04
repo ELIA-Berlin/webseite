@@ -46,16 +46,12 @@ export async function alleNews() {
   return news.sort((a, b) => (b.entry.datum ?? '').localeCompare(a.entry.datum ?? ''));
 }
 
-/** Medium eines Beitrags (Bild oder verlinktes YouTube-Video) in einheitlicher Form */
+/** Medium eines Beitrags: Bild, oder bei gesetztem YouTube-Link ein Video mit Vorschaubild */
 export function newsMedium(entry: Awaited<ReturnType<typeof alleNews>>[number]['entry']) {
-  const m = entry.medium;
-  if (m.discriminant === 'video') {
-    const link = sichererLink(m.value.link);
-    // nur YouTube-Adressen zulassen
-    const ok = link && /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)/.test(link) ? link : undefined;
-    return { art: 'video' as const, src: m.value.vorschau, alt: m.value.beschreibung, link: ok };
-  }
-  return { art: 'bild' as const, src: m.value.datei, alt: m.value.beschreibung, link: undefined };
+  const link = sichererLink(entry.videoLink);
+  // nur YouTube-Adressen zulassen
+  const ok = link && /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)/.test(link) ? link : undefined;
+  return { art: ok ? ('video' as const) : ('bild' as const), src: entry.bild, alt: entry.bildBeschreibung, link: ok };
 }
 
 export const datumLang = (iso: string) =>

@@ -205,64 +205,29 @@ export default config({
       format: 'yaml',
       columns: ['titel', 'datum'],
       schema: {
-        // 1. Medium
-        medium: fields.conditional(
-          fields.select({
-            label: '1. Medium',
-            description: 'Ein Bild oder ein Video, das bei YouTube liegt (wird nur verlinkt, nicht eingebettet).',
-            options: [
-              { label: 'Bild', value: 'bild' },
-              { label: 'Video (Link zu YouTube mit Vorschaubild)', value: 'video' },
-            ],
-            defaultValue: 'bild',
-          }),
-          {
-            bild: fields.object(
-              {
-                datei: fields.image({
-                  label: 'Bild',
-                  description: 'Querformat (z. B. 3:2), Metadaten/GPS vorher entfernen, nur eigene Bilder.',
-                  directory: 'public/bilder/news',
-                  publicPath: '/bilder/news/',
-                  validation: { isRequired: true },
-                }),
-                beschreibung: fields.text({
-                  label: 'Bildbeschreibung',
-                  description: 'Ein Satz: Was ist zu sehen? (für Screenreader, Pflicht)',
-                  validation: { length: { min: 5, max: 200 } },
-                }),
-              },
-              { label: 'Bild' },
-            ),
-            video: fields.object(
-              {
-                link: fields.text({
-                  label: 'YouTube-Link',
-                  description: 'Der Link aus der Adressleiste, z. B. https://www.youtube.com/watch?v=… oder https://youtu.be/…',
-                  validation: {
-                    pattern: {
-                      regex: /^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{6,}\S*$/,
-                      message: 'Bitte einen vollständigen YouTube-Link einfügen (https://www.youtube.com/watch?v=… oder https://youtu.be/…).',
-                    },
-                  },
-                }),
-                vorschau: fields.image({
-                  label: 'Vorschaubild',
-                  description: 'Standbild aus dem Video, Querformat 16:9.',
-                  directory: 'public/bilder/news',
-                  publicPath: '/bilder/news/',
-                  validation: { isRequired: true },
-                }),
-                beschreibung: fields.text({
-                  label: 'Bildbeschreibung',
-                  description: 'Ein Satz: Worum geht es im Video? (Pflicht)',
-                  validation: { length: { min: 5, max: 200 } },
-                }),
-              },
-              { label: 'Video' },
-            ),
+        // 1. Medium: immer ein Bild (bei Videos das Vorschaubild); Video-Link nur bei Videos
+        bild: fields.image({
+          label: '1. Bild (bei Videos: das Vorschaubild)',
+          description: 'Querformat 3:2 (bei Videos 16:9), Metadaten/GPS vorher entfernen, nur eigene Bilder.',
+          directory: 'public/bilder/news',
+          publicPath: '/bilder/news/',
+          validation: { isRequired: true },
+        }),
+        bildBeschreibung: fields.text({
+          label: 'Bildbeschreibung',
+          description: 'Ein Satz: Was ist zu sehen? (für Screenreader, Pflicht)',
+          validation: { length: { min: 5, max: 200 } },
+        }),
+        videoLink: fields.text({
+          label: 'YouTube-Link (nur bei Videos, sonst leer lassen)',
+          description: 'Der Link aus der Adressleiste, z. B. https://www.youtube.com/watch?v=… oder https://youtu.be/… Das Video wird nicht eingebettet: Ein Klick auf das Bild öffnet YouTube.',
+          validation: {
+            pattern: {
+              regex: /^$|^https:\/\/(www\.youtube\.com\/watch\?v=|youtu\.be\/)[\w-]{6,}\S*$/,
+              message: 'Bitte einen vollständigen YouTube-Link einfügen (https://www.youtube.com/watch?v=… oder https://youtu.be/…) oder das Feld leer lassen.',
+            },
           },
-        ),
+        }),
 
         // 2. Überschrift (+ Adresse der Seite, wird automatisch erzeugt)
         titel: fields.slug({

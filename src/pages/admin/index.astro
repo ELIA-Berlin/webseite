@@ -1,0 +1,32 @@
+---
+/**
+ * Online-Editor für News (Sveltia CMS), erreichbar unter eliaspace.de/admin/.
+ * Die Seite zeigt nur die Anmeldung. Schreiben kann nur, wer in GitHub Schreibrechte
+ * auf das Repo hat und sich mit seinem eigenen Zugriffstoken anmeldet.
+ * Felder und Regeln: public/admin/config.yml (müssen zu keystatic.config.ts passen).
+ */
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <!--
+      Eigene Sicherheitsregeln für den Editor: nur eigene Dateien plus die GitHub-Schnittstelle.
+    -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://avatars.githubusercontent.com https://*.githubusercontent.com; font-src 'self' data:; connect-src 'self' data: https://api.github.com https://github.com https://www.githubstatus.com; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    />
+    <meta name="referrer" content="no-referrer" />
+    <title>ELIA – News schreiben</title>
+    <link href="/admin/config.yml" type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <script>
+      import { init } from '@sveltia/cms';
+      init();
+    </script>
+  </body>
+</html>

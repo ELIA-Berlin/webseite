@@ -1,0 +1,93 @@
+# Online-Editor für News (Sveltia CMS). Felder und Regeln entsprechen keystatic.config.ts (Sammlung „news“).
+# Änderungen an den Feldern immer an BEIDEN Stellen machen, sonst stimmen die Dateien nicht mehr überein.
+backend:
+  name: github
+  repo: ELIA-Berlin/webseite
+  # Beiträge landen zuerst im Zweig „redaktion“ und werden erst nach Freigabe (Pull Request) veröffentlicht.
+  branch: redaktion
+
+site_url: https://eliaspace.de
+display_url: https://eliaspace.de/news
+
+media_folder: public/bilder/news
+public_folder: /bilder/news
+
+collections:
+  - name: news
+    label: News
+    label_singular: News-Beitrag
+    folder: src/content/news
+    extension: yaml
+    format: yaml
+    create: true
+    delete: true
+    identifier_field: titel
+    slug: '{{slug}}'
+    summary: '{{datum}} · {{titel}}'
+    sortable_fields: [datum, titel]
+    fields:
+      - label: '1. Bild (bei Videos: das Vorschaubild)'
+        name: bild
+        widget: image
+        required: true
+        media_folder: /public/bilder/news
+        public_folder: /bilder/news
+        hint: 'Querformat 3:2 (bei Videos 16:9), Metadaten/GPS vorher entfernen, nur eigene Bilder.'
+      - label: Bildbeschreibung
+        name: bildBeschreibung
+        widget: string
+        required: true
+        minlength: 5
+        maxlength: 200
+        pattern: ['^.{5,200}$', 'Ein Satz mit 5 bis 200 Zeichen.']
+        hint: 'Ein Satz: Was ist zu sehen? (für Screenreader, Pflicht)'
+      - label: 'YouTube-Link (nur bei Videos, sonst leer lassen)'
+        name: videoLink
+        widget: string
+        required: false
+        pattern:
+          - '^$|^https://(www\.youtube\.com/watch\?v=|youtu\.be/)[\w-]{6,}\S*$'
+          - 'Bitte einen vollständigen YouTube-Link einfügen (https://www.youtube.com/watch?v=… oder https://youtu.be/…) oder das Feld leer lassen.'
+        hint: 'Das Video wird nicht eingebettet: Ein Klick auf das Bild öffnet YouTube in einem neuen Tab.'
+      - label: '2. Überschrift'
+        name: titel
+        widget: string
+        required: true
+        minlength: 5
+        maxlength: 90
+        pattern: ['^.{5,90}$', 'Die Überschrift braucht 5 bis 90 Zeichen.']
+      - label: '3. Untertitel'
+        name: untertitel
+        widget: string
+        required: true
+        minlength: 10
+        maxlength: 200
+        pattern: ['^.{10,200}$', 'Ein Satz mit 10 bis 200 Zeichen.']
+        hint: 'Ergänzt die Überschrift und erscheint auch in der Übersicht.'
+      - label: '4. Text'
+        name: text
+        widget: text
+        required: true
+        minlength: 200
+        maxlength: 3500
+        pattern: ['^[\s\S]{200,3500}$', 'Der Text braucht 200 bis 3500 Zeichen.']
+        hint: 'Höchstens 3500 Zeichen. Eine Leerzeile beginnt einen neuen Absatz. Nur Fließtext, keine Formatierung. Der Abbinder „Über ELIA“ kommt automatisch darunter.'
+      - label: Datum der Veröffentlichung
+        name: datum
+        widget: datetime
+        required: true
+        date_format: 'YYYY-MM-DD'
+        time_format: false
+        picker_utc: false
+        default: '{{now}}'
+      - label: Thema (optional)
+        name: thema
+        widget: select
+        required: false
+        options:
+          - { label: Entrepreneurship, value: entrepreneurship }
+          - { label: Rakete, value: rakete }
+          - { label: Space Law, value: space-law }
+          - { label: Rover, value: rover }
+          - { label: UAV & Drohne, value: uav-drohne }
+        hint: 'Wenn gewählt, erscheint der Beitrag auch auf der Themenseite und im Filter.'

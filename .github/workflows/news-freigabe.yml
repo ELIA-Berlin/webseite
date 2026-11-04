@@ -1,0 +1,30 @@
+# Legt automatisch einen Pull Request „Neue News zur Freigabe“ an, sobald im Online-Editor
+# (eliaspace.de/admin) ein Beitrag in den Zweig „redaktion“ gespeichert wurde.
+# Veröffentlicht wird erst, wenn jemand aus dem Vorstand den Pull Request zusammenführt.
+name: News zur Freigabe
+
+on:
+  push:
+    branches: [redaktion]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull Request anlegen, falls noch keiner offen ist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          offen=$(gh pr list --head redaktion --base main --state open --json number --jq length)
+          if [ "$offen" = "0" ]; then
+            gh pr create --head redaktion --base main \
+              --title "Neue News zur Freigabe" \
+              --body "Dieser Pull Request wurde automatisch angelegt, weil im Online-Editor ein News-Beitrag gespeichert wurde. Bitte Beitrag prüfen (Reiter „Files changed“) und mit „Create a merge commit“ zusammenführen. Danach ist er in 1 bis 2 Minuten live."
+          else
+            echo "Es gibt schon einen offenen Pull Request, die neuen Änderungen sind dort enthalten."
+          fi
